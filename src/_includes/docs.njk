@@ -1,0 +1,68 @@
+{# ABOUTME: Docs layout with expandable sidebar navigation. #}
+{# ABOUTME: Used by the spec page for two-column documentation display. #}
+
+{% extends "base.njk" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-8">
+
+    <!-- Mobile menu button -->
+    <button id="sidebar-toggle" class="lg:hidden fixed bottom-6 right-6 z-40 w-12 h-12 bg-[var(--color-accent)] text-white rounded-full shadow-lg flex items-center justify-center" aria-label="Toggle navigation">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h14M3 10h14M3 14h14"/></svg>
+    </button>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/30 z-30 lg:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="hidden lg:block fixed lg:sticky top-16 z-30 lg:z-auto h-[calc(100vh-4rem)] w-64 lg:w-auto bg-white lg:bg-transparent border-r lg:border-r-0 border-[var(--color-border)] overflow-y-auto py-8 px-4 lg:px-0">
+      <nav aria-label="Specification sections">
+        <ul class="list-none m-0 p-0 space-y-1 text-sm">
+          {% for section in spec.nav %}
+          <li>
+            <a href="#{{ section.id }}" class="nav-link flex items-center gap-1.5 py-1.5 px-2 rounded text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] no-underline" data-section="{{ section.id }}">
+              {% if section.children.length > 0 %}
+              <svg class="nav-chevron w-3.5 h-3.5 shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              {% endif %}
+              <span class="{% if section.children.length == 0 %}ml-5{% endif %}">{{ section.text }}</span>
+            </a>
+            {% if section.children.length > 0 %}
+            <ul class="nav-children hidden list-none m-0 pl-5 space-y-0.5">
+              {% for child in section.children %}
+              <li>
+                <a href="#{{ child.id }}" class="nav-link block py-1 px-2 rounded text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg)] no-underline" data-section="{{ child.id }}">{{ child.text }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="min-w-0 py-8 lg:py-10">
+      <article class="prose prose-gray max-w-none
+        prose-headings:font-bold prose-headings:tracking-tight
+        prose-h1:text-3xl prose-h1:mb-4
+        prose-h2:text-xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:pt-8 prose-h2:border-t prose-h2:border-[var(--color-border)]
+        prose-h3:text-base prose-h3:mt-8 prose-h3:mb-3
+        prose-p:text-[var(--color-text-secondary)]
+        prose-strong:text-[var(--color-text-primary)]
+        prose-a:text-[var(--color-accent)] prose-a:no-underline hover:prose-a:underline
+        prose-code:text-sm prose-code:bg-[var(--color-code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-[family-name:var(--font-mono)]
+        prose-pre:bg-[var(--color-code-block-bg)] prose-pre:text-[var(--color-code-block-text)] prose-pre:rounded-lg prose-pre:font-[family-name:var(--font-mono)]
+        prose-table:text-sm
+        prose-th:bg-[var(--color-code-bg)] prose-th:border prose-th:border-[var(--color-border)] prose-th:px-3 prose-th:py-2
+        prose-td:border prose-td:border-[var(--color-border)] prose-td:px-3 prose-td:py-2 prose-td:text-[var(--color-text-secondary)]">
+        {{ content | safe }}
+      </article>
+    </main>
+
+  </div>
+</div>
+
+<script src="{{ '/js/docs.js' | url }}"></script>
+{% endblock %}
