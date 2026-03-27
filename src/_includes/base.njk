@@ -1,0 +1,43 @@
+{# ABOUTME: Base HTML template shared by all pages. #}
+{# ABOUTME: Provides head, sticky nav, content block, and footer. #}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} — Open Portable Entitlement</title>
+  <meta name="description" content="{{ description | default('A portable entitlement layer for gated content. OPE standardizes entitlement verification across platforms, readers, and protocols.') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/css/main.css' | url }}">
+</head>
+<body class="font-[family-name:var(--font-sans)] text-[var(--color-text-primary)] bg-[var(--color-bg)] leading-relaxed">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 bg-white/92 backdrop-blur-md border-b border-[var(--color-border)]">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+      <a href="{{ '/' | url }}" class="font-extrabold text-lg tracking-tight flex items-center gap-2 text-[var(--color-text-primary)] no-underline">
+        <span class="inline-flex items-center justify-center w-8 h-8 bg-[#0f172a] text-white rounded-lg text-xs font-extrabold tracking-widest">OPE</span>
+        Open Portable Entitlement
+      </a>
+      <ul class="flex items-center gap-6 list-none m-0 p-0">
+        <li class="hidden md:block"><a href="{{ '/spec/' | url }}" class="text-[var(--color-text-secondary)] text-sm font-medium hover:text-[var(--color-text-primary)] no-underline">Specification</a></li>
+        <li><a href="https://github.com/shellen/open-portable-entitlement" class="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--color-accent-hover)] no-underline">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer class="py-8 border-t border-[var(--color-border)] text-center">
+    <p class="text-sm text-[var(--color-text-tertiary)]">
+      OPE is a working draft by <a href="https://shellen.com" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">Jason Shellen</a>.
+      Discuss and contribute on <a href="https://github.com/shellen/open-portable-entitlement" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">GitHub</a>.
+    </p>
+  </footer>
+
+</body>
+</html>
