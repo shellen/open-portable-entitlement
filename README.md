@@ -12,7 +12,7 @@ OPE doesn't handle payments — it proves you're allowed in. How you earned acce
 
 ## Read the Spec
 
-- **[Rendered specification](https://feedspec.org/spec/)** — navigable docs with sidebar and section anchors
+- **[Rendered specification](https://feedspec.org/ope/spec/)** — navigable docs with sidebar and section anchors
 - **[Plain text (Markdown)](./OPE-Specification.md)** — the spec source file, readable on GitHub
 
 ## Local Development
