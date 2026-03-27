@@ -21,11 +21,12 @@ export default function (eleventyConfig) {
     },
   });
 
-  // Pass through JS files
+  // Pass through static files
   eleventyConfig.addPassthroughCopy("src/js");
+  eleventyConfig.addPassthroughCopy("src/CNAME");
 
   return {
-    pathPrefix: "/open-portable-entitlement/",
+    pathPrefix: "/",
     dir: {
       input: "src",
       output: "_site",
