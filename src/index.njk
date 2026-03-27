@@ -3,31 +3,36 @@ layout: base.njk
 title: feedspec.org
 ---
 
-<div class="max-w-2xl mx-auto px-6 lg:px-8 pt-20 pb-24">
+<div class="max-w-2xl mx-auto px-6 lg:px-8 pt-16 pb-24">
 
-  <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 mb-6">feedspec.org</h1>
+  <p class="text-sm text-zinc-600 leading-relaxed">Feeds power the open web — RSS, Atom, JSON Feed, AT Protocol — but the infrastructure around them has gaps. feedspec.org is where we publish open specifications to fill them.</p>
 
-  <div class="text-sm text-zinc-600 leading-relaxed space-y-4">
-    <p>Feeds power the open web — RSS, Atom, JSON Feed, AT Protocol — but the infrastructure around them has gaps. feedspec.org is where we publish open specifications to fill them.</p>
+  <p class="text-sm text-zinc-600 leading-relaxed mt-4">These specs extend existing feed formats, not replace them. They build on standards you already use and degrade gracefully — readers that don't support them just see what they always have.</p>
 
-    <p>These specs extend existing feed formats, not replace them. They build on standards you already use (OAuth 2.0, JWT, well-known URIs) and degrade gracefully — readers that don't support them just see what they always have.</p>
+  <div class="mt-12 border-t border-zinc-900/5 pt-8">
+    <h2 class="text-xs font-semibold text-zinc-900 mb-1">Specifications</h2>
+    <p class="text-xs text-zinc-400 mb-6">Open standards for the feed ecosystem.</p>
 
-    <p>This is a project by <a href="https://shellen.com" class="text-emerald-500 hover:text-emerald-600 transition-colors">Jason Shellen</a>. Specs are developed in the open on <a href="https://github.com/shellen/open-portable-entitlement" class="text-emerald-500 hover:text-emerald-600 transition-colors">GitHub</a>.</p>
+    <div class="space-y-3">
+      <a href="{{ '/ope/' | url }}" class="block p-5 rounded-2xl border border-zinc-900/5 hover:border-emerald-400/30 transition-all no-underline group">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <h3 class="text-sm font-semibold text-zinc-900 group-hover:text-emerald-500 transition-colors">Open Portable Entitlement (OPE)</h3>
+              <span class="rounded-full px-2 py-0.5 text-[10px] font-medium bg-emerald-400/10 text-emerald-600 ring-1 ring-inset ring-emerald-400/20">Draft v0.1</span>
+            </div>
+            <p class="text-sm text-zinc-500">Portable subscriptions for gated content. Subscribe once, read anywhere.</p>
+          </div>
+          <svg class="w-4 h-4 text-zinc-300 group-hover:text-emerald-500 mt-1 shrink-0 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </a>
+
+      <!-- Future specs go here as additional cards -->
+    </div>
   </div>
 
-  <div class="mt-16 border-t border-zinc-900/5 pt-10">
-    <h2 class="text-xs font-semibold text-zinc-900 mb-6">Specifications</h2>
-
-    <a href="{{ '/ope/' | url }}" class="block p-5 rounded-2xl border border-zinc-900/5 hover:border-zinc-900/10 transition-colors no-underline group">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-sm font-semibold text-zinc-900 group-hover:text-emerald-500 transition-colors">Open Portable Entitlement (OPE)</h3>
-          <p class="text-sm text-zinc-600 mt-1">A portable entitlement layer for gated content. Subscribe once, read anywhere.</p>
-          <span class="inline-flex items-center mt-3 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-500 ring-1 ring-inset ring-emerald-400/20">Draft v0.1</span>
-        </div>
-        <svg class="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 mt-0.5 shrink-0 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-    </a>
+  <div class="mt-12 border-t border-zinc-900/5 pt-8">
+    <p class="text-xs text-zinc-400">A project by <a href="https://shellen.com" class="text-zinc-500 hover:text-zinc-900 transition-colors">Jason Shellen</a>. All specs are developed in the open on <a href="https://github.com/shellen/open-portable-entitlement" class="text-zinc-500 hover:text-zinc-900 transition-colors">GitHub</a>.</p>
   </div>
 
 </div>

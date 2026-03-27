@@ -18,12 +18,14 @@
   <!-- Nav -->
   <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-zinc-900/5">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-14">
-      <a href="{{ '/' | url }}" class="font-semibold text-sm tracking-tight text-zinc-900 no-underline">
-        feedspec.org
-      </a>
-      <ul class="flex items-center gap-6 list-none m-0 p-0">
-        <li class="hidden md:block"><a href="{{ '/ope/' | url }}" class="text-zinc-600 text-sm hover:text-zinc-900 no-underline transition-colors">OPE</a></li>
-        <li class="hidden md:block"><a href="{{ '/ope/spec/' | url }}" class="text-zinc-600 text-sm hover:text-zinc-900 no-underline transition-colors">Specification</a></li>
+      <div class="flex items-center gap-6">
+        <a href="{{ '/' | url }}" class="font-semibold text-sm tracking-tight text-zinc-900 no-underline">
+          feedspec.org
+        </a>
+        <span class="hidden md:block text-zinc-200">/ </span>
+        <a href="{{ '/' | url }}" class="hidden md:block text-zinc-500 text-sm hover:text-zinc-900 no-underline transition-colors">Docs</a>
+      </div>
+      <ul class="flex items-center gap-5 list-none m-0 p-0">
         <li><a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white hover:bg-zinc-700 no-underline transition-colors">GitHub</a></li>
       </ul>
     </div>
