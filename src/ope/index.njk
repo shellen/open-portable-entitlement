@@ -4,52 +4,52 @@ title: OPE
 ---
 
 <!-- Hero -->
-<section class="bg-[#0f172a] text-[#f8fafc] py-20 md:py-24 relative overflow-hidden">
-  <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37, 99, 235, 0.12), transparent), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(37, 99, 235, 0.06), transparent)"></div>
-  <div class="max-w-6xl mx-auto px-6 relative">
+<section class="relative overflow-hidden bg-zinc-900 py-20 sm:py-28">
+  <div class="absolute inset-0 pointer-events-none opacity-30" style="background: radial-gradient(ellipse 60% 50% at 50% -10%, #36b49f, transparent), radial-gradient(ellipse 40% 40% at 80% 100%, #DBFF75, transparent)"></div>
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
     <div class="max-w-2xl">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/15 text-blue-300 rounded-full text-xs font-semibold tracking-wide mb-6">Draft Specification v0.1</div>
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter mb-6">Portable subscriptions for the open web</h1>
-      <p class="text-lg text-[#94a3b8] leading-relaxed mb-8 max-w-xl">OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, and any platform. Subscribe once, read anywhere.</p>
-      <div class="flex flex-wrap gap-3">
-        <a href="{{ '/ope/spec/' | url }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white rounded-lg font-semibold hover:bg-[var(--color-accent-hover)] no-underline">Read the Spec</a>
-        <a href="https://github.com/shellen/open-portable-entitlement" class="inline-flex items-center gap-2 px-6 py-3 border border-[#94a3b833] text-[#94a3b8] rounded-lg font-semibold hover:text-[#f8fafc] hover:border-[#94a3b880] no-underline">View on GitHub</a>
+      <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft Specification v0.1</span>
+      <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Portable subscriptions for the open web</h1>
+      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, and any platform. Subscribe once, read anywhere.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
+        <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Principles -->
-<section class="bg-white border-y border-[var(--color-border)] py-16">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-[var(--color-accent-light)] text-[var(--color-accent)] rounded-xl mb-4">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+<section class="border-b border-zinc-900/5 py-16">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18.3s6.7-3.3 6.7-8.3V4.2L10 1.7 3.3 4.2V10c0 5 6.7 8.3 6.7 8.3z"/></svg>
         </div>
-        <h3 class="font-bold mb-2">Entitlement, not payments</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">OPE proves you're allowed in. Payment processors handle money. Clean separation.</p>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement, not payments</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">OPE proves you're allowed in. Payment processors handle money. Clean separation.</p>
       </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-[var(--color-accent-light)] text-[var(--color-accent)] rounded-xl mb-4">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M13 18V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14"/></svg>
         </div>
-        <h3 class="font-bold mb-2">Truly portable</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">Your subscription works in any OPE-compatible reader. No platform lock-in.</p>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Truly portable</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Your subscription works in any OPE-compatible reader. No platform lock-in.</p>
       </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-[var(--color-accent-light)] text-[var(--color-accent)] rounded-xl mb-4">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.3 9.2a7.5 7.5 0 0 1 7.5 7.5"/><path d="M3.3 3.3a13.3 13.3 0 0 1 13.3 13.3"/><circle cx="4.2" cy="15.8" r=".8"/></svg>
         </div>
-        <h3 class="font-bold mb-2">Works with any feed</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">RSS, Atom, JSON Feed, AT Protocol. OPE extends what you already use.</p>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Works with any feed</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">RSS, Atom, JSON Feed, AT Protocol. OPE extends what you already use.</p>
       </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-[var(--color-accent-light)] text-[var(--color-accent)] rounded-xl mb-4">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.2 17.5v-1.7a3.3 3.3 0 0 0-3.3-3.3H4.2a3.3 3.3 0 0 0-3.3 3.3v1.7"/><circle cx="7.5" cy="5.8" r="3.3"/><path d="M19.2 17.5v-1.7a3.3 3.3 0 0 0-2.5-3.2"/><path d="M13.3 2.6a3.3 3.3 0 0 1 0 6.5"/></svg>
         </div>
-        <h3 class="font-bold mb-2">Publisher-controlled</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">Publishers issue grants and control access. Their content, their rules.</p>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Publisher-controlled</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Publishers issue grants and control access. Their content, their rules.</p>
       </div>
     </div>
   </div>
@@ -57,115 +57,95 @@ title: OPE
 
 <!-- Design Philosophy -->
 <section class="py-20" id="how-it-works">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-xl mx-auto mb-14">
-      <span class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-3 block">Design Philosophy</span>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">Four layers, cleanly separated</h2>
-      <p class="text-[var(--color-text-secondary)]">OPE occupies the space between content distribution and payment processing. Each concern stays independent.</p>
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-12">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">Design Philosophy</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Four layers, cleanly separated</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE occupies the space between content distribution and payment processing. Each concern stays independent.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-6 border border-[var(--color-border)] rounded-xl bg-[var(--color-bg)]">
-        <div class="text-xs font-bold uppercase tracking-widest text-[var(--color-text-tertiary)] mb-2">Layer 1</div>
-        <h3 class="font-bold mb-2">Content</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">Articles, media, and resources. Created and hosted by the publisher.</p>
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 1</div>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Content</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Articles, media, and resources. Created and hosted by the publisher.</p>
       </div>
-      <div class="p-6 border border-[var(--color-border)] rounded-xl bg-[var(--color-bg)]">
-        <div class="text-xs font-bold uppercase tracking-widest text-[var(--color-text-tertiary)] mb-2">Layer 2</div>
-        <h3 class="font-bold mb-2">Distribution</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">Feed formats (RSS, Atom, JSON Feed, ATProto) that catalog and deliver previews.</p>
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 2</div>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Distribution</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Feed formats (RSS, Atom, JSON Feed, ATProto) that catalog and deliver previews.</p>
       </div>
-      <div class="p-6 border border-[var(--color-accent)] rounded-xl bg-[var(--color-accent-light)]">
-        <div class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-2">Layer 3 — OPE</div>
-        <h3 class="font-bold mb-2">Entitlement</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">Verification that a reader has the right to access content. Portable across apps.</p>
+      <div class="p-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/5">
+        <div class="text-xs font-medium text-emerald-500 mb-2">Layer 3 — OPE</div>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Verification that a reader has the right to access content. Portable across apps.</p>
       </div>
-      <div class="p-6 border border-[var(--color-border)] rounded-xl bg-[var(--color-bg)]">
-        <div class="text-xs font-bold uppercase tracking-widest text-[var(--color-text-tertiary)] mb-2">Layer 4</div>
-        <h3 class="font-bold mb-2">Payments</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">How money changes hands. Stripe, x402, Lightning, or anything else. Out of scope.</p>
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 4</div>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Payments</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">How money changes hands. Stripe, x402, Lightning, or anything else. Out of scope.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Flow -->
-<section class="py-20 bg-[var(--color-bg)]">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-xl mx-auto mb-14">
-      <span class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-3 block">The Flow</span>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">From feed to full content</h2>
-      <p class="text-[var(--color-text-secondary)]">Five steps from discovering an article in your reader to reading the full thing.</p>
+<section class="py-20 border-t border-zinc-900/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-12">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">The Flow</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">From feed to full content</p>
+      <p class="text-sm text-zinc-600 mt-3">Five steps from discovering an article in your reader to reading the full thing.</p>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-4">
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-[var(--color-border)] rounded-full font-bold text-[var(--color-accent)] bg-white mb-4">1</div>
-        <h4 class="font-bold mb-1 text-sm">Feed</h4>
-        <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">Reader fetches a feed and finds OPE-gated items with preview content.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+      {% for step in [{n:"1",t:"Feed",d:"Reader fetches a feed and finds OPE-gated items with preview content."},{n:"2",t:"Discovery",d:"Reader fetches /.well-known/ope to learn the publisher's capabilities."},{n:"3",t:"Authenticate",d:"Reader initiates OAuth 2.0 with PKCE. User logs in with the publisher."},{n:"4",t:"Grant",d:"Publisher issues a signed grant token proving entitlement."},{n:"5",t:"Read",d:"Reader presents the token and retrieves full content. Done."}] %}
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-500 mb-4">{{ step.n }}</div>
+        <h4 class="text-sm font-semibold text-zinc-900 mb-1">{{ step.t }}</h4>
+        <p class="text-xs text-zinc-500 leading-relaxed">{{ step.d }}</p>
       </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-[var(--color-border)] rounded-full font-bold text-[var(--color-accent)] bg-white mb-4">2</div>
-        <h4 class="font-bold mb-1 text-sm">Discovery</h4>
-        <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">Reader fetches <code class="text-xs bg-[var(--color-code-bg)] px-1 py-0.5 rounded">/.well-known/ope</code> to learn the publisher's capabilities.</p>
-      </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-[var(--color-border)] rounded-full font-bold text-[var(--color-accent)] bg-white mb-4">3</div>
-        <h4 class="font-bold mb-1 text-sm">Authenticate</h4>
-        <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">Reader initiates OAuth 2.0 with PKCE. User logs in with the publisher.</p>
-      </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-[var(--color-border)] rounded-full font-bold text-[var(--color-accent)] bg-white mb-4">4</div>
-        <h4 class="font-bold mb-1 text-sm">Grant</h4>
-        <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">Publisher issues a signed grant token proving entitlement.</p>
-      </div>
-      <div class="text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-[var(--color-border)] rounded-full font-bold text-[var(--color-accent)] bg-white mb-4">5</div>
-        <h4 class="font-bold mb-1 text-sm">Read</h4>
-        <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">Reader presents the token and retrieves full content. Done.</p>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>
 
 <!-- Code Example -->
-<section class="bg-white border-y border-[var(--color-border)] py-20">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+<section class="py-20 border-t border-zinc-900/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-start">
       <div>
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">Simple discovery, powerful access</h2>
-        <p class="text-[var(--color-text-secondary)] mb-6">Publishers expose a single well-known endpoint. Reader apps handle the rest — OAuth, token management, content retrieval — all standardized.</p>
-        <ul class="space-y-3 list-none p-0">
-          <li class="flex gap-3 text-sm text-[var(--color-text-secondary)]"><strong class="text-[var(--color-text-primary)] whitespace-nowrap">Discovery:</strong> JSON manifest at a well-known URL</li>
-          <li class="flex gap-3 text-sm text-[var(--color-text-secondary)]"><strong class="text-[var(--color-text-primary)] whitespace-nowrap">Auth:</strong> Standard OAuth 2.0 with PKCE, PAR, DPoP</li>
-          <li class="flex gap-3 text-sm text-[var(--color-text-secondary)]"><strong class="text-[var(--color-text-primary)] whitespace-nowrap">Tokens:</strong> JWT, PASETO, or Macaroons — your choice</li>
-          <li class="flex gap-3 text-sm text-[var(--color-text-secondary)]"><strong class="text-[var(--color-text-primary)] whitespace-nowrap">Content:</strong> Single item or batch retrieval APIs</li>
-          <li class="flex gap-3 text-sm text-[var(--color-text-secondary)]"><strong class="text-[var(--color-text-primary)] whitespace-nowrap">Feeds:</strong> Non-breaking extensions to existing formats</li>
-        </ul>
+        <h2 class="text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Simple discovery, powerful access</h2>
+        <p class="text-sm text-zinc-600 mb-6 leading-relaxed">Publishers expose a single well-known endpoint. Reader apps handle the rest — OAuth, token management, content retrieval — all standardized.</p>
+        <dl class="space-y-3">
+          {% for item in [{k:"Discovery",v:"JSON manifest at a well-known URL"},{k:"Auth",v:"Standard OAuth 2.0 with PKCE, PAR, DPoP"},{k:"Tokens",v:"JWT, PASETO, or Macaroons — your choice"},{k:"Content",v:"Single item or batch retrieval APIs"},{k:"Feeds",v:"Non-breaking extensions to existing formats"}] %}
+          <div class="flex gap-3 text-sm">
+            <dt class="font-semibold text-zinc-900 whitespace-nowrap">{{ item.k }}</dt>
+            <dd class="text-zinc-600">{{ item.v }}</dd>
+          </div>
+          {% endfor %}
+        </dl>
       </div>
-      <div class="bg-[#1e293b] text-[#e2e8f0] rounded-xl overflow-hidden font-[family-name:var(--font-mono)] text-xs leading-relaxed">
-        <div class="flex items-center gap-2 px-4 py-3 bg-black/20 border-b border-white/5">
-          <span class="w-2 h-2 rounded-full bg-white/15"></span>
-          <span class="w-2 h-2 rounded-full bg-white/15"></span>
-          <span class="w-2 h-2 rounded-full bg-white/15"></span>
-          <span class="ml-2 text-white/40 text-xs">/.well-known/ope</span>
+      <div class="mt-8 lg:mt-0 bg-zinc-900 rounded-2xl overflow-hidden font-[family-name:var(--font-mono)] text-xs">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+          <span class="w-2 h-2 rounded-full bg-white/10"></span>
+          <span class="w-2 h-2 rounded-full bg-white/10"></span>
+          <span class="w-2 h-2 rounded-full bg-white/10"></span>
+          <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">/.well-known/ope</span>
         </div>
-        <pre class="p-5 overflow-x-auto m-0">{
-  <span class="text-blue-300">"version"</span>: <span class="text-green-300">"0.1"</span>,
-  <span class="text-blue-300">"oauth_server"</span>: <span class="text-green-300">"https://example.com/.well-known/oauth-authorization-server"</span>,
-  <span class="text-blue-300">"entitlement"</span>: {
-    <span class="text-blue-300">"grant_url"</span>: <span class="text-green-300">"https://example.com/api/entitlement/grant"</span>,
-    <span class="text-blue-300">"refresh_url"</span>: <span class="text-green-300">"https://example.com/api/entitlement/refresh"</span>,
-    <span class="text-blue-300">"token_format"</span>: <span class="text-green-300">"jwt"</span>,
-    <span class="text-blue-300">"token_mode"</span>: <span class="text-green-300">"portable"</span>,
-    <span class="text-blue-300">"default_ttl_seconds"</span>: <span class="text-yellow-300">3600</span>
+        <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed">{
+  <span class="text-emerald-400">"version"</span>: <span class="text-amber-300">"0.1"</span>,
+  <span class="text-emerald-400">"oauth_server"</span>: <span class="text-amber-300">"https://example.com/.well-known/oauth-authorization-server"</span>,
+  <span class="text-emerald-400">"entitlement"</span>: {
+    <span class="text-emerald-400">"grant_url"</span>: <span class="text-amber-300">"https://example.com/api/entitlement/grant"</span>,
+    <span class="text-emerald-400">"token_format"</span>: <span class="text-amber-300">"jwt"</span>,
+    <span class="text-emerald-400">"token_mode"</span>: <span class="text-amber-300">"portable"</span>,
+    <span class="text-emerald-400">"default_ttl_seconds"</span>: <span class="text-sky-300">3600</span>
   },
-  <span class="text-blue-300">"content"</span>: {
-    <span class="text-blue-300">"endpoint_template"</span>: <span class="text-green-300">"https://example.com/api/content/{id}"</span>,
-    <span class="text-blue-300">"batch_endpoint"</span>: <span class="text-green-300">"https://example.com/api/content/batch"</span>,
-    <span class="text-blue-300">"formats_available"</span>: [<span class="text-green-300">"html"</span>, <span class="text-green-300">"markdown"</span>]
+  <span class="text-emerald-400">"content"</span>: {
+    <span class="text-emerald-400">"endpoint_template"</span>: <span class="text-amber-300">"https://example.com/api/content/{id}"</span>,
+    <span class="text-emerald-400">"batch_endpoint"</span>: <span class="text-amber-300">"https://example.com/api/content/batch"</span>,
+    <span class="text-emerald-400">"formats_available"</span>: [<span class="text-amber-300">"html"</span>, <span class="text-amber-300">"markdown"</span>]
   },
-  <span class="text-blue-300">"grants_supported"</span>: [
-    <span class="text-green-300">"subscription"</span>, <span class="text-green-300">"gift"</span>, <span class="text-green-300">"per_item"</span>, <span class="text-green-300">"broker"</span>
-  ]
+  <span class="text-emerald-400">"grants_supported"</span>: [<span class="text-amber-300">"subscription"</span>, <span class="text-amber-300">"gift"</span>, <span class="text-amber-300">"per_item"</span>, <span class="text-amber-300">"broker"</span>]
 }</pre>
       </div>
     </div>
@@ -173,120 +153,71 @@ title: OPE
 </section>
 
 <!-- Audience -->
-<section class="py-20" id="for-whom">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-xl mx-auto mb-14">
-      <span class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-3 block">Who It's For</span>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">Built for the entire ecosystem</h2>
-      <p class="text-[var(--color-text-secondary)]">OPE is designed so publishers, reader apps, and intermediaries each get exactly what they need.</p>
+<section class="py-20 border-t border-zinc-900/5" id="for-whom">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-12">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">Who It's For</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Built for the entire ecosystem</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white border border-[var(--color-border)] rounded-xl p-8">
-        <h3 class="font-bold text-lg mb-3">Publishers</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] mb-5">Keep full control of your content and subscriptions while making them work everywhere.</p>
-        <ul class="space-y-2 list-none p-0">
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Add OPE metadata to your existing feeds</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Expose a single discovery endpoint</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Use the reference gateway or build your own</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Support any payment processor you want</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">WordPress, Ghost, Substack migration paths</li>
+      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack migration paths"]},{t:"Reader Apps",d:"Give your users seamless access to gated content from any OPE-enabled publisher.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews with content metadata","Batch retrieval for fast offline sync","Unified subscription view across publishers"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
+      <div class="rounded-2xl border border-zinc-900/5 p-6">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-2">{{ card.t }}</h3>
+        <p class="text-sm text-zinc-600 mb-4">{{ card.d }}</p>
+        <ul class="space-y-1.5 list-none p-0">
+          {% for item in card.items %}
+          <li class="text-sm text-zinc-500 flex gap-2"><span class="text-emerald-500 mt-1.5 shrink-0">·</span> {{ item }}</li>
+          {% endfor %}
         </ul>
       </div>
-      <div class="bg-white border border-[var(--color-border)] rounded-xl p-8">
-        <h3 class="font-bold text-lg mb-3">Reader Apps</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] mb-5">Give your users seamless access to gated content from any OPE-enabled publisher.</p>
-        <ul class="space-y-2 list-none p-0">
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Detect OPE extensions in any feed format</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Manage per-publisher OAuth sessions</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Show rich previews with content metadata</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Batch retrieval for fast offline sync</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Unified subscription view across publishers</li>
-        </ul>
-      </div>
-      <div class="bg-white border border-[var(--color-border)] rounded-xl p-8">
-        <h3 class="font-bold text-lg mb-3">Brokers</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] mb-5">Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.</p>
-        <ul class="space-y-2 list-none p-0">
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Aggregate entitlements across publishers</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Issue broker grant tokens with Macaroons</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Capability attenuation for scoped access</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Single sign-on for multi-publisher access</li>
-          <li class="text-sm text-[var(--color-text-secondary)] pl-4 relative before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-accent)]">Enable new business models</li>
-        </ul>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>
 
 <!-- Grant Types -->
-<section class="py-20 bg-[var(--color-bg)]">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-xl mx-auto mb-14">
-      <span class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-3 block">Flexible Access</span>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">Eight grant types, one protocol</h2>
-      <p class="text-[var(--color-text-secondary)]">OPE doesn't prescribe how entitlements are earned — it standardizes how they're proven.</p>
+<section class="py-20 border-t border-zinc-900/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-12">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">Flexible Access</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Eight grant types, one protocol</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE doesn't prescribe how entitlements are earned — it standardizes how they're proven.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Subscription</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Recurring access to all content</p>
+      {% for g in [{t:"Subscription",d:"Recurring access to all content"},{t:"Per-item",d:"Pay per article, scoped to content IDs"},{t:"Gift",d:"Shareable unlock links, time-limited"},{t:"Institutional",d:"Libraries, universities, organizations"},{t:"Metered",d:"Free article limits with meter tracking"},{t:"Locale-free",d:"Regional free access by user locale"},{t:"Patronage",d:"Voluntary support, optional full access"},{t:"Broker",d:"Multi-publisher bundles via brokers"}] %}
+      <div class="p-4 rounded-xl border border-zinc-900/5 hover:border-emerald-400/30 transition-colors">
+        <h4 class="text-sm font-semibold text-zinc-900 mb-0.5">{{ g.t }}</h4>
+        <p class="text-xs text-zinc-500">{{ g.d }}</p>
       </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Per-item</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Pay per article, scoped to content IDs</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Gift</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Shareable unlock links, time-limited</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Institutional</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Libraries, universities, organizations</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Metered</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Free article limits with meter tracking</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Locale-free</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Regional free access by user locale</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Patronage</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Voluntary support, optional full access</p>
-      </div>
-      <div class="p-5 bg-white border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors">
-        <h4 class="font-bold text-sm mb-1">Broker</h4>
-        <p class="text-xs text-[var(--color-text-secondary)]">Multi-publisher bundles via brokers</p>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>
 
 <!-- Compatibility -->
-<section class="bg-white border-y border-[var(--color-border)] py-20">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-xl mx-auto mb-14">
-      <span class="text-xs font-bold uppercase tracking-widest text-[var(--color-accent)] mb-3 block">Compatibility</span>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">Works with what you already use</h2>
-      <p class="text-[var(--color-text-secondary)]">OPE is a purely additive extension. Readers without OPE support simply see previews as usual.</p>
+<section class="py-20 border-t border-zinc-900/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-10">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">Compatibility</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Works with what you already use</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE is a purely additive extension. Readers without OPE support simply see previews as usual.</p>
     </div>
-    <div class="flex flex-wrap justify-center gap-3">
+    <div class="flex flex-wrap gap-2">
       {% for tag in ["RSS 2.0", "Atom", "JSON Feed", "AT Protocol", "OAuth 2.0", "JWT", "PASETO", "Macaroons", "DPoP", "PAR / RAR", "x402", "Stripe", "WordPress", "Ghost"] %}
-      <span class="inline-flex items-center px-4 py-2 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-full text-sm font-medium text-[var(--color-text-secondary)]">{{ tag }}</span>
+      <span class="rounded-full px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-900/10">{{ tag }}</span>
       {% endfor %}
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="bg-[#0f172a] text-[#f8fafc] text-center py-20">
-  <div class="max-w-6xl mx-auto px-6">
-    <h2 class="text-2xl md:text-3xl font-bold mb-4">Start building with OPE</h2>
-    <p class="text-[#94a3b8] text-lg mb-8 max-w-lg mx-auto">The specification is open and ready for implementers. Read it, build on it, and help shape portable entitlements for the open web.</p>
+<section class="bg-zinc-900 py-20">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+    <h2 class="text-2xl font-semibold tracking-tight text-white mb-3">Start building with OPE</h2>
+    <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">The specification is open and ready for implementers. Read it, build on it, and help shape portable entitlements for the open web.</p>
     <div class="flex flex-wrap justify-center gap-3">
-      <a href="{{ '/ope/spec/' | url }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white rounded-lg font-semibold hover:bg-[var(--color-accent-hover)] no-underline">Read the Specification</a>
-      <a href="https://github.com/shellen/open-portable-entitlement" class="inline-flex items-center gap-2 px-6 py-3 border border-[#94a3b833] text-[#94a3b8] rounded-lg font-semibold hover:text-[#f8fafc] hover:border-[#94a3b880] no-underline">Contribute on GitHub</a>
+      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Specification</a>
+      <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Contribute on GitHub</a>
     </div>
   </div>
 </section>

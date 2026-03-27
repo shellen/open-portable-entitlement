@@ -43,18 +43,16 @@
     // Remove all active states
     document.querySelectorAll(".nav-link").forEach(function (link) {
       link.classList.remove(
-        "text-[var(--color-accent)]",
-        "font-semibold",
-        "bg-[var(--color-accent-light)]"
+        "text-emerald-500",
+        "font-semibold"
       );
     });
     // Set active
     var active = document.querySelector('.nav-link[data-section="' + id + '"]');
     if (!active) return;
     active.classList.add(
-      "text-[var(--color-accent)]",
-      "font-semibold",
-      "bg-[var(--color-accent-light)]"
+      "text-emerald-500",
+      "font-semibold"
     );
     // Expand parent if it's a child link
     var parentUl = active.closest(".nav-children");

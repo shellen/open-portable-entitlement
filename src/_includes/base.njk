@@ -13,18 +13,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/css/main.css' | url }}">
 </head>
-<body class="font-[family-name:var(--font-sans)] text-[var(--color-text-primary)] bg-[var(--color-bg)] leading-relaxed">
+<body class="font-[family-name:var(--font-sans)] text-zinc-900 bg-white antialiased">
 
   <!-- Nav -->
-  <nav class="sticky top-0 z-50 bg-white/92 backdrop-blur-md border-b border-[var(--color-border)]">
-    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-      <a href="{{ '/' | url }}" class="font-extrabold text-lg tracking-tight flex items-center gap-2 text-[var(--color-text-primary)] no-underline">
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-zinc-900/5">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-14">
+      <a href="{{ '/' | url }}" class="font-semibold text-sm tracking-tight text-zinc-900 no-underline">
         feedspec.org
       </a>
       <ul class="flex items-center gap-6 list-none m-0 p-0">
-        <li class="hidden md:block"><a href="{{ '/ope/' | url }}" class="text-[var(--color-text-secondary)] text-sm font-medium hover:text-[var(--color-text-primary)] no-underline">OPE</a></li>
-        <li class="hidden md:block"><a href="{{ '/ope/spec/' | url }}" class="text-[var(--color-text-secondary)] text-sm font-medium hover:text-[var(--color-text-primary)] no-underline">Specification</a></li>
-        <li><a href="https://github.com/shellen/open-portable-entitlement" class="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--color-accent-hover)] no-underline">GitHub</a></li>
+        <li class="hidden md:block"><a href="{{ '/ope/' | url }}" class="text-zinc-600 text-sm hover:text-zinc-900 no-underline transition-colors">OPE</a></li>
+        <li class="hidden md:block"><a href="{{ '/ope/spec/' | url }}" class="text-zinc-600 text-sm hover:text-zinc-900 no-underline transition-colors">Specification</a></li>
+        <li><a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white hover:bg-zinc-700 no-underline transition-colors">GitHub</a></li>
       </ul>
     </div>
   </nav>
@@ -32,10 +32,10 @@
   {% block content %}{% endblock %}
 
   <!-- Footer -->
-  <footer class="py-8 border-t border-[var(--color-border)] text-center">
-    <p class="text-sm text-[var(--color-text-tertiary)]">
-      feedspec.org is a project by <a href="https://shellen.com" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">Jason Shellen</a>.
-      Contribute on <a href="https://github.com/shellen/open-portable-entitlement" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">GitHub</a>.
+  <footer class="py-10 border-t border-zinc-900/5 text-center">
+    <p class="text-xs text-zinc-400">
+      feedspec.org is a project by <a href="https://shellen.com" class="text-zinc-500 hover:text-zinc-900 transition-colors">Jason Shellen</a>.
+      Contribute on <a href="https://github.com/shellen/open-portable-entitlement" class="text-zinc-500 hover:text-zinc-900 transition-colors">GitHub</a>.
     </p>
   </footer>
 
