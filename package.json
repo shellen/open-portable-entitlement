@@ -1,0 +1,32 @@
+{
+  "name": "open-portable-entitlement",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "npx @11ty/eleventy --serve",
+    "build": "npx @11ty/eleventy",
+    "test": "npx playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shellen/open-portable-entitlement.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shellen/open-portable-entitlement/issues"
+  },
+  "homepage": "https://github.com/shellen/open-portable-entitlement#readme",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.5",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tailwindcss/typography": "^0.5.19",
+    "marked": "^14.1.4",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2"
+  }
+}

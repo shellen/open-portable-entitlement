@@ -1,0 +1,81 @@
+/* ABOUTME: Tailwind CSS v4 entry point for the OPE site. */
+/* ABOUTME: Contains theme tokens — zinc + emerald palette inspired by Protocol. */
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@source "../**/*.{njk,js}";
+
+@theme {
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+  --color-accent-light: #ecfdf5;
+  --color-surface: #ffffff;
+  --color-bg: #fafafa;
+  --color-text-primary: #18181b;
+  --color-text-secondary: #52525b;
+  --color-text-tertiary: #a1a1aa;
+  --color-border: rgba(24, 24, 27, 0.05);
+  --color-code-bg: #f4f4f5;
+  --color-code-block-bg: #18181b;
+  --color-code-block-text: #e4e4e7;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Fira Code", monospace;
+}
+
+.anchor-link {
+  opacity: 0;
+  margin-left: 0.5rem;
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+
+.group:hover .anchor-link {
+  opacity: 1;
+}
+
+.anchor-link:hover {
+  color: var(--color-accent);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+/* Code blocks — Protocol-style dark panels */
+article pre {
+  background: #1c1f26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: #d4d4d8;
+}
+
+article pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  font-weight: normal !important;
+  display: block;
+}
+
+article pre code .highlight-line {
+  background: transparent !important;
+}
+
+/* Inline code */
+article :not(pre) > code {
+  background: #f4f4f5;
+  color: #27272a;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125em;
+  font-weight: 500;
+}
