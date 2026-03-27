@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPE &mdash; Open Portable Entitlement</title>
+  <meta name="description" content="A portable entitlement layer for gated content. OPE standardizes entitlement verification across platforms, readers, and protocols.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ─── Nav ──────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-mark">OPE</span>
+        Open Portable Entitlement
+      </a>
+      <ul class="nav__links">
+        <li><a href="#how-it-works" class="hide-mobile">How It Works</a></li>
+        <li><a href="#for-whom" class="hide-mobile">Who It's For</a></li>
+        <li><a href="spec/">Specification</a></li>
+        <li><a href="https://github.com/shellen/open-portable-entitlement" class="btn btn--sm btn--primary">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container hero__content">
+      <div class="hero__badge">Draft Specification v0.1</div>
+      <h1 class="hero__title">Portable subscriptions for the open web</h1>
+      <p class="hero__subtitle">
+        OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, and any platform. Subscribe once, read anywhere.
+      </p>
+      <div class="hero__actions">
+        <a href="spec/" class="btn btn--primary">Read the Spec</a>
+        <a href="https://github.com/shellen/open-portable-entitlement" class="btn btn--ghost">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Principles ───────────────────────────────── -->
+  <section class="principles">
+    <div class="container">
+      <div class="principles__grid">
+        <div class="principle">
+          <div class="principle__icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Entitlement, not payments</h3>
+          <p>OPE proves you're allowed in. Payment processors handle money. Clean separation.</p>
+        </div>
+        <div class="principle">
+          <div class="principle__icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <h3>Truly portable</h3>
+          <p>Your subscription works in any OPE-compatible reader. No platform lock-in.</p>
+        </div>
+        <div class="principle">
+          <div class="principle__icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          </div>
+          <h3>Works with any feed</h3>
+          <p>RSS, Atom, JSON Feed, AT Protocol. OPE extends what you already use.</p>
+        </div>
+        <div class="principle">
+          <div class="principle__icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Publisher-controlled</h3>
+          <p>Publishers issue grants and control access. Their content, their rules.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Separation of Concerns ───────────────────── -->
+  <section class="concerns" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__label">Design Philosophy</span>
+        <h2>Four layers, cleanly separated</h2>
+        <p>OPE occupies the space between content distribution and payment processing. Each concern stays independent.</p>
+      </div>
+      <div class="concerns__grid">
+        <div class="concern-card">
+          <div class="concern-card__label">Layer 1</div>
+          <h3>Content</h3>
+          <p>Articles, media, and resources. Created and hosted by the publisher.</p>
+        </div>
+        <div class="concern-card">
+          <div class="concern-card__label">Layer 2</div>
+          <h3>Distribution</h3>
+          <p>Feed formats (RSS, Atom, JSON Feed, ATProto) that catalog and deliver previews.</p>
+        </div>
+        <div class="concern-card concern-card--highlight">
+          <div class="concern-card__label">Layer 3 &mdash; OPE</div>
+          <h3>Entitlement</h3>
+          <p>Verification that a reader has the right to access content. Portable across apps.</p>
+        </div>
+        <div class="concern-card">
+          <div class="concern-card__label">Layer 4</div>
+          <h3>Payments</h3>
+          <p>How money changes hands. Stripe, x402, Lightning, or anything else. Out of scope.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Flow ─────────────────────────────────────── -->
+  <section class="flow">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__label">The Flow</span>
+        <h2>From feed to full content</h2>
+        <p>Five steps from discovering an article in your reader to reading the full thing.</p>
+      </div>
+      <div class="flow__steps">
+        <div class="flow__step">
+          <div class="flow__number">1</div>
+          <h4>Feed</h4>
+          <p>Reader fetches a feed and finds OPE-gated items with preview content.</p>
+        </div>
+        <div class="flow__step">
+          <div class="flow__number">2</div>
+          <h4>Discovery</h4>
+          <p>Reader fetches <code>/.well-known/ope</code> to learn the publisher's capabilities.</p>
+        </div>
+        <div class="flow__step">
+          <div class="flow__number">3</div>
+          <h4>Authenticate</h4>
+          <p>Reader initiates OAuth 2.0 with PKCE. User logs in with the publisher.</p>
+        </div>
+        <div class="flow__step">
+          <div class="flow__number">4</div>
+          <h4>Grant</h4>
+          <p>Publisher issues a signed grant token proving entitlement.</p>
+        </div>
+        <div class="flow__step">
+          <div class="flow__number">5</div>
+          <h4>Read</h4>
+          <p>Reader presents the token and retrieves full content. Done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Code Example ─────────────────────────────── -->
+  <section class="example">
+    <div class="container">
+      <div class="example__layout">
+        <div class="example__text">
+          <h2>Simple discovery, powerful access</h2>
+          <p>Publishers expose a single well-known endpoint. Reader apps handle the rest — OAuth, token management, content retrieval — all standardized.</p>
+          <ul class="steps">
+            <li><strong>Discovery:</strong> JSON manifest at a well-known URL</li>
+            <li><strong>Auth:</strong> Standard OAuth 2.0 with PKCE, PAR, DPoP</li>
+            <li><strong>Tokens:</strong> JWT, PASETO, or Macaroons — your choice</li>
+            <li><strong>Content:</strong> Single item or batch retrieval APIs</li>
+            <li><strong>Feeds:</strong> Non-breaking extensions to existing formats</li>
+          </ul>
+        </div>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__dot"></span>
+            <span class="code-block__dot"></span>
+            <span class="code-block__dot"></span>
+            <span class="code-block__title">/.well-known/ope</span>
+          </div>
+<pre>{
+  <span class="key">"version"</span>: <span class="string">"0.1"</span>,
+  <span class="key">"oauth_server"</span>: <span class="string">"https://example.com/.well-known/oauth-authorization-server"</span>,
+  <span class="key">"entitlement"</span>: {
+    <span class="key">"grant_url"</span>: <span class="string">"https://example.com/api/entitlement/grant"</span>,
+    <span class="key">"refresh_url"</span>: <span class="string">"https://example.com/api/entitlement/refresh"</span>,
+    <span class="key">"token_format"</span>: <span class="string">"jwt"</span>,
+    <span class="key">"token_mode"</span>: <span class="string">"portable"</span>,
+    <span class="key">"default_ttl_seconds"</span>: <span class="number">3600</span>
+  },
+  <span class="key">"content"</span>: {
+    <span class="key">"endpoint_template"</span>: <span class="string">"https://example.com/api/content/{id}"</span>,
+    <span class="key">"batch_endpoint"</span>: <span class="string">"https://example.com/api/content/batch"</span>,
+    <span class="key">"formats_available"</span>: [<span class="string">"html"</span>, <span class="string">"markdown"</span>]
+  },
+  <span class="key">"grants_supported"</span>: [
+    <span class="string">"subscription"</span>, <span class="string">"gift"</span>, <span class="string">"per_item"</span>, <span class="string">"broker"</span>
+  ]
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Audience ─────────────────────────────────── -->
+  <section id="for-whom">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__label">Who It's For</span>
+        <h2>Built for the entire ecosystem</h2>
+        <p>OPE is designed so publishers, reader apps, and intermediaries each get exactly what they need.</p>
+      </div>
+      <div class="audience__grid">
+        <div class="audience-card">
+          <h3>Publishers</h3>
+          <p>Keep full control of your content and subscriptions while making them work everywhere.</p>
+          <ul>
+            <li>Add OPE metadata to your existing feeds</li>
+            <li>Expose a single discovery endpoint</li>
+            <li>Use the reference gateway or build your own</li>
+            <li>Support any payment processor you want</li>
+            <li>WordPress, Ghost, Substack migration paths</li>
+          </ul>
+        </div>
+        <div class="audience-card">
+          <h3>Reader Apps</h3>
+          <p>Give your users seamless access to gated content from any OPE-enabled publisher.</p>
+          <ul>
+            <li>Detect OPE extensions in any feed format</li>
+            <li>Manage per-publisher OAuth sessions</li>
+            <li>Show rich previews with content metadata</li>
+            <li>Batch retrieval for fast offline sync</li>
+            <li>Unified subscription view across publishers</li>
+          </ul>
+        </div>
+        <div class="audience-card">
+          <h3>Brokers</h3>
+          <p>Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.</p>
+          <ul>
+            <li>Aggregate entitlements across publishers</li>
+            <li>Issue broker grant tokens with Macaroons</li>
+            <li>Capability attenuation for scoped access</li>
+            <li>Single sign-on for multi-publisher access</li>
+            <li>Enable new business models</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Grant Types ──────────────────────────────── -->
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__label">Flexible Access</span>
+        <h2>Eight grant types, one protocol</h2>
+        <p>OPE doesn't prescribe how entitlements are earned — it standardizes how they're proven.</p>
+      </div>
+      <div class="grants__grid">
+        <div class="grant-tag">
+          <h4>Subscription</h4>
+          <p>Recurring access to all content</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Per-item</h4>
+          <p>Pay per article, scoped to content IDs</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Gift</h4>
+          <p>Shareable unlock links, time-limited</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Institutional</h4>
+          <p>Libraries, universities, organizations</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Metered</h4>
+          <p>Free article limits with meter tracking</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Locale-free</h4>
+          <p>Regional free access by user locale</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Patronage</h4>
+          <p>Voluntary support, optional full access</p>
+        </div>
+        <div class="grant-tag">
+          <h4>Broker</h4>
+          <p>Multi-publisher bundles via brokers</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Compatibility ────────────────────────────── -->
+  <section class="compat">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__label">Compatibility</span>
+        <h2>Works with what you already use</h2>
+        <p>OPE is a purely additive extension. Readers without OPE support simply see previews as usual.</p>
+      </div>
+      <div class="compat__tags">
+        <span class="compat-tag">RSS 2.0</span>
+        <span class="compat-tag">Atom</span>
+        <span class="compat-tag">JSON Feed</span>
+        <span class="compat-tag">AT Protocol</span>
+        <span class="compat-tag">OAuth 2.0</span>
+        <span class="compat-tag">JWT</span>
+        <span class="compat-tag">PASETO</span>
+        <span class="compat-tag">Macaroons</span>
+        <span class="compat-tag">DPoP</span>
+        <span class="compat-tag">PAR / RAR</span>
+        <span class="compat-tag">x402</span>
+        <span class="compat-tag">Stripe</span>
+        <span class="compat-tag">WordPress</span>
+        <span class="compat-tag">Ghost</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ──────────────────────────────────────── -->
+  <section class="cta">
+    <div class="container">
+      <h2>Start building with OPE</h2>
+      <p>The specification is open and ready for implementers. Read it, build on it, and help shape portable entitlements for the open web.</p>
+      <div class="cta__actions">
+        <a href="spec/" class="btn btn--primary">Read the Specification</a>
+        <a href="https://github.com/shellen/open-portable-entitlement" class="btn btn--ghost">Contribute on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ───────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        OPE is a working draft by <a href="https://shellen.com">Jason Shellen</a>.
+        Discuss and contribute on <a href="https://github.com/shellen/open-portable-entitlement">GitHub</a>.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
