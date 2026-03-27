@@ -43,3 +43,39 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
 }
+
+/* Code blocks — Protocol-style dark panels */
+article pre {
+  background: #1c1f26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: #d4d4d8;
+}
+
+article pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  font-weight: normal !important;
+  display: block;
+}
+
+article pre code .highlight-line {
+  background: transparent !important;
+}
+
+/* Inline code */
+article :not(pre) > code {
+  background: #f4f4f5;
+  color: #27272a;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125em;
+  font-weight: 500;
+}
