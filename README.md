@@ -15,6 +15,20 @@ OPE doesn't handle payments — it proves you're allowed in. How you earned acce
 - **[Rendered specification](https://feedspec.org/ope/spec/)** — navigable docs with sidebar and section anchors
 - **[Plain text (Markdown)](./OPE-Specification.md)** — the spec source file, readable on GitHub
 
+## Try the Demo
+
+The **[OPE Eleventy Demo](https://github.com/shellen/ope-eleventy-demo)** is a working reference implementation you can run locally in one command. It includes:
+
+- **Publisher** — an Eleventy blog with OPE-enabled feeds and a content API
+- **Gateway** — an Express server that issues and manages grant tokens
+- **Reader** — a browser UI and CLI that walks through the full OPE lifecycle
+
+```bash
+git clone https://github.com/shellen/ope-eleventy-demo.git
+cd ope-eleventy-demo
+./run-demo.sh
+```
+
 ## Local Development
 
 ```bash
@@ -42,14 +56,10 @@ OPE is a working draft. Feedback, questions, and contributions are welcome:
 
 The specification source is `OPE-Specification.md`. The site is built with [Eleventy](https://www.11ty.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
-## License
-
-This specification and site are licensed under the [Apache License 2.0](./LICENSE).
-
 ## Author
 
 [Jason Shellen](https://shellen.com) — [@shellen.com](https://bsky.app/profile/shellen.com) on Bluesky
 
 ## License
 
-This specification and site are open source. See [LICENSE](./LICENSE) for details.
+This specification and site are licensed under the [Apache License 2.0](./LICENSE).

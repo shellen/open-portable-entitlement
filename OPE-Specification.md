@@ -177,7 +177,7 @@ Publishers SHOULD support RAR for fine-grained permission definitions. RAR enabl
   "authorization_details": [
     {
       "type": "ope_entitlement",
-      "publisher": "did:web:shellen.com",
+      "publisher": "did:web:publisher.example.com",
       "grant": {
         "type": "access",
         "scope": "all",
@@ -301,7 +301,7 @@ The `grant` claim replaces the former `grant_type` string. It carries the full g
 
 ```json
 {
-  "iss": "shellen.com",
+  "iss": "publisher.example.com",
   "sub": "user123",
   "scope": ["content:read", "content:batch"],
   "grant": {
@@ -349,9 +349,9 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
         "resource_type": "article",
         "word_count": 3200,
         "estimated_read_time_minutes": 14,
-        "preview_image": "https://shellen.com/img/post-123-hero.jpg",
+        "preview_image": "https://publisher.example.com/img/post-123-hero.jpg",
         "unlock_cta": "Subscribe to read the full essay",
-        "unlock_url": "https://shellen.com/post-123?ope_unlock=1",
+        "unlock_url": "https://publisher.example.com/post-123?ope_unlock=1",
         "per_item_price": { "currency": "USD", "amount": 200 }
       }
     }
@@ -368,7 +368,7 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
   "content_text": "Preview: A 2-minute clip from our conversation about...",
   "attachments": [
     {
-      "url": "https://shellen.com/podcast/ep42-preview.mp3",
+      "url": "https://publisher.example.com/podcast/ep42-preview.mp3",
       "mime_type": "audio/mpeg",
       "size_in_bytes": 2400000
     }
@@ -383,12 +383,12 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
         "duration_seconds": 3420,
         "media_type": "audio/mpeg",
         "file_size_bytes": 54800000,
-        "series_title": "Shellen on Feeds",
+        "series_title": "Sound and Signal",
         "episode_number": 42,
         "season_number": 3,
-        "preview_image": "https://shellen.com/podcast/ep42-art.jpg",
+        "preview_image": "https://publisher.example.com/podcast/ep42-art.jpg",
         "unlock_cta": "Subscribe for the full episode",
-        "unlock_url": "https://shellen.com/podcast/ep42?ope_unlock=1",
+        "unlock_url": "https://publisher.example.com/podcast/ep42?ope_unlock=1",
         "per_item_price": { "currency": "USD", "amount": 200 }
       }
     }
@@ -447,10 +447,10 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
 
 ```xml
 <entry>
-  <id>https://shellen.com/post-123</id>
+  <id>https://publisher.example.com/post-123</id>
   <title>Deep Essay on Protocol Design</title>
   <updated>2026-03-03T00:00:00Z</updated>
-  <link rel="alternate" href="https://shellen.com/post-123" type="text/html"/>
+  <link rel="alternate" href="https://publisher.example.com/post-123" type="text/html"/>
   <summary>Preview: The history of feed formats reveals...</summary>
   <ope:access level="subscriber">
     <ope:content-id>post-123</ope:content-id>
@@ -462,7 +462,7 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
       <ope:resource-type>article</ope:resource-type>
       <ope:word-count>3200</ope:word-count>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
-      <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
+      <ope:unlock-url>https://publisher.example.com/post-123?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </entry>
@@ -472,11 +472,11 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
 
 ```xml
 <entry>
-  <id>https://shellen.com/podcast/ep42</id>
+  <id>https://publisher.example.com/podcast/ep42</id>
   <title>Interview: The Future of Open Podcasting</title>
   <updated>2026-03-10T00:00:00Z</updated>
-  <link rel="alternate" href="https://shellen.com/podcast/ep42" type="text/html"/>
-  <link rel="enclosure" href="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+  <link rel="alternate" href="https://publisher.example.com/podcast/ep42" type="text/html"/>
+  <link rel="enclosure" href="https://publisher.example.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
   <summary>Preview: A 2-minute clip from our conversation about...</summary>
   <ope:access level="subscriber">
     <ope:content-id>episode-42</ope:content-id>
@@ -489,11 +489,11 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
       <ope:resource-type>podcast_episode</ope:resource-type>
       <ope:duration-seconds>3420</ope:duration-seconds>
       <ope:media-type>audio/mpeg</ope:media-type>
-      <ope:series-title>Shellen on Feeds</ope:series-title>
+      <ope:series-title>Sound and Signal</ope:series-title>
       <ope:episode-number>42</ope:episode-number>
       <ope:season-number>3</ope:season-number>
       <ope:unlock-cta>Subscribe for the full episode</ope:unlock-cta>
-      <ope:unlock-url>https://shellen.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
+      <ope:unlock-url>https://publisher.example.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </entry>
@@ -506,14 +506,14 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
 ```xml
 <item>
   <title>Deep Essay on Protocol Design</title>
-  <link>https://shellen.com/post-123</link>
+  <link>https://publisher.example.com/post-123</link>
   <description>Preview: The history of feed formats reveals...</description>
   <ope:access level="subscriber">
     <ope:content-id>post-123</ope:content-id>
     <ope:metadata>
       <ope:resource-type>article</ope:resource-type>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
-      <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
+      <ope:unlock-url>https://publisher.example.com/post-123?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </item>
@@ -526,9 +526,9 @@ OPE works alongside the standard RSS `<enclosure>` element used by podcast feeds
 ```xml
 <item>
   <title>Interview: The Future of Open Podcasting</title>
-  <link>https://shellen.com/podcast/ep42</link>
+  <link>https://publisher.example.com/podcast/ep42</link>
   <description>Preview: A 2-minute clip from our conversation about...</description>
-  <enclosure url="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+  <enclosure url="https://publisher.example.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
   <ope:access level="subscriber">
     <ope:content-id>episode-42</ope:content-id>
     <ope:metadata>
@@ -536,11 +536,11 @@ OPE works alongside the standard RSS `<enclosure>` element used by podcast feeds
       <ope:duration-seconds>3420</ope:duration-seconds>
       <ope:media-type>audio/mpeg</ope:media-type>
       <ope:file-size-bytes>54800000</ope:file-size-bytes>
-      <ope:series-title>Shellen on Feeds</ope:series-title>
+      <ope:series-title>Sound and Signal</ope:series-title>
       <ope:episode-number>42</ope:episode-number>
       <ope:season-number>3</ope:season-number>
       <ope:unlock-cta>Subscribe for the full episode</ope:unlock-cta>
-      <ope:unlock-url>https://shellen.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
+      <ope:unlock-url>https://publisher.example.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </item>
@@ -581,7 +581,7 @@ Content-Type: application/json
   "resource_type": "article",
   "content_html": "<p>Full article content...</p>",
   "published": "2026-03-03T00:00:00Z",
-  "author": { "name": "Jason Shellen", "url": "https://shellen.com" }
+  "author": { "name": "Jane Martinez", "url": "https://publisher.example.com" }
 }
 ```
 
@@ -607,7 +607,7 @@ Content-Type: application/json
   "published": "2026-03-10T00:00:00Z",
   "author": { "name": "Jason Shellen" },
   "media": {
-    "url": "https://shellen.com/podcast/ep42-full.mp3",
+    "url": "https://publisher.example.com/podcast/ep42-full.mp3",
     "mime_type": "audio/mpeg",
     "size_bytes": 54800000,
     "duration_seconds": 3420,
@@ -615,7 +615,7 @@ Content-Type: application/json
   },
   "media_alternatives": [
     {
-      "url": "https://shellen.com/podcast/ep42-full-hq.mp3",
+      "url": "https://publisher.example.com/podcast/ep42-full-hq.mp3",
       "mime_type": "audio/mpeg",
       "size_bytes": 82200000,
       "bitrate_kbps": 192
@@ -1253,9 +1253,8 @@ Minimum viable implementation (without reference gateway):
 
 ## 20. Reference Implementations
 
-- Reference reader: Pull Read (https://pullread.com)
-- Reference publisher: Drafty (https://drafty.com)
-- Reference gateway: OPE Gateway (planned)
+- Reference implementation: OPE Eleventy Demo (https://github.com/shellen/ope-eleventy-demo) — includes a publisher blog, gateway server, and reader app running locally in one command
+- Reference gateway: OPE Gateway (included in demo)
 
 Publisher reference architecture:
 
@@ -1340,20 +1339,20 @@ Compatible payment processors include Stripe, Paddle, Lemon Squeezy, PayPal, Woo
 
 This non-normative section walks through the complete OPE flow from feed discovery to content display.
 
-**Scenario:** A user named Alice uses Pull Read (reader app). She subscribes to a JSON Feed from Shellen Publishing. One item in the feed is gated for subscribers. Alice has a subscription.
+**Scenario:** Alice uses her favorite feed reader. She subscribes to a JSON Feed from The Cosmic Courier. One item in the feed is gated for subscribers. Alice has a subscription.
 
 ### Step 1: Alice adds the feed
 
-Pull Read fetches the JSON Feed:
+The reader app fetches the JSON Feed:
 
 ```
-GET https://shellen.com/feed.json
+GET https://publisher.example.com/feed.json
 ```
 
 ```json
 {
   "version": "https://jsonfeed.org/version/1.1",
-  "title": "Shellen Publishing",
+  "title": "The Cosmic Courier",
   "items": [
     {
       "id": "post-456",
@@ -1381,34 +1380,34 @@ GET https://shellen.com/feed.json
 }
 ```
 
-### Step 2: Pull Read discovers OPE support
+### Step 2: The reader discovers OPE support
 
-Pull Read detects the `ope` extension and fetches discovery:
+The reader app detects the `ope` extension and fetches discovery:
 
 ```
-GET https://shellen.com/.well-known/ope
+GET https://publisher.example.com/.well-known/ope
 ```
 
 ```json
 {
   "version": "0.1",
-  "oauth_server": "https://shellen.com/.well-known/oauth-authorization-server",
+  "oauth_server": "https://publisher.example.com/.well-known/oauth-authorization-server",
   "entitlement": { "..." },
   "content": { "..." },
   "metadata": { "..." }
 }
 ```
 
-Pull Read then fetches the OAuth server metadata per RFC 8414 to obtain authorization and token endpoints.
+The reader app then fetches the OAuth server metadata per RFC 8414 to obtain authorization and token endpoints.
 
 ### Step 3: Alice taps the gated article
 
-Pull Read shows the preview text, word count (4,500 words), read time (18 min), and unlock CTA. Alice taps "Subscribe for $5/month."
+The reader app shows the preview text, word count (4,500 words), read time (18 min), and unlock CTA. Alice taps "Subscribe for $5/month."
 
-Pull Read initiates OAuth2 Authorization Code flow with PKCE:
+The reader app initiates OAuth2 Authorization Code flow with PKCE:
 
 ```
-GET https://shellen.com/oauth/authorize
+GET https://publisher.example.com/oauth/authorize
   ?response_type=code
   &client_id=pullread_ios
   &redirect_uri=pullread://oauth/callback
@@ -1426,10 +1425,10 @@ The publisher's OAuth page opens in an in-app browser. Alice logs in (or creates
 pullread://oauth/callback?code=AUTH_CODE_xyz&state=<random>
 ```
 
-Pull Read exchanges the code for tokens:
+The reader app exchanges the code for tokens:
 
 ```
-POST https://shellen.com/oauth/token
+POST https://publisher.example.com/oauth/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=authorization_code
@@ -1447,12 +1446,12 @@ grant_type=authorization_code
 }
 ```
 
-### Step 5: Pull Read requests an entitlement grant
+### Step 5: The reader requests an entitlement grant
 
-Using the OAuth access token, Pull Read requests a grant (portable mode):
+Using the OAuth access token, the reader app requests a grant (portable mode):
 
 ```
-POST https://shellen.com/api/entitlement/grant
+POST https://publisher.example.com/api/entitlement/grant
 Authorization: Bearer <oauth_access_token>
 ```
 
@@ -1471,12 +1470,12 @@ Authorization: Bearer <oauth_access_token>
 }
 ```
 
-Pull Read stores the grant token and refresh token securely, associated with shellen.com in its publisher registry.
+The reader app stores the grant token and refresh token securely, associated with the publisher in its registry.
 
-### Step 6: Pull Read retrieves the full article
+### Step 6: The reader retrieves the full article
 
 ```
-GET https://shellen.com/api/content/post-789
+GET https://publisher.example.com/api/content/post-789
 Authorization: Bearer <jwt_grant_token>
 ```
 
@@ -1490,30 +1489,30 @@ Authorization: Bearer <jwt_grant_token>
 }
 ```
 
-Alice reads the full article in Pull Read. Future gated articles from shellen.com will be automatically accessible until the grant token expires, at which point Pull Read refreshes it silently.
+Alice reads the full article right in her reader. Future gated articles from the publisher are automatically accessible until the grant token expires, at which point the reader app refreshes it silently.
 
 ### Worked Example: Podcast Episode
 
-**Scenario:** Bob uses Podcast App (an OPE-compatible podcast player). He subscribes to the "Shellen on Feeds" podcast RSS feed. Most episodes are free with ads, but premium subscribers get ad-free episodes and bonus content.
+**Scenario:** Bob uses his favorite podcast player (any OPE-compatible player). He subscribes to the "Sound and Signal" podcast RSS feed. Most episodes are free with ads, but premium subscribers get ad-free episodes and bonus content.
 
-#### Step 1: Podcast App fetches the RSS feed
+#### Step 1: The player fetches the RSS feed
 
 ```
-GET https://shellen.com/podcast/feed.xml
+GET https://publisher.example.com/podcast/feed.xml
 ```
 
 ```xml
 <rss version="2.0" xmlns:ope="https://feedspec.org/ope/ns/1.0">
   <channel>
-    <title>Shellen on Feeds</title>
+    <title>Sound and Signal</title>
     <item>
       <title>Episode 41: RSS at 25</title>
-      <enclosure url="https://shellen.com/podcast/ep41.mp3" type="audio/mpeg" length="41000000"/>
+      <enclosure url="https://publisher.example.com/podcast/ep41.mp3" type="audio/mpeg" length="41000000"/>
       <description>A look back at 25 years of RSS...</description>
     </item>
     <item>
       <title>Episode 42: The Future of Open Podcasting (Premium)</title>
-      <enclosure url="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+      <enclosure url="https://publisher.example.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
       <description>Preview: A 2-minute clip from our conversation...</description>
       <ope:access level="subscriber">
         <ope:content-id>episode-42</ope:content-id>
@@ -1521,11 +1520,11 @@ GET https://shellen.com/podcast/feed.xml
           <ope:resource-type>podcast_episode</ope:resource-type>
           <ope:duration-seconds>3420</ope:duration-seconds>
           <ope:media-type>audio/mpeg</ope:media-type>
-          <ope:series-title>Shellen on Feeds</ope:series-title>
+          <ope:series-title>Sound and Signal</ope:series-title>
           <ope:episode-number>42</ope:episode-number>
           <ope:season-number>3</ope:season-number>
           <ope:unlock-cta>Subscribe for $3/month for ad-free and bonus episodes</ope:unlock-cta>
-          <ope:unlock-url>https://shellen.com/podcast/subscribe?ope_unlock=1</ope:unlock-url>
+          <ope:unlock-url>https://publisher.example.com/podcast/subscribe?ope_unlock=1</ope:unlock-url>
         </ope:metadata>
       </ope:access>
     </item>
@@ -1533,16 +1532,16 @@ GET https://shellen.com/podcast/feed.xml
 </rss>
 ```
 
-Podcast App plays Episode 41 normally (it's free). For Episode 42, it detects the `ope:access` element and shows the 2-minute preview clip with the unlock CTA.
+The podcast player plays Episode 41 normally (it's free). For Episode 42, it detects the `ope:access` element and shows the 2-minute preview clip with the unlock CTA.
 
 #### Step 2: Bob subscribes
 
-Bob taps "Subscribe for $3/month." Podcast App initiates the OPE OAuth flow (same as Steps 2-5 in the article example above). After authentication and payment, Bob receives a grant token with an `access` grant (scope: `all`, duration: `recurring`).
+Bob taps "Subscribe for $3/month." The podcast player initiates the OPE OAuth flow (same as Steps 2-5 in the article example above). After authentication and payment, Bob receives a grant token with an `access` grant (scope: `all`, duration: `recurring`).
 
-#### Step 3: Podcast App retrieves the full episode
+#### Step 3: The player retrieves the full episode
 
 ```
-GET https://shellen.com/api/content/episode-42
+GET https://publisher.example.com/api/content/episode-42
 Authorization: Bearer <jwt_grant_token>
 ```
 
@@ -1553,7 +1552,7 @@ Authorization: Bearer <jwt_grant_token>
   "resource_type": "podcast_episode",
   "published": "2026-03-10T00:00:00Z",
   "media": {
-    "url": "https://shellen.com/podcast/ep42-full-adfree.mp3?sig=<signed_token>&exp=1710003600",
+    "url": "https://publisher.example.com/podcast/ep42-full-adfree.mp3?sig=<signed_token>&exp=1710003600",
     "mime_type": "audio/mpeg",
     "size_bytes": 54800000,
     "duration_seconds": 3420
@@ -1562,7 +1561,7 @@ Authorization: Bearer <jwt_grant_token>
 }
 ```
 
-Podcast App downloads the full ad-free episode from the signed media URL and plays it. The signed URL expires alongside the grant token, preventing URL sharing. Future premium episodes are automatically accessible until the grant refreshes.
+The podcast player downloads the full ad-free episode from the signed media URL and plays it. The signed URL expires alongside the grant token, preventing URL sharing. Future premium episodes are automatically accessible until the grant refreshes.
 
 ## 23. Why OPE Matters
 
