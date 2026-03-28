@@ -10,7 +10,7 @@ title: OPE
     <div class="max-w-2xl">
       <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft Specification v0.1</span>
       <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Portable subscriptions for the open web</h1>
-      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, any browser, and any platform. Subscribe once, read anywhere — in your feed reader, on the web, or through a broker bundle.</p>
+      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets users access gated content across any app, any feed format, any browser, and any platform. Subscribe once, access anywhere — articles in your feed reader, podcasts in your player, video in your app, or content on the web.</p>
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
         <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
@@ -35,7 +35,7 @@ title: OPE
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M13 18V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Truly portable</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Your subscription works in any OPE-compatible reader. No platform lock-in.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Your subscription works in any OPE-compatible app — feed reader, podcast player, or browser. No platform lock-in.</p>
       </div>
       <div>
         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
@@ -67,7 +67,7 @@ title: OPE
       <div class="p-5 rounded-2xl border border-zinc-900/5">
         <div class="text-xs font-medium text-zinc-400 mb-2">Layer 1</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Content</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Articles, media, and resources. Created and hosted by the publisher.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Articles, podcasts, video, courses, and more. Created and hosted by the publisher.</p>
       </div>
       <div class="p-5 rounded-2xl border border-zinc-900/5">
         <div class="text-xs font-medium text-zinc-400 mb-2">Layer 2</div>
@@ -77,7 +77,7 @@ title: OPE
       <div class="p-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/5">
         <div class="text-xs font-medium text-emerald-500 mb-2">Layer 3 — OPE</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Verification that a reader has the right to access content. Portable across apps.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Verification that a user has the right to access content. Portable across apps.</p>
       </div>
       <div class="p-5 rounded-2xl border border-zinc-900/5">
         <div class="text-xs font-medium text-zinc-400 mb-2">Layer 4</div>
@@ -94,16 +94,117 @@ title: OPE
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">The Flow</h2>
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">From feed to full content</p>
-      <p class="text-sm text-zinc-600 mt-3">Five steps from discovering an article in your reader to reading the full thing.</p>
+      <p class="text-sm text-zinc-600 mt-3">Five steps from discovering content in your app to accessing the full thing.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8">
-      {% for step in [{n:"1",t:"Feed",d:"Reader fetches a feed and finds OPE-gated items with preview content."},{n:"2",t:"Discovery",d:"Reader fetches /.well-known/ope to learn the publisher's capabilities."},{n:"3",t:"Authenticate",d:"Reader initiates OAuth 2.0 with PKCE. User logs in with the publisher."},{n:"4",t:"Grant",d:"Publisher issues a signed grant token proving entitlement."},{n:"5",t:"Read",d:"Reader presents the token and retrieves full content. Done."}] %}
+      {% for step in [{n:"1",t:"Feed",d:"Client fetches a feed and finds OPE-gated items with preview content or trailer clips."},{n:"2",t:"Discovery",d:"Client fetches /.well-known/ope to learn the publisher's capabilities."},{n:"3",t:"Authenticate",d:"Client initiates OAuth 2.0 with PKCE. User logs in with the publisher."},{n:"4",t:"Grant",d:"Publisher issues a signed grant token proving entitlement."},{n:"5",t:"Access",d:"Client presents the token and retrieves full content — article, episode, or video. Done."}] %}
       <div>
         <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-500 mb-4">{{ step.n }}</div>
         <h4 class="text-sm font-semibold text-zinc-900 mb-1">{{ step.t }}</h4>
         <p class="text-xs text-zinc-500 leading-relaxed">{{ step.d }}</p>
       </div>
       {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works — Flipable Story Deck -->
+<section class="py-20 border-t border-zinc-900/5" id="stories">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mb-12">
+      <h2 class="text-xs font-semibold text-zinc-900 mb-3">See It In Action</h2>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">How OPE works for real people</p>
+      <p class="text-sm text-zinc-600 mt-3">Flip through these stories to see how publishers, readers, and listeners benefit from portable entitlements.</p>
+    </div>
+
+    <!-- Story selector tabs -->
+    <div class="flex gap-2 mb-8" id="story-tabs">
+      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors bg-emerald-500 text-white" data-story="alice">Alice reads an article</button>
+      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900" data-story="bob">Bob listens to a podcast</button>
+    </div>
+
+    <!-- Alice's story (article) -->
+    <div class="story-deck" id="story-alice">
+      <div class="relative overflow-hidden">
+        <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
+          {% for card in [
+            {step:"1 of 6", icon:"rss", title:"Alice adds a feed", body:"Alice uses Pull Read, her favorite feed reader. She adds the Shellen Publishing JSON Feed. Most items show full content — but one article, <strong>\"Protocol Economics,\"</strong> shows only a preview with a note: <em>4,500 words &middot; 18 min read.</em>"},
+            {step:"2 of 6", icon:"search", title:"Pull Read discovers OPE", body:"Pull Read detects the <code>ope</code> extension in the feed and fetches the publisher's <code>/.well-known/ope</code> endpoint. Now it knows the publisher's OAuth server, content API, grant types, and pricing — all from one JSON file."},
+            {step:"3 of 6", icon:"lock", title:"Alice taps 'Subscribe'", body:"The gated article shows a rich preview: word count, estimated read time, and a call-to-action. Alice taps <strong>\"Subscribe for $5/month.\"</strong> Pull Read opens the publisher's OAuth login in an in-app browser."},
+            {step:"4 of 6", icon:"key", title:"Authentication & grant", body:"Alice logs in (or signs up) with the publisher. After consenting to share read access, the publisher issues a <strong>signed grant token</strong> — a portable JWT proving Alice is a subscriber. Pull Read stores it securely."},
+            {step:"5 of 6", icon:"doc", title:"Full content, instantly", body:"Pull Read presents the grant token to the content API and retrieves the full 4,500-word article. Alice reads it right in her feed reader — no browser switch, no paywall page, no friction."},
+            {step:"6 of 6", icon:"refresh", title:"It just keeps working", body:"Future gated articles from this publisher are <strong>automatically accessible.</strong> The token refreshes silently in the background. Alice can also open articles on the publisher's website — the same token works via a browser cookie. One subscription, every surface."}
+          ] %}
+          <div class="deck-card flex-none w-full px-1">
+            <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="text-xs font-medium text-emerald-500">{{ card.step }}</span>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
+              <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Navigation -->
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex gap-1.5 deck-dots">
+          {% for i in range(0, 6) %}
+          <button class="deck-dot w-2 h-2 rounded-full transition-colors {% if i == 0 %}bg-emerald-500{% else %}bg-zinc-300{% endif %}" data-index="{{ i }}"></button>
+          {% endfor %}
+        </div>
+        <div class="flex gap-2">
+          <button class="deck-prev w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" disabled>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+          </button>
+          <button class="deck-next w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12l4-4-4-4"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bob's story (podcast) -->
+    <div class="story-deck hidden" id="story-bob">
+      <div class="relative overflow-hidden">
+        <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
+          {% for card in [
+            {step:"1 of 6", title:"Bob subscribes to a podcast feed", body:"Bob uses Podcast App, an OPE-compatible player. He subscribes to <strong>\"Shellen on Feeds\"</strong> via its RSS feed. Most episodes play normally — but Episode 42 only has a 2-minute preview clip. The feed shows: <em>57 min &middot; Season 3, Episode 42.</em>"},
+            {step:"2 of 6", title:"Preview clip plays, full episode is gated", body:"Bob listens to the preview clip from the RSS <code>&lt;enclosure&gt;</code>. The app detects OPE metadata on the episode and shows: <strong>\"Subscribe for $3/month for ad-free and bonus episodes.\"</strong> The full episode is behind entitlement."},
+            {step:"3 of 6", title:"Bob taps 'Subscribe'", body:"Podcast App opens the publisher's OAuth login. Bob creates an account and subscribes. The same OAuth + PKCE flow as any OPE client — the podcast app doesn't need a special integration with this specific publisher."},
+            {step:"4 of 6", title:"Grant token issued", body:"The publisher verifies Bob's subscription and issues a <strong>portable grant token.</strong> The token includes <code>grant_type: \"subscription\"</code> and works for all gated episodes — not just this one. Podcast App stores it alongside Bob's other publisher tokens."},
+            {step:"5 of 6", title:"Full episode downloads", body:"Podcast App calls the content API with the grant token. The response includes a <strong>signed media URL</strong> for the full ad-free MP3 (54.8 MB, 57 min). The app downloads it for offline listening. Show notes come along as HTML."},
+            {step:"6 of 6", title:"Every premium episode, any app", body:"New premium episodes are <strong>automatically unlocked.</strong> The signed URLs expire with the token, preventing link sharing. And because the grant token is portable, Bob could switch to a different OPE-compatible podcast player without re-subscribing. His entitlement follows him."}
+          ] %}
+          <div class="deck-card flex-none w-full px-1">
+            <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="text-xs font-medium text-emerald-500">{{ card.step }}</span>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
+              <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Navigation -->
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex gap-1.5 deck-dots">
+          {% for i in range(0, 6) %}
+          <button class="deck-dot w-2 h-2 rounded-full transition-colors {% if i == 0 %}bg-emerald-500{% else %}bg-zinc-300{% endif %}" data-index="{{ i }}"></button>
+          {% endfor %}
+        </div>
+        <div class="flex gap-2">
+          <button class="deck-prev w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" disabled>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+          </button>
+          <button class="deck-next w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12l4-4-4-4"/></svg>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -160,7 +261,7 @@ title: OPE
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">Built for the entire ecosystem</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack migration paths"]},{t:"Reader Apps & Browsers",d:"Give your users seamless access to gated content from any OPE-enabled publisher — in-app or on the web.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews with content metadata","Batch retrieval for fast offline sync","Browser unlock via cookies and HTTP 402","Unified subscription view across publishers"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
+      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Works for articles, podcasts, video, courses, and more","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack, podcast host migration paths"]},{t:"Apps & Browsers",d:"Give your users seamless access to gated content from any OPE-enabled publisher — in feed readers, podcast players, video apps, or on the web.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews: word count, duration, artwork","Retrieve full articles, media files, or streaming URLs","Batch retrieval for fast offline sync","Browser unlock via cookies and HTTP 402"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
       <div class="rounded-2xl border border-zinc-900/5 p-6">
         <h3 class="text-sm font-semibold text-zinc-900 mb-2">{{ card.t }}</h3>
         <p class="text-sm text-zinc-600 mb-4">{{ card.d }}</p>
@@ -180,11 +281,11 @@ title: OPE
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">Flexible Access</h2>
-      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Eight grant types, one protocol</p>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Fourteen grant types, one protocol</p>
       <p class="text-sm text-zinc-600 mt-3">OPE doesn't prescribe how entitlements are earned — it standardizes how they're proven.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-      {% for g in [{t:"Subscription",d:"Recurring access to all content"},{t:"Per-item",d:"Pay per article, scoped to content IDs"},{t:"Gift",d:"Shareable unlock links, time-limited"},{t:"Institutional",d:"Libraries, universities, organizations"},{t:"Metered",d:"Free article limits with meter tracking"},{t:"Locale-free",d:"Regional free access by user locale"},{t:"Patronage",d:"Voluntary support, optional full access"},{t:"Broker",d:"Multi-publisher bundles via brokers"}] %}
+      {% for g in [{t:"Subscription",d:"Recurring access to all content"},{t:"Per-item",d:"Pay per article or episode, scoped to content IDs"},{t:"Gift",d:"Shareable unlock links, time-limited"},{t:"Institutional",d:"Libraries, universities, organizations"},{t:"Metered",d:"Free content limits with meter tracking"},{t:"Locale-free",d:"Regional free access by user locale"},{t:"Patronage",d:"Voluntary support, optional full access"},{t:"Broker",d:"Multi-publisher bundles via brokers"},{t:"Trial",d:"Time-limited free access for new users"},{t:"Rental",d:"Temporary access to specific content"},{t:"Bundle",d:"Album, season, or course collection access"},{t:"Ad-supported",d:"Free with ads; grant signals ad-free tier"},{t:"Early access",d:"Pre-release content for premium tiers"},{t:"Family",d:"Shared group or household access"}] %}
       <div class="p-4 rounded-xl border border-zinc-900/5 hover:border-emerald-400/30 transition-colors">
         <h4 class="text-sm font-semibold text-zinc-900 mb-0.5">{{ g.t }}</h4>
         <p class="text-xs text-zinc-500">{{ g.d }}</p>
@@ -221,3 +322,5 @@ title: OPE
     </div>
   </div>
 </section>
+
+<script src="{{ '/js/deck.js' | url }}"></script>
