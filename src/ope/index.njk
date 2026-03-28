@@ -10,7 +10,7 @@ title: OPE
     <div class="max-w-2xl">
       <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft Specification v0.1</span>
       <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Portable subscriptions for the open web</h1>
-      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets users access gated content across any app, any feed format, any browser, and any platform. Subscribe once, access anywhere — articles in your feed reader, podcasts in your player, video in your app, or content on the web.</p>
+      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets users access gated content across any app, any feed format, any browser, and any platform. Subscribe once, read anywhere — articles in your feed reader, podcasts in your player, video in your app, or content on the web. No lock-in. No walled gardens.</p>
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
         <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
@@ -114,7 +114,7 @@ title: OPE
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">See It In Action</h2>
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">How OPE works for real people</p>
-      <p class="text-sm text-zinc-600 mt-3">Flip through these stories to see how publishers, readers, and listeners benefit from portable entitlements.</p>
+      <p class="text-sm text-zinc-600 mt-3">Two people, two apps, one protocol. Flip through to see how it actually works.</p>
     </div>
 
     <!-- Story selector tabs -->
@@ -128,12 +128,12 @@ title: OPE
       <div class="relative overflow-hidden">
         <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
           {% for card in [
-            {step:"1 of 6", icon:"rss", title:"Alice adds a feed", body:"Alice uses Pull Read, her favorite feed reader. She adds the Shellen Publishing JSON Feed. Most items show full content — but one article, <strong>\"Protocol Economics,\"</strong> shows only a preview with a note: <em>4,500 words &middot; 18 min read.</em>"},
-            {step:"2 of 6", icon:"search", title:"Pull Read discovers OPE", body:"Pull Read detects the <code>ope</code> extension in the feed and fetches the publisher's <code>/.well-known/ope</code> endpoint. Now it knows the publisher's OAuth server, content API, grant types, and pricing — all from one JSON file."},
-            {step:"3 of 6", icon:"lock", title:"Alice taps 'Subscribe'", body:"The gated article shows a rich preview: word count, estimated read time, and a call-to-action. Alice taps <strong>\"Subscribe for $5/month.\"</strong> Pull Read opens the publisher's OAuth login in an in-app browser."},
-            {step:"4 of 6", icon:"key", title:"Authentication & grant", body:"Alice logs in (or signs up) with the publisher. After consenting to share read access, the publisher issues a <strong>signed grant token</strong> — a portable JWT proving Alice is a subscriber. Pull Read stores it securely."},
-            {step:"5 of 6", icon:"doc", title:"Full content, instantly", body:"Pull Read presents the grant token to the content API and retrieves the full 4,500-word article. Alice reads it right in her feed reader — no browser switch, no paywall page, no friction."},
-            {step:"6 of 6", icon:"refresh", title:"It just keeps working", body:"Future gated articles from this publisher are <strong>automatically accessible.</strong> The token refreshes silently in the background. Alice can also open articles on the publisher's website — the same token works via a browser cookie. One subscription, every surface."}
+            {step:"1 of 6", icon:"rss", title:"Alice adds a feed", body:"Alice opens her favorite feed reader and subscribes to <strong>The Cosmic Courier</strong>, a space and science publication. Most articles show full content, but one piece — <strong>\"The Hidden Cost of Walled Gardens\"</strong> — shows only a preview. The teaser says: <em>4,500 words &middot; 18 min read.</em> Intriguing."},
+            {step:"2 of 6", icon:"search", title:"Her reader discovers OPE", body:"The feed reader spots the <code>ope</code> extension in the JSON Feed and fetches the publisher's <code>/.well-known/ope</code> endpoint. One tiny JSON file tells it everything: OAuth server, content API, grant types, and pricing. No special integration required."},
+            {step:"3 of 6", icon:"lock", title:"Alice taps 'Subscribe'", body:"The gated article shows a rich preview with word count, estimated read time, and a clear call-to-action. Alice taps <strong>\"Subscribe for $5/month\"</strong> and her reader opens the publisher's OAuth login. Quick and familiar."},
+            {step:"4 of 6", icon:"key", title:"Authentication & grant", body:"Alice logs in with The Cosmic Courier. After a quick consent screen, the publisher issues a <strong>signed grant token</strong> — a portable JWT that proves Alice is a subscriber. Her reader stores it securely. That's it."},
+            {step:"5 of 6", icon:"doc", title:"Full content, instantly", body:"Her reader presents the token to the content API and pulls down the full 4,500-word article. Alice reads it right where she is — no browser switch, no paywall interstitial, no friction. Just the article."},
+            {step:"6 of 6", icon:"refresh", title:"It just keeps working", body:"Every future gated article from The Cosmic Courier is <strong>automatically accessible.</strong> The token refreshes silently in the background. Alice can also read on the publisher's website — same token, works via a browser cookie. One subscription, every surface."}
           ] %}
           <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
             <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
@@ -171,12 +171,12 @@ title: OPE
       <div class="relative overflow-hidden">
         <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
           {% for card in [
-            {step:"1 of 6", title:"Bob subscribes to a podcast feed", body:"Bob uses Podcast App, an OPE-compatible player. He subscribes to <strong>\"Shellen on Feeds\"</strong> via its RSS feed. Most episodes play normally — but Episode 42 only has a 2-minute preview clip. The feed shows: <em>57 min &middot; Season 3, Episode 42.</em>"},
-            {step:"2 of 6", title:"Preview clip plays, full episode is gated", body:"Bob listens to the preview clip from the RSS <code>&lt;enclosure&gt;</code>. The app detects OPE metadata on the episode and shows: <strong>\"Subscribe for $3/month for ad-free and bonus episodes.\"</strong> The full episode is behind entitlement."},
-            {step:"3 of 6", title:"Bob taps 'Subscribe'", body:"Podcast App opens the publisher's OAuth login. Bob creates an account and subscribes. The same OAuth + PKCE flow as any OPE client — the podcast app doesn't need a special integration with this specific publisher."},
-            {step:"4 of 6", title:"Grant token issued", body:"The publisher verifies Bob's subscription and issues a <strong>portable grant token.</strong> The token includes an <code>access</code> grant and works for all gated episodes — not just this one. Podcast App stores it alongside Bob's other publisher tokens."},
-            {step:"5 of 6", title:"Full episode downloads", body:"Podcast App calls the content API with the grant token. The response includes a <strong>signed media URL</strong> for the full ad-free MP3 (54.8 MB, 57 min). The app downloads it for offline listening. Show notes come along as HTML."},
-            {step:"6 of 6", title:"Every premium episode, any app", body:"New premium episodes are <strong>automatically unlocked.</strong> The signed URLs expire with the token, preventing link sharing. And because the grant token is portable, Bob could switch to a different OPE-compatible podcast player without re-subscribing. His entitlement follows him."}
+            {step:"1 of 6", title:"Bob subscribes to a podcast feed", body:"Bob adds <strong>\"Sound and Signal\"</strong> — a music and culture podcast — to his podcast player via its RSS feed. Most episodes play fine. But Episode 12, <em>\"Why Vinyl Sounds Better (And Why It Doesn't),\"</em> only has a 2-minute teaser. The feed says: <em>57 min &middot; Season 2, Episode 12.</em>"},
+            {step:"2 of 6", title:"Preview clip plays, full episode is gated", body:"Bob listens to the teaser from the RSS <code>&lt;enclosure&gt;</code>. His player detects OPE metadata on the episode and shows: <strong>\"Subscribe for $3/month for ad-free and bonus episodes.\"</strong> The full episode is behind entitlement. Fair enough — he's hooked."},
+            {step:"3 of 6", title:"Bob taps Subscribe", body:"His podcast player opens the publisher's OAuth login. Bob signs up and subscribes. It's the same OAuth + PKCE flow every OPE client uses — the player doesn't need any special deal with this particular show."},
+            {step:"4 of 6", title:"Grant token issued", body:"Sound and Signal verifies Bob's subscription and issues a <strong>portable grant token.</strong> It includes an <code>access</code> grant that covers all premium episodes — not just this one. His player stores it alongside tokens from other publishers."},
+            {step:"5 of 6", title:"Full episode downloads", body:"The player calls the content API with the grant token. Back comes a <strong>signed media URL</strong> for the full ad-free MP3 (54.8 MB, 57 min). Bob downloads it for his commute. Show notes arrive as HTML. Nice."},
+            {step:"6 of 6", title:"Every premium episode, any app", body:"New premium episodes are <strong>automatically unlocked.</strong> Signed URLs expire with the token, so links can't be shared. And here's the kicker: because the grant token is portable, Bob could switch to any other OPE-compatible podcast player without re-subscribing. His entitlement follows him."}
           ] %}
           <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
             <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
@@ -343,9 +343,10 @@ title: OPE
 <section class="bg-zinc-900 py-20">
   <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
     <h2 class="text-2xl font-semibold tracking-tight text-white mb-3">Start building with OPE</h2>
-    <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">The specification is open and ready for implementers. Read it, build on it, and help shape portable entitlements for the open web.</p>
+    <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">The spec is open. The demo runs locally in one command. Read it, build on it, and help shape portable entitlements for the open web.</p>
     <div class="flex flex-wrap justify-center gap-3">
       <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Specification</a>
+      <a href="https://github.com/shellen/ope-eleventy-demo" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Try the Demo</a>
       <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Contribute on GitHub</a>
     </div>
   </div>
