@@ -945,7 +945,7 @@ OPE separates these layers so that:
 
 ## Acknowledgments
 
-Thanks to Max Engel for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 14.
+Thanks to [Max Engel](https://github.com/maxengel) for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 14.
 
 ---
 
