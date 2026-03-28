@@ -10,7 +10,7 @@ title: OPE
     <div class="max-w-2xl">
       <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft Specification v0.1</span>
       <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Portable subscriptions for the open web</h1>
-      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, and any platform. Subscribe once, read anywhere.</p>
+      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets readers access gated content across any app, any feed format, any browser, and any platform. Subscribe once, read anywhere — in your feed reader, on the web, or through a broker bundle.</p>
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
         <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
@@ -116,7 +116,7 @@ title: OPE
         <h2 class="text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Simple discovery, powerful access</h2>
         <p class="text-sm text-zinc-600 mb-6 leading-relaxed">Publishers expose a single well-known endpoint. Reader apps handle the rest — OAuth, token management, content retrieval — all standardized.</p>
         <dl class="space-y-3">
-          {% for item in [{k:"Discovery",v:"JSON manifest at a well-known URL"},{k:"Auth",v:"Standard OAuth 2.0 with PKCE, PAR, DPoP"},{k:"Tokens",v:"JWT, PASETO, or Macaroons — your choice"},{k:"Content",v:"Single item or batch retrieval APIs"},{k:"Feeds",v:"Non-breaking extensions to existing formats"}] %}
+          {% for item in [{k:"Discovery",v:"JSON manifest at a well-known URL"},{k:"Auth",v:"OAuth 2.0 with PKCE, consent, dynamic registration"},{k:"Tokens",v:"JWT, PASETO, or Macaroons — API or cookie transport"},{k:"Content",v:"Single item or batch retrieval, HTTP 402 signaling"},{k:"Web",v:"Cookie-based grants, browser unlock, cross-publisher SSO"},{k:"Feeds",v:"Non-breaking extensions with unlock URLs"}] %}
           <div class="flex gap-3 text-sm">
             <dt class="font-semibold text-zinc-900 whitespace-nowrap">{{ item.k }}</dt>
             <dd class="text-zinc-600">{{ item.v }}</dd>
@@ -160,7 +160,7 @@ title: OPE
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">Built for the entire ecosystem</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack migration paths"]},{t:"Reader Apps",d:"Give your users seamless access to gated content from any OPE-enabled publisher.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews with content metadata","Batch retrieval for fast offline sync","Unified subscription view across publishers"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
+      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack migration paths"]},{t:"Reader Apps &amp; Browsers",d:"Give your users seamless access to gated content from any OPE-enabled publisher — in-app or on the web.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews with content metadata","Batch retrieval for fast offline sync","Browser unlock via cookies and HTTP 402","Unified subscription view across publishers"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
       <div class="rounded-2xl border border-zinc-900/5 p-6">
         <h3 class="text-sm font-semibold text-zinc-900 mb-2">{{ card.t }}</h3>
         <p class="text-sm text-zinc-600 mb-4">{{ card.d }}</p>
@@ -203,7 +203,7 @@ title: OPE
       <p class="text-sm text-zinc-600 mt-3">OPE is a purely additive extension. Readers without OPE support simply see previews as usual.</p>
     </div>
     <div class="flex flex-wrap gap-2">
-      {% for tag in ["RSS 2.0", "Atom", "JSON Feed", "AT Protocol", "OAuth 2.0", "JWT", "PASETO", "Macaroons", "DPoP", "PAR / RAR", "x402", "Stripe", "WordPress", "Ghost"] %}
+      {% for tag in ["RSS 2.0", "Atom", "JSON Feed", "AT Protocol", "OAuth 2.0", "PKCE", "JWT", "PASETO", "Macaroons", "DPoP", "PAR / RAR", "HTTP 402", "RFC 7591", "x402", "Stripe", "WordPress", "Ghost"] %}
       <span class="rounded-full px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-900/10">{{ tag }}</span>
       {% endfor %}
     </div>
