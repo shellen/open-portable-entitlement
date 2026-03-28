@@ -9,17 +9,17 @@ Date: 2026
 
 *A portable entitlement layer for resources discovered through feeds and decentralized publishing. OPE standardizes entitlement verification—not payment systems—enabling portable subscriptions and content access across platforms, readers, and protocols.*
 
-**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, and Complete Worked Example.
+**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Web-Based Entitlement (HTTP 402, cookie transport, browser unlock flows), Consent Screen requirements, Dynamic Client Registration (RFC 7591), PKCE requirement, Cross-Publisher Browser Flow via Entitlement Brokers, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, and Complete Worked Example.
 
 ---
 
 ## 1. Abstract
 
-Open Portable Entitlement (OPE) proposes a portable method for readers to access protected resources referenced in feeds. The specification enables publishers to distribute preview content through RSS, Atom, JSON Feed, or AT Protocol; authenticate readers; issue entitlement grants; and allow authorized clients to retrieve full content.
+Open Portable Entitlement (OPE) proposes a portable method for readers to access protected resources referenced in feeds. The specification enables publishers to distribute preview content through RSS, Atom, JSON Feed, or AT Protocol; authenticate readers; issue entitlement grants; and allow authorized clients to retrieve full content—whether those clients are API consumers, feed readers, browser extensions, or web browsers.
 
 OPE standardizes entitlement verification, not payment systems. This enables portable subscriptions and resource access across platforms and readers while preserving compatibility with existing feed ecosystems.
 
-While the primary use case is content (articles, media, newsletters), the entitlement architecture is deliberately resource-agnostic. The grant token mechanism does not constrain what is being entitled—content, API access, capabilities, or any other gated resource.
+While the primary use case is content (articles, media, newsletters), the entitlement architecture is deliberately resource-agnostic. The grant token mechanism does not constrain what is being entitled—content, API access, capabilities, or any other gated resource. OPE grant tokens are transport-agnostic: they can be presented via HTTP `Authorization` headers (API clients) or optionally via `HttpOnly` cookies (browsers), using the same token format and verification logic in both cases. The web-based entitlement extension (Section 11) is optional and designed to complement—not replace—existing site authentication systems.
 
 ## 2. Status of This Document
 
@@ -109,7 +109,14 @@ GET /.well-known/ope
     "subscription", "gift", "per_item", "institutional",
     "metered", "locale_free", "patronage", "broker"
   ],
-  "broker_support": true
+  "broker_support": true,
+  "client_registration_endpoint": "https://example.com/api/ope/register",
+  "web": {
+    "unlock_endpoint": "https://example.com/api/ope/unlock",
+    "cookie_domain": "example.com",
+    "cookie_name": "ope_grant",
+    "cookie_path": "/"
+  }
 }
 ```
 
@@ -144,6 +151,18 @@ Publishers that support RFC 8414 SHOULD NOT duplicate auth fields in the OPE man
 
 **broker_support** (boolean, optional): Indicates whether this publisher accepts entitlement verification from recognized Entitlement Brokers, enabling multi-publisher subscription bundles.
 
+**client_registration_endpoint** (string, optional): URL for Dynamic Client Registration (RFC 7591). When present, OPE consumers can register programmatically rather than requiring out-of-band registration with the publisher. See Section 7.6.
+
+**web** (object, optional): Configuration for browser-based entitlement. When present, indicates the publisher supports cookie-based grant token transport for web clients. See Section 11.
+
+**web.unlock_endpoint** (string): URL that accepts a grant token and sets a browser cookie, enabling feed-to-browser unlock flows.
+
+**web.cookie_domain** (string): Domain for the `ope_grant` cookie.
+
+**web.cookie_name** (string): Name of the cookie. Defaults to `ope_grant` if omitted.
+
+**web.cookie_path** (string): Path scope for the cookie. Defaults to `/`.
+
 ## 7. Authentication
 
 OPE uses OAuth 2.0 for authentication. Publishers MUST support the Authorization Code flow with PKCE (RFC 7636). Publishers SHOULD support the following OAuth extensions:
@@ -171,7 +190,7 @@ Publishers SHOULD support RAR for fine-grained permission definitions. RAR enabl
 
 ### 7.3 Demonstrating Proof of Possession (DPoP, RFC 9449)
 
-Publishers SHOULD support DPoP for binding tokens to client keys. DPoP prevents token theft from being useful across clients by requiring the presenting client to prove possession of the private key bound to the token. This directly strengthens the token binding recommendation in Section 11.1.
+Publishers SHOULD support DPoP for binding tokens to client keys. DPoP prevents token theft from being useful across clients by requiring the presenting client to prove possession of the private key bound to the token. This directly strengthens the token binding recommendation in Section 12.1.
 
 ### 7.4 Scope Requirements
 
@@ -179,6 +198,60 @@ The following OAuth scopes are defined:
 
 - `content:read` — REQUIRED. Read access to entitled content.
 - `content:batch` — RECOMMENDED. Batch retrieval of multiple entitled items.
+
+### 7.5 Consent Screen Requirements
+
+Publishers MUST display a consent screen before issuing authorization codes. Auto-redirecting after authentication without user consent is an OAuth anti-pattern that undermines user trust and violates the intent of the authorization code flow.
+
+The consent screen MUST display:
+
+- **Client identity:** The application name and verified domain of the requesting client.
+- **Requested scopes:** Human-readable descriptions of the access being granted (e.g., "Read your subscribed content" for `content:read`).
+- **Grant duration:** How long the authorization will remain active.
+- **Action buttons:** Clearly labeled "Allow" and "Deny" controls.
+- **Revocation link:** A link or instructions for revoking access later.
+
+Publishers MAY skip the consent screen for repeat authorizations from the same client if the user has previously consented and the requested scopes have not expanded. Publishers MUST re-prompt consent if new scopes are requested.
+
+### 7.6 Dynamic Client Registration (RFC 7591)
+
+To support an open ecosystem where any OPE-compatible reader can obtain entitlements, publishers SHOULD support Dynamic Client Registration per RFC 7591. This eliminates the need for out-of-band client registration (e.g., hardcoded client ID allowlists).
+
+```
+POST /api/ope/register
+Content-Type: application/json
+```
+
+```json
+{
+  "client_name": "FeedReader Pro",
+  "redirect_uris": ["https://feedreader.pro/callback"],
+  "grant_types": ["authorization_code"],
+  "scope": "content:read content:batch",
+  "client_uri": "https://feedreader.pro",
+  "logo_uri": "https://feedreader.pro/logo.png",
+  "contacts": ["admin@feedreader.pro"]
+}
+```
+
+```
+201 Created
+```
+
+```json
+{
+  "client_id": "fr_pro_a1b2c3",
+  "client_secret": "secret_xyz",
+  "client_id_issued_at": 1710000000,
+  "client_secret_expires_at": 0,
+  "registration_access_token": "reg_token_abc",
+  "registration_client_uri": "https://example.com/api/ope/register/fr_pro_a1b2c3"
+}
+```
+
+The `client_secret` is issued only for confidential clients (server-side applications). Public clients (SPAs, mobile apps, browser extensions, CLI tools) MUST use PKCE and MUST NOT receive a `client_secret`. Publishers SHOULD assign newly registered clients a limited scope and MAY require manual approval before granting full access.
+
+The registration endpoint URL is published in the discovery document as `client_registration_endpoint`.
 
 ## 8. Grant Tokens
 
@@ -211,7 +284,7 @@ Publishers declare their supported mode in the discovery document via `token_mod
 | Claim | Type | Description |
 | --- | --- | --- |
 | content_ids | string[] | Specific content items (for per_item grants) |
-| meter_remaining | integer | Articles remaining in metered access |
+| meter_remaining | integer | Reading entitlements remaining in metered access (decrements per content retrieval, not per content creation) |
 | institutional_domain | string | Domain for institutional verification |
 | broker_id | string | Broker that issued the grant (for broker grants) |
 | refresh_token | string | Token for refreshing the grant |
@@ -264,6 +337,7 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
         "content_type": "essay",
         "preview_image": "https://shellen.com/img/post-123-hero.jpg",
         "unlock_cta": "Subscribe to read the full essay",
+        "unlock_url": "https://shellen.com/post-123?ope_unlock=1",
         "per_item_price": { "currency": "USD", "amount": 200 }
       }
     }
@@ -271,7 +345,7 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
 }
 ```
 
-**content_metadata**: Provides structured information for readers to display rich previews of gated content. All fields are optional. The **unlock_cta** field allows publishers to specify a call-to-action string. The **per_item_price** field uses the smallest currency unit (e.g., cents for USD).
+**content_metadata**: Provides structured information for readers to display rich previews of gated content. All fields are optional. The **unlock_cta** field allows publishers to specify a call-to-action string. The **unlock_url** field provides a browser-openable URL that triggers the web-based entitlement flow (see Section 11), bridging feed discovery to browser access. The **per_item_price** field uses the smallest currency unit (e.g., cents for USD).
 
 ### 9.2 Atom (RFC 4287)
 
@@ -298,6 +372,7 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
     <ope:metadata>
       <ope:word-count>3200</ope:word-count>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
+      <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </entry>
@@ -314,6 +389,7 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
     <ope:content-id>post-123</ope:content-id>
     <ope:metadata>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
+      <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
   </ope:access>
 </item>
@@ -383,23 +459,173 @@ The batch endpoint MUST return partial results. Items the user is not entitled t
 | Status | Meaning | Reader Behavior |
 | --- | --- | --- |
 | 401 Unauthorized | Token missing or invalid | Re-authenticate with publisher |
+| 402 Payment Required | Content requires entitlement (web) | Discover unlock flow via OPE headers (see Section 11) |
 | 403 Forbidden | Valid token but insufficient entitlement | Show content metadata and subscribe prompt |
 | 404 Not Found | Content ID does not exist | Remove from local cache |
 | 410 Gone | Content was removed by publisher | Remove from local cache |
 | 429 Too Many Requests | Rate limited | Backoff per Retry-After header |
 
-## 11. Security Considerations
+Error responses MUST use the following JSON body format:
+
+```json
+{
+  "error": "not_entitled",
+  "error_description": "Valid token but insufficient entitlement for this content",
+  "content_id": "post-123",
+  "ope_discovery": "https://example.com/.well-known/ope"
+}
+```
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| error | string | REQUIRED | Machine-readable error code: `invalid_token`, `not_entitled`, `not_found`, `gone`, `rate_limited` |
+| error_description | string | RECOMMENDED | Human-readable explanation |
+| content_id | string | OPTIONAL | The content ID that triggered the error |
+| ope_discovery | string | OPTIONAL | URL to the publisher's OPE discovery endpoint, for clients that need to (re-)discover capabilities |
+
+## 11. Web-Based Entitlement
+
+This section is OPTIONAL. Publishers are not required to implement web-based OPE flows. Many publishers already have mature browser-based access control—session cookies, identity providers (Clerk, Auth0, Firebase Auth), or custom authentication middleware. OPE does not replace these systems.
+
+OPE Sections 1–10 define the core protocol for programmatic consumers—feed readers, AI agents, and other API clients using the `Authorization` header. This section defines an optional extension that allows the same OPE grant tokens to also work in browser contexts, bridging the gap between API-based entitlement and web-based access.
+
+**When to implement this section:**
+
+- You want feed readers to deep-link users to full content on your site
+- You want browser extensions or aggregator apps to unlock content on your pages
+- You want to accept cross-publisher entitlements from brokers in a browser context
+- You want a single entitlement system that serves both API and web clients
+
+**When to skip this section:**
+
+- Your existing site authentication already handles browser-based access
+- You only need OPE for programmatic consumers (feed readers, AI agents)
+- You prefer to keep site auth and API auth as separate concerns
+
+Publishers MAY implement web-based OPE alongside an existing site authentication system. The two are not mutually exclusive—a publisher can check its own session cookie first and fall back to an OPE grant cookie, or vice versa. The `web` block in the discovery document (Section 6) signals to clients that the publisher supports these flows.
+
+The core principle for publishers who opt in is **one token, two transports.** The same OPE grant token that an API client presents via `Authorization: Bearer <token>` can be delivered to a browser via an `HttpOnly` cookie. Publishers verify the same token using the same logic regardless of how it arrives.
+
+### 11.1 HTTP 402 and OPE Response Headers
+
+When a browser (or any HTTP client) requests a gated resource without a valid entitlement, publishers SHOULD signal entitlement requirements using HTTP headers. Publishers MAY use HTTP 402 (Payment Required) or HTTP 200 with a paywall in the response body. In either case, the following OPE headers SHOULD be included:
+
+```http
+HTTP/1.1 402 Payment Required
+Link: </.well-known/ope>; rel="ope-discovery"
+OPE-Content-Id: post-123
+OPE-Access-Level: subscriber
+OPE-Unlock-URL: /api/ope/unlock?content_id=post-123
+Content-Type: text/html
+```
+
+| Header | Required | Description |
+| --- | --- | --- |
+| `Link` | RECOMMENDED | Discovery endpoint with `rel="ope-discovery"` |
+| `OPE-Content-Id` | RECOMMENDED | The content identifier for the gated resource |
+| `OPE-Access-Level` | OPTIONAL | The required access level (e.g., `subscriber`, `institutional`) |
+| `OPE-Unlock-URL` | OPTIONAL | URL to initiate the browser unlock flow |
+
+Publishers SHOULD also include a `<link>` element in the HTML `<head>` for HTML responses:
+
+```html
+<link rel="ope-discovery" href="/.well-known/ope" />
+<meta name="ope:content-id" content="post-123" />
+```
+
+This allows browser extensions, aggregator apps, and progressive web apps to discover how to unlock content programmatically—even when the server returns 200 with a paywall `<div>`.
+
+**Note on HTTP 402:** The 402 status code has historically been "reserved for future use" in HTTP. Content entitlement is precisely the use case it was reserved for. However, publishers concerned about client compatibility MAY use 200 with OPE headers instead. Clients MUST check for OPE headers regardless of the status code.
+
+### 11.2 Cookie-Based Grant Token Transport
+
+After a browser-based OAuth flow completes, the publisher's unlock endpoint SHOULD set the grant token as an `HttpOnly` cookie so subsequent page loads carry the entitlement automatically:
+
+```http
+HTTP/1.1 302 Found
+Set-Cookie: ope_grant=<grant_token>; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/
+Location: /post-123
+```
+
+Cookie requirements:
+
+- **`HttpOnly`:** REQUIRED. Prevents JavaScript access, mitigating XSS-based token theft.
+- **`Secure`:** REQUIRED. Ensures the cookie is only sent over HTTPS.
+- **`SameSite=Lax`:** REQUIRED. Prevents CSRF while allowing top-level navigations (e.g., clicking a link from a feed reader).
+- **`Max-Age`:** SHOULD match the grant token's TTL. MUST NOT exceed the token's `exp` claim.
+- **`Path`:** SHOULD be set to `/` unless the publisher scopes content to a subpath.
+
+Publishers that implement cookie-based transport SHOULD check for entitlement in this order:
+
+1. The publisher's own session mechanism, if any (e.g., Clerk, Auth0, custom session cookies)
+2. `Authorization: Bearer <token>` header (API clients)
+3. `ope_grant` cookie (browser clients presenting OPE grants)
+
+This allows OPE web-based entitlement to coexist with existing site authentication. A publisher running Clerk for its logged-in users can still accept OPE grant cookies from broker flows or feed reader handoffs — the two systems compose rather than conflict. The same OPE token verification logic applies regardless of whether the token arrives via header or cookie.
+
+### 11.3 Browser Unlock Flow
+
+The browser unlock flow connects feed discovery to web page access. When a feed reader or aggregator app wants to open gated content in a browser, it directs the user to the `unlock_url` from the feed's `content_metadata` (Section 9) or to the publisher's `web.unlock_endpoint` from the discovery document (Section 6).
+
+```
+1. User clicks "Read on web" in a feed reader
+2. Feed reader opens: https://publisher.com/post-123?ope_unlock=1
+3. Publisher detects ope_unlock parameter, checks for existing session or cookie
+4. If already authenticated (site session or OPE cookie): skip to step 8
+5. If no session: redirect to OAuth authorization endpoint (or publisher's own login)
+6. User authenticates and consents
+7. Publisher issues OPE grant token and sets ope_grant cookie, redirects to /post-123
+8. Browser loads /post-123 with cookie → full content rendered
+```
+
+Step 5 is intentionally flexible. Publishers MAY use OPE's OAuth flow (Section 7), their existing login system, or a combination. A publisher using Clerk could authenticate the user via Clerk, check their subscription status internally, and then issue an OPE grant cookie — using OPE as the cross-system entitlement format while keeping their own auth for the login step.
+
+### 11.4 Cross-Publisher Browser Flow
+
+The most powerful application of web-based entitlement is cross-publisher access via an Entitlement Broker (Section 14). This enables a "Sign in with your [Aggregator] subscription" flow:
+
+```
+1. Reader on publisher-a.com hits paywall
+2. Publisher redirects to broker.example/authorize
+     ?publisher=publisher-a.com
+     &content_id=post-123
+     &redirect_uri=https://publisher-a.com/api/ope/broker-callback
+3. Broker verifies reader's subscription covers publisher-a.com
+4. Broker issues a broker grant token (portable mode, signed by broker key)
+5. Broker redirects to publisher-a.com/api/ope/broker-callback?grant=<token>
+6. Publisher verifies broker token against broker's public key
+7. Publisher sets ope_grant cookie with the verified grant
+8. Reader sees full content
+```
+
+This flow is structurally identical to OpenID Connect—the broker acts as an identity-and-entitlement provider. The `broker` grant type (already defined in Section 8) carries the authorization. See Section 14.1 for the broker's verification responsibilities.
+
+### 11.5 CORS Requirements for Web Clients
+
+Publishers that implement web-based entitlement SHOULD set appropriate CORS headers on OPE API endpoints to support browser-based consumers (extensions, SPAs, aggregator web apps):
+
+```http
+Access-Control-Allow-Origin: <requesting-origin>
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400
+```
+
+The discovery endpoint (`/.well-known/ope`) SHOULD allow any origin (`Access-Control-Allow-Origin: *`). Content and entitlement endpoints SHOULD restrict origins to registered clients or use credential-based CORS with specific origins.
+
+## 12. Security Considerations
 
 This section is normative. Implementations that do not address these concerns SHOULD NOT be deployed in production.
 
-### 11.1 Token Security
+### 12.1 Token Security
 
 - **Transport:** All OPE endpoints MUST be served over HTTPS. Grant tokens MUST NOT be transmitted over unencrypted connections.
-- **Storage:** Readers MUST store grant tokens in secure, application-private storage. Tokens MUST NOT be logged, included in URLs, or stored in browser localStorage.
+- **Storage:** Readers MUST store grant tokens in secure, application-private storage. Tokens MUST NOT be logged, included in URLs, or stored in browser `localStorage`. Publishers that implement web-based entitlement (Section 11) MUST use `HttpOnly; Secure; SameSite=Lax` cookies for browser-based token transport. JavaScript-accessible storage (`localStorage`, `sessionStorage`, non-`HttpOnly` cookies) is prohibited for grant tokens in any context.
 - **Token Binding:** Publishers SHOULD bind tokens to a client identifier using DPoP (RFC 9449). When DPoP is supported, the `cnf` claim in the grant token binds it to the client's DPoP key, preventing token theft from being useful across clients.
 - **Short-lived tokens:** Grant tokens SHOULD have a TTL of no more than 1 hour. Readers use the refresh endpoint to obtain new tokens. This limits the window of exposure if a token is compromised. Short TTLs are the primary mitigation for token compromise—revocation lists are belt-and-suspenders.
 
-### 11.2 Token Revocation
+### 12.2 Token Revocation
 
 Publishers MUST implement the revocation endpoint. Revocation is critical for:
 
@@ -428,7 +654,7 @@ Content-Type: application/json
 
 **Revocation enforcement note:** JWT-based grant tokens are stateless—a revoked token remains cryptographically valid until expiry. Publishers SHOULD maintain a revocation list and content endpoints SHOULD check it on each request. However, enforcement depends on content endpoints actually performing this check. Short TTLs (recommended: 1 hour maximum) are the strongest mitigation because they bound the window during which a revoked token can still be used. For deployments where immediate revocation is critical (institutional access), publishers SHOULD use TTLs of 15-30 minutes.
 
-### 11.3 Refresh Token Rotation
+### 12.3 Refresh Token Rotation
 
 When a reader refreshes a grant token, the publisher MUST issue a new refresh token and invalidate the previous one. This prevents replay attacks where a stolen refresh token could be used indefinitely.
 
@@ -453,19 +679,19 @@ Content-Type: application/json
 }
 ```
 
-### 11.4 Scope Constraints
+### 12.4 Scope Constraints
 
 Grant tokens MUST only authorize the minimum access required. A subscription grant SHOULD NOT implicitly grant administrative access. Publishers SHOULD reject tokens with unrecognized scopes.
 
-### 11.5 Institutional Access
+### 12.5 Institutional Access
 
 For institutional grants (e.g., university library access), publishers SHOULD verify the reader's network origin against the institutional_domain claim. Publishers MAY use IP range verification, SAML/SSO federation, or both. Institutional tokens SHOULD have shorter TTLs (15-30 minutes) because the population of authorized users changes frequently.
 
-## 12. Multi-Publisher Session Management
+## 13. Multi-Publisher Session Management
 
 The most compelling use case for OPE is a reader that seamlessly presents gated content from multiple publishers. This requires careful session management.
 
-### 12.1 Reader Session Architecture
+### 13.1 Reader Session Architecture
 
 A reader MUST maintain per-publisher OAuth sessions independently. Readers SHOULD store:
 
@@ -481,15 +707,15 @@ When a reader encounters a new OPE-enabled feed, it SHOULD:
 4. Display content metadata for gated items, with a prompt to authenticate.
 5. On user action, initiate OAuth flow with the publisher.
 
-### 12.2 Unified Subscription View
+### 13.2 Unified Subscription View
 
 Readers SHOULD provide a unified view of all active entitlements across publishers. The discovery document's `metadata.plans` field enables readers to display subscription status and pricing without opening the publisher's website.
 
-## 13. Entitlement Brokers
+## 14. Entitlement Brokers
 
 An Entitlement Broker is an optional intermediary that aggregates subscriptions across multiple publishers, similar to how a cable bundle aggregates TV channels. Brokers address the friction of managing individual subscriptions with many publishers.
 
-### 13.1 Broker Flow
+### 14.1 Broker Flow
 
 ```
 Reader → Broker (authenticate once)
@@ -507,15 +733,55 @@ Publishers that support brokers MUST:
 
 Brokers MUST NOT cache or store full content retrieved on behalf of users. Brokers facilitate entitlement only.
 
-### 13.2 Broker Token Structure
+### 14.2 Broker Token Structure
 
 Broker-issued tokens include an additional `broker_id` claim identifying the broker, and MAY attenuate the grant (e.g., limiting access to specific content categories). Macaroons are the recommended format for broker tokens because they natively support capability attenuation.
 
-## 14. AT Protocol Integration
+### 14.3 Broker Trust Establishment
+
+Before a publisher accepts broker tokens, a trust relationship MUST be established. Brokers MUST publish a JSON Web Key Set (JWKS) at a well-known URL:
+
+```
+GET https://broker.example/.well-known/jwks.json
+```
+
+Publishers verify broker tokens by fetching the broker's public keys and validating the token signature. Publishers SHOULD cache broker JWKS for no more than 24 hours.
+
+Publishers MUST maintain an allowlist of trusted broker identifiers. Publishers MAY support automatic broker registration through a registration endpoint, but MUST require manual approval before accepting tokens from a new broker.
+
+### 14.4 Browser-Based Broker Flow
+
+The cross-publisher browser flow (Section 11.4) relies on brokers to provide a redirect-based entitlement exchange. This subsection specifies the broker's responsibilities in that flow.
+
+**Broker authorization endpoint:** Brokers MUST expose an authorization endpoint that accepts the following parameters:
+
+| Parameter | Required | Description |
+| --- | --- | --- |
+| `publisher` | REQUIRED | The publisher's domain |
+| `content_id` | OPTIONAL | Specific content being unlocked |
+| `redirect_uri` | REQUIRED | Publisher's callback URL |
+| `state` | REQUIRED | Opaque value for CSRF protection |
+
+**Broker verification:** Upon receiving an authorization request, the broker MUST:
+
+1. Authenticate the reader (or verify an existing session)
+2. Verify the reader's subscription covers the requested publisher
+3. Issue a portable-mode grant token signed with the broker's private key
+4. Redirect to the publisher's `redirect_uri` with `grant=<token>&state=<state>`
+
+**Publisher callback:** The publisher's callback endpoint MUST:
+
+1. Validate the `state` parameter
+2. Verify the broker token's signature against the broker's JWKS
+3. Verify the `broker_id` claim matches a trusted broker
+4. Verify the token's `iss`, `scope`, and `exp` claims
+5. Set the `ope_grant` cookie (Section 11.2) and redirect the reader to the content
+
+## 15. AT Protocol Integration
 
 OPE may operate over ATProto. This section describes how OPE relates to ATProto's permission spaces architecture and proposes a concrete integration path.
 
-### 14.1 Relationship to ATProto Permission Spaces
+### 15.1 Relationship to ATProto Permission Spaces
 
 The ATProto team is developing a permissioned data system based on permission spaces—protocol-level authorization and sync boundaries for permissioned records representing shared social contexts in the network. OPE is designed to work as an application-layer complement to this infrastructure:
 
@@ -527,7 +793,7 @@ The two systems are complementary, not competitive:
 - A permission space's member list answers: "Is this DID allowed to see these records?" (binary yes/no)
 - An OPE grant token answers: "Why does this person have access, through what mechanism, and under what terms?"
 
-### 14.2 Integration Flow
+### 15.2 Integration Flow
 
 When a user obtains an OPE grant (via subscription, gift, broker, etc.), the publisher's managing app uses that grant to manage the permission space member list:
 
@@ -538,25 +804,25 @@ When a user obtains an OPE grant (via subscription, gift, broker, etc.), the pub
 
 Space credentials are short-lived (2-4 hour expiration), stateless, asymmetrically signed by the space owner, and verifiable without coordinating with the owner. This complements OPE's own short-lived grant tokens.
 
-### 14.3 Space Configuration for Gated Content
+### 15.3 Space Configuration for Gated Content
 
 Paid content spaces SHOULD be configured as "default deny" for service access, with only the publisher's reader app and explicitly approved OPE-compatible readers on the allowlist.
 
 The space type NSID (e.g., `org.feedspec.ope.content`) serves as the OAuth consent boundary—when a user logs into a reader application, they grant access based on the type of space.
 
-### 14.4 URI Considerations
+### 15.4 URI Considerations
 
 ATProto's permissioned data uses a different URI scheme from public data (likely `ats://` rather than `at://`). Permissioned record addressing requires six components: space owner DID, space type NSID, space key, user DID, collection NSID, and record key.
 
 OPE's `content_id` can map to the space key or to individual record keys within a space, depending on publisher architecture. Publishers SHOULD document their mapping in the OPE discovery endpoint.
 
-### 14.5 Namespace
+### 15.5 Namespace
 
 Suggested namespace: `org.feedspec.ope.*`
 
 **Important:** In ATProto, namespaces map to domain authority via reverse-DNS. This namespace uses `feedspec.org`, which is controlled by the editor.
 
-### 14.6 Lexicon: org.feedspec.ope.entitlement.grant
+### 15.6 Lexicon: org.feedspec.ope.entitlement.grant
 
 ```json
 {
@@ -585,7 +851,7 @@ Suggested namespace: `org.feedspec.ope.*`
 }
 ```
 
-### 14.7 Lexicon: org.feedspec.ope.content.get
+### 15.7 Lexicon: org.feedspec.ope.content.get
 
 ```json
 {
@@ -624,7 +890,7 @@ Suggested namespace: `org.feedspec.ope.*`
 }
 ```
 
-### 14.8 Lexicon: org.feedspec.ope.content.getBatch
+### 15.8 Lexicon: org.feedspec.ope.content.getBatch
 
 ```json
 {
@@ -666,17 +932,17 @@ Suggested namespace: `org.feedspec.ope.*`
 }
 ```
 
-## 15. Caching
+## 16. Caching
 
 Feeds remain publicly cacheable. Authorized content SHOULD return `Cache-Control: private`. Readers SHOULD cache entitled content locally to reduce redundant API calls, respecting the publisher's cache directives.
 
 The OPE discovery document SHOULD be cached by readers for at least 1 hour and at most 24 hours. Publishers SHOULD set appropriate Cache-Control headers on the discovery endpoint.
 
-## 16. Backwards Compatibility
+## 17. Backwards Compatibility
 
 Readers without OPE support will ignore OPE elements, show preview content, and open the publisher page as a fallback. No existing feed functionality is broken. OPE is a purely additive extension.
 
-## 17. Migration Path
+## 18. Migration Path
 
 Existing systems already implement partial equivalents:
 
@@ -696,11 +962,11 @@ Migration strategy:
 4. Implement OAuth2 and grant token issuance (or deploy the reference gateway).
 5. Optionally register with an Entitlement Broker.
 
-## 18. Implementer Guide
+## 19. Implementer Guide
 
 This non-normative section describes the minimum work required to implement OPE, for both publishers and reader developers.
 
-### 18.1 Reference Gateway
+### 19.1 Reference Gateway
 
 Standing up OAuth + token management + content APIs is a significant lift for publishers. The OPE project provides an open-source reference gateway—a deployable container that handles:
 
@@ -714,7 +980,7 @@ The reference gateway is designed to sit alongside an existing publishing stack.
 
 Reference gateway: https://github.com/feedspec/ope-gateway (planned)
 
-### 18.2 For Reader Developers
+### 19.2 For Reader Developers
 
 Minimum viable implementation:
 
@@ -727,7 +993,7 @@ Minimum viable implementation:
 
 **Estimated effort:** For a reader that already supports OAuth2, OPE adds approximately 2-4 weeks of development for a single developer. The heaviest lift is per-publisher session management and token storage.
 
-### 18.3 For Publishers
+### 19.3 For Publishers
 
 Minimum viable implementation (without reference gateway):
 
@@ -739,7 +1005,7 @@ Minimum viable implementation (without reference gateway):
 
 **Estimated effort:** For a publisher running a standard web stack, the discovery and content API add approximately 1-2 weeks. Using the reference gateway reduces this to configuration only.
 
-## 19. Reference Implementations
+## 20. Reference Implementations
 
 - Reference reader: Pull Read (https://pullread.com)
 - Reference publisher: Drafty (https://drafty.com)
@@ -752,7 +1018,7 @@ Publisher reference architecture:
 - Entitlement service (OAuth2 + grant token issuance, refresh, revocation)
 - Content API (authenticated content retrieval with batch support)
 
-## 20. Payment Models (Informative)
+## 21. Payment Models (Informative)
 
 OPE supports multiple payment models. The `grant_type` field in the token indicates how entitlement was obtained:
 
@@ -769,7 +1035,7 @@ OPE supports multiple payment models. The `grant_type` field in the token indica
 
 Compatible payment processors include Stripe, Paddle, Lemon Squeezy, PayPal, WooCommerce, Adyen, and self-hosted billing. Compatible payment protocols include x402, Stripe MPP, and any system that can trigger OPE grant issuance upon successful payment. Micropayment options include Lightning Network, Web Monetization (W3C WICG), and Nostr zaps.
 
-## 21. Complete Worked Example
+## 22. Complete Worked Example
 
 This non-normative section walks through the complete OPE flow from feed discovery to content display.
 
@@ -920,7 +1186,7 @@ Authorization: Bearer <jwt_grant_token>
 
 Alice reads the full article in Pull Read. Future gated articles from shellen.com will be automatically accessible until the grant token expires, at which point Pull Read refreshes it silently.
 
-## 22. Why OPE Matters
+## 23. Why OPE Matters
 
 Historically, publishing stacks combine content, payments, and distribution into monolithic platforms. When a reader subscribes to a Substack newsletter, that subscription is locked to the Substack ecosystem. When a publisher leaves Substack, subscribers don't follow automatically.
 
@@ -932,20 +1198,22 @@ OPE separates these layers so that:
 - **New models emerge:** brokers can create subscription bundles; gift links work cross-platform; institutional access standardizes.
 - **Agents can participate:** OPE grant tokens work for machine clients as naturally as human ones, complementing agentic payment protocols.
 
-## 23. Future Work
+## 24. Future Work
 
 - Reference gateway implementation (open-source OPE container for publishers).
-- Reference broker implementation demonstrating multi-publisher bundles.
+- Reference broker implementation demonstrating multi-publisher bundles and browser-based cross-publisher unlock.
+- Browser extension reference implementation demonstrating HTTP 402 detection, OPE header parsing, and cookie-based unlock.
 - Formal alignment with ATProto permission spaces as the system reaches specification stage.
 - Standardized reader-to-reader entitlement portability (transferring an active subscription between reader clients without re-authentication).
 - Content format negotiation (request markdown vs. HTML vs. structured blocks).
 - Integration with ActivityPub for cross-protocol entitlement verification.
 - Publisher analytics extensions (anonymized read metrics returned to publisher without tracking individual users).
 - Agent-to-agent entitlement flows, where OPE grants serve as capability attestations in A2A communication.
+- Metered reading analytics: standardized mechanism for publishers to track `meter_remaining` decrements across API and browser contexts.
 
 ## Acknowledgments
 
-Thanks to [Max Engel](https://github.com/maxengel) for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 14.
+Thanks to [Max Engel](https://github.com/maxengel) for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the Drafty team for implementation feedback that identified critical gaps in web-based permissioning flows, consent requirements, and error response standardization. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 15.
 
 ---
 
