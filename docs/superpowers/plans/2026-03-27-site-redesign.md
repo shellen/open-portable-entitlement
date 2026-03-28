@@ -324,8 +324,8 @@ export default function () {
     }
 
     return `<h${depth} id="${id}" class="group">
-      <a href="#${id}" class="anchor-link" aria-hidden="true">#</a>
       ${text}
+      <a href="#${id}" class="anchor-link" aria-hidden="true">#</a>
     </h${depth}>`;
   };
 
