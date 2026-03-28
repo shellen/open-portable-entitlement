@@ -5,7 +5,7 @@
 Status: Working Draft
 Editor: Jason Shellen
 https://shellen.com • @shellen.com (ATProto / Bluesky)
-Date: 2026
+Date: March 27, 2026
 
 *A portable entitlement layer for resources discovered through feeds and decentralized publishing. OPE standardizes entitlement verification—not payment systems—enabling portable subscriptions and content access across platforms, clients, and protocols.*
 
