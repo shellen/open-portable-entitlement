@@ -57,5 +57,5 @@ export default function () {
 
   const html = marked.parse(md, { renderer });
 
-  return { html, nav };
+  return { html, nav, md };
 }
