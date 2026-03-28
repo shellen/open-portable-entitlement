@@ -7,19 +7,19 @@ Editor: Jason Shellen
 https://shellen.com • @shellen.com (ATProto / Bluesky)
 Date: 2026
 
-*A portable entitlement layer for resources discovered through feeds and decentralized publishing. OPE standardizes entitlement verification—not payment systems—enabling portable subscriptions and content access across platforms, readers, and protocols.*
+*A portable entitlement layer for resources discovered through feeds and decentralized publishing. OPE standardizes entitlement verification—not payment systems—enabling portable subscriptions and content access across platforms, clients, and protocols.*
 
-**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Web-Based Entitlement (HTTP 402, cookie transport, browser unlock flows), Consent Screen requirements, Dynamic Client Registration (RFC 7591), PKCE requirement, Cross-Publisher Browser Flow via Entitlement Brokers, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, and Complete Worked Example.
+**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Web-Based Entitlement (HTTP 402, cookie transport, browser unlock flows), Consent Screen requirements, Dynamic Client Registration (RFC 7591), PKCE requirement, Cross-Publisher Browser Flow via Entitlement Brokers, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states (text and media), Media Content Retrieval (signed URLs, streaming, media alternatives), RSS Enclosure Interaction for podcasts, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, Extended Grant Types (trial, rental, bundle, ad-supported, early access, family), Complete Worked Examples (article and podcast), and Migration Paths for podcast hosts, video platforms, and course providers.
 
 ---
 
 ## 1. Abstract
 
-Open Portable Entitlement (OPE) proposes a portable method for readers to access protected resources referenced in feeds. The specification enables publishers to distribute preview content through RSS, Atom, JSON Feed, or AT Protocol; authenticate readers; issue entitlement grants; and allow authorized clients to retrieve full content—whether those clients are API consumers, feed readers, browser extensions, or web browsers.
+Open Portable Entitlement (OPE) proposes a portable method for clients to access protected resources referenced in feeds. The specification enables publishers to distribute preview content through RSS, Atom, JSON Feed, or AT Protocol; authenticate users; issue entitlement grants; and allow authorized clients to retrieve full content—whether those clients are API consumers, feed readers, podcast players, video apps, browser extensions, or web browsers.
 
-OPE standardizes entitlement verification, not payment systems. This enables portable subscriptions and resource access across platforms and readers while preserving compatibility with existing feed ecosystems.
+OPE standardizes entitlement verification, not payment systems. This enables portable subscriptions and resource access across platforms and clients while preserving compatibility with existing feed ecosystems.
 
-While the primary use case is content (articles, media, newsletters), the entitlement architecture is deliberately resource-agnostic. The grant token mechanism does not constrain what is being entitled—content, API access, capabilities, or any other gated resource. OPE grant tokens are transport-agnostic: they can be presented via HTTP `Authorization` headers (API clients) or optionally via `HttpOnly` cookies (browsers), using the same token format and verification logic in both cases. The web-based entitlement extension (Section 11) is optional and designed to complement—not replace—existing site authentication systems.
+While the examples in this specification often reference articles and text content, the entitlement architecture is deliberately resource-agnostic. OPE works equally well for articles, podcast episodes, video, music, courses, image galleries, software, or any other gated resource. The grant token mechanism does not constrain what is being entitled—content, media, API access, capabilities, or any other protected resource. OPE grant tokens are transport-agnostic: they can be presented via HTTP `Authorization` headers (API clients) or optionally via `HttpOnly` cookies (browsers), using the same token format and verification logic in both cases. The web-based entitlement extension (Section 11) is optional and designed to complement—not replace—existing site authentication systems.
 
 ## 2. Status of This Document
 
@@ -29,9 +29,9 @@ This document is a working draft intended for discussion among feed ecosystem ma
 
 OPE does not attempt to replace existing feed formats or payment protocols. Instead, it adds a portable entitlement layer that occupies the space between content distribution and payment processing. The architecture deliberately separates four concerns:
 
-- **Content:** the articles, media, and resources themselves
-- **Distribution:** feed formats (RSS, Atom, JSON Feed, ATProto records) that catalog and deliver previews
-- **Entitlement:** verification that a reader has the right to access content
+- **Content:** the articles, podcast episodes, videos, music, courses, and other resources themselves
+- **Distribution:** feed formats (RSS, Atom, JSON Feed, ATProto records) that catalog and deliver previews or trailers
+- **Entitlement:** verification that a user has the right to access content
 - **Payments:** the mechanisms by which money changes hands (explicitly out of scope)
 
 This separation allows publishers and readers to experiment with new monetization models without locking content distribution to a specific platform.
@@ -50,15 +50,15 @@ A publisher could accept payment via x402 micropayment and issue an OPE grant to
 
 | Term | Definition |
 | --- | --- |
-| Resource | Any gated item: article, media, API endpoint, capability |
+| Resource | Any gated item: article, podcast episode, video, music track, course, API endpoint, capability |
 | Feed | Catalog of content items in RSS, Atom, JSON Feed, or ATProto format |
 | Manifest | Publisher metadata describing entitlement and content endpoints |
 | Grant | Authorization allowing access to a resource |
 | Grant Token | Signed token proving access rights |
-| Reader | Client application retrieving and presenting feeds |
+| Client | Application retrieving and presenting feeds and entitled content (also referred to as "reader" when the context is text-based feeds) |
 | Publisher | Content provider issuing entitlements |
 | Entitlement Broker | Optional intermediary aggregating entitlements across publishers |
-| Content Metadata | Structured preview information shown to unentitled readers |
+| Content Metadata | Structured preview information shown to unentitled users |
 
 ## 5. Architecture
 
@@ -95,7 +95,7 @@ GET /.well-known/ope
   "content": {
     "endpoint_template": "https://example.com/api/content/{id}",
     "batch_endpoint": "https://example.com/api/content/batch",
-    "formats_available": ["html", "markdown", "text"]
+    "formats_available": ["html", "markdown", "text", "audio", "video", "streaming_hls", "streaming_dash"]
   },
   "metadata": {
     "subscribe_url": "https://example.com/subscribe",
@@ -107,7 +107,8 @@ GET /.well-known/ope
   },
   "grants_supported": [
     "subscription", "gift", "per_item", "institutional",
-    "metered", "locale_free", "patronage", "broker"
+    "metered", "locale_free", "patronage", "broker",
+    "trial", "rental", "bundle", "ad_supported", "early_access", "family"
   ],
   "broker_support": true,
   "client_registration_endpoint": "https://example.com/api/ope/register",
@@ -283,12 +284,17 @@ Publishers declare their supported mode in the discovery document via `token_mod
 
 | Claim | Type | Description |
 | --- | --- | --- |
-| content_ids | string[] | Specific content items (for per_item grants) |
-| meter_remaining | integer | Reading entitlements remaining in metered access (decrements per content retrieval, not per content creation) |
+| content_ids | string[] | Specific content items (for per_item, rental, and bundle grants) |
+| meter_remaining | integer | Entitlements remaining in metered access (decrements per content retrieval, not per content creation) |
 | institutional_domain | string | Domain for institutional verification |
 | broker_id | string | Broker that issued the grant (for broker grants) |
 | refresh_token | string | Token for refreshing the grant |
 | cnf | object | DPoP confirmation claim (RFC 9449) |
+| trial_expires_at | integer | Unix timestamp when trial period ends (for trial grants) |
+| rental_expires_at | integer | Unix timestamp when rental access ends (for rental grants; may differ from token exp) |
+| bundle_id | string | Identifier for the content bundle (for bundle grants) |
+| group_id | string | Household or group identifier (for family grants) |
+| ad_free | boolean | Whether this grant confers ad-free access (for ad_supported grants) |
 
 ### 8.4 Example Token (Portable Mode)
 
@@ -317,9 +323,11 @@ Macaroons are particularly useful for broker scenarios because they allow a brok
 
 ## 9. Feed Extensions
 
-Feeds declare entitlement requirements per item. OPE introduces structured content metadata so readers can present meaningful information to unentitled users.
+Feeds declare entitlement requirements per item. OPE introduces structured content metadata so clients can present meaningful information to unentitled users.
 
 ### 9.1 JSON Feed
+
+**Article example:**
 
 ```json
 {
@@ -332,9 +340,9 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
       "grants_allowed": ["subscription", "gift", "per_item", "broker"],
       "content_id": "post-123",
       "content_metadata": {
+        "resource_type": "article",
         "word_count": 3200,
         "estimated_read_time_minutes": 14,
-        "content_type": "essay",
         "preview_image": "https://shellen.com/img/post-123-hero.jpg",
         "unlock_cta": "Subscribe to read the full essay",
         "unlock_url": "https://shellen.com/post-123?ope_unlock=1",
@@ -345,7 +353,81 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
 }
 ```
 
-**content_metadata**: Provides structured information for readers to display rich previews of gated content. All fields are optional. The **unlock_cta** field allows publishers to specify a call-to-action string. The **unlock_url** field provides a browser-openable URL that triggers the web-based entitlement flow (see Section 11), bridging feed discovery to browser access. The **per_item_price** field uses the smallest currency unit (e.g., cents for USD).
+**Podcast episode example:**
+
+```json
+{
+  "id": "episode-42",
+  "title": "Interview: The Future of Open Podcasting",
+  "content_text": "Preview: A 2-minute clip from our conversation about...",
+  "attachments": [
+    {
+      "url": "https://shellen.com/podcast/ep42-preview.mp3",
+      "mime_type": "audio/mpeg",
+      "size_in_bytes": 2400000
+    }
+  ],
+  "extensions": {
+    "ope": {
+      "required": { "level": "subscriber" },
+      "grants_allowed": ["subscription", "ad_supported", "per_item", "broker"],
+      "content_id": "episode-42",
+      "content_metadata": {
+        "resource_type": "podcast_episode",
+        "duration_seconds": 3420,
+        "media_type": "audio/mpeg",
+        "file_size_bytes": 54800000,
+        "series_title": "Shellen on Feeds",
+        "episode_number": 42,
+        "season_number": 3,
+        "preview_image": "https://shellen.com/podcast/ep42-art.jpg",
+        "unlock_cta": "Subscribe for the full episode",
+        "unlock_url": "https://shellen.com/podcast/ep42?ope_unlock=1",
+        "per_item_price": { "currency": "USD", "amount": 200 }
+      }
+    }
+  }
+}
+```
+
+#### 9.1.1 Content Metadata Field Reference
+
+**content_metadata** provides structured information for clients to display rich previews of gated content. All fields are optional.
+
+**Common fields (all resource types):**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| resource_type | string | The type of resource. Known values: `article`, `essay`, `newsletter`, `podcast_episode`, `audio`, `video`, `music_track`, `album`, `course_lesson`, `course`, `gallery`, `software`, `dataset` |
+| preview_image | string | URL to a preview/hero image or artwork |
+| unlock_cta | string | Call-to-action string for unentitled users |
+| unlock_url | string | Browser-openable URL triggering the web-based entitlement flow (Section 11) |
+| per_item_price | object | Price for per-item purchase, using smallest currency unit (e.g., cents for USD): `{ "currency": "USD", "amount": 200 }` |
+
+**Text-specific fields:**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| word_count | integer | Total word count of the full content |
+| estimated_read_time_minutes | integer | Estimated reading time |
+
+**Media-specific fields (audio, video, podcasts):**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| duration_seconds | integer | Duration of the media in seconds |
+| media_type | string | MIME type of the full media file (e.g., `audio/mpeg`, `video/mp4`) |
+| file_size_bytes | integer | Size of the full media file in bytes |
+| series_title | string | Name of the podcast, video series, or course |
+| episode_number | integer | Episode number within a season or series |
+| season_number | integer | Season number, if applicable |
+| bitrate_kbps | integer | Bitrate in kilobits per second |
+
+**Gallery/collection fields:**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| item_count | integer | Number of items in a gallery, album, or collection |
 
 ### 9.2 Atom (RFC 4287)
 
@@ -354,6 +436,8 @@ Namespace:
 ```
 xmlns:ope="https://feedspec.org/ope/ns/1.0"
 ```
+
+**Article example:**
 
 ```xml
 <entry>
@@ -370,6 +454,7 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
       <ope:type>broker</ope:type>
     </ope:grant-types>
     <ope:metadata>
+      <ope:resource-type>article</ope:resource-type>
       <ope:word-count>3200</ope:word-count>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
       <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
@@ -378,7 +463,40 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
 </entry>
 ```
 
+**Podcast episode example:**
+
+```xml
+<entry>
+  <id>https://shellen.com/podcast/ep42</id>
+  <title>Interview: The Future of Open Podcasting</title>
+  <updated>2026-03-10T00:00:00Z</updated>
+  <link rel="alternate" href="https://shellen.com/podcast/ep42" type="text/html"/>
+  <link rel="enclosure" href="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+  <summary>Preview: A 2-minute clip from our conversation about...</summary>
+  <ope:access level="subscriber">
+    <ope:content-id>episode-42</ope:content-id>
+    <ope:grant-types>
+      <ope:type>subscription</ope:type>
+      <ope:type>ad_supported</ope:type>
+      <ope:type>per_item</ope:type>
+    </ope:grant-types>
+    <ope:metadata>
+      <ope:resource-type>podcast_episode</ope:resource-type>
+      <ope:duration-seconds>3420</ope:duration-seconds>
+      <ope:media-type>audio/mpeg</ope:media-type>
+      <ope:series-title>Shellen on Feeds</ope:series-title>
+      <ope:episode-number>42</ope:episode-number>
+      <ope:season-number>3</ope:season-number>
+      <ope:unlock-cta>Subscribe for the full episode</ope:unlock-cta>
+      <ope:unlock-url>https://shellen.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
+    </ope:metadata>
+  </ope:access>
+</entry>
+```
+
 ### 9.3 RSS 2.0
+
+**Article example:**
 
 ```xml
 <item>
@@ -388,6 +506,7 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
   <ope:access level="subscriber">
     <ope:content-id>post-123</ope:content-id>
     <ope:metadata>
+      <ope:resource-type>article</ope:resource-type>
       <ope:unlock-cta>Subscribe to read the full essay</ope:unlock-cta>
       <ope:unlock-url>https://shellen.com/post-123?ope_unlock=1</ope:unlock-url>
     </ope:metadata>
@@ -395,9 +514,48 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
 </item>
 ```
 
+**Podcast episode example (with enclosure):**
+
+OPE works alongside the standard RSS `<enclosure>` element used by podcast feeds. When an episode is gated, the enclosure MAY point to a preview clip or trailer, while the full episode is available through OPE content retrieval. Clients that do not support OPE will see the preview enclosure and degrade gracefully.
+
+```xml
+<item>
+  <title>Interview: The Future of Open Podcasting</title>
+  <link>https://shellen.com/podcast/ep42</link>
+  <description>Preview: A 2-minute clip from our conversation about...</description>
+  <enclosure url="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+  <ope:access level="subscriber">
+    <ope:content-id>episode-42</ope:content-id>
+    <ope:metadata>
+      <ope:resource-type>podcast_episode</ope:resource-type>
+      <ope:duration-seconds>3420</ope:duration-seconds>
+      <ope:media-type>audio/mpeg</ope:media-type>
+      <ope:file-size-bytes>54800000</ope:file-size-bytes>
+      <ope:series-title>Shellen on Feeds</ope:series-title>
+      <ope:episode-number>42</ope:episode-number>
+      <ope:season-number>3</ope:season-number>
+      <ope:unlock-cta>Subscribe for the full episode</ope:unlock-cta>
+      <ope:unlock-url>https://shellen.com/podcast/ep42?ope_unlock=1</ope:unlock-url>
+    </ope:metadata>
+  </ope:access>
+</item>
+```
+
+### 9.4 Enclosure Interaction
+
+For podcast and media feeds, OPE metadata complements rather than replaces the existing `<enclosure>` element (RSS) or `attachments` array (JSON Feed). Publishers have two strategies for gated media:
+
+1. **Preview enclosure:** The enclosure/attachment points to a free preview clip or trailer. The full media file is retrieved through the OPE content endpoint after entitlement verification. This is the RECOMMENDED approach as it maintains backwards compatibility with non-OPE clients.
+
+2. **Omitted enclosure:** The enclosure is absent for gated items, and the full media URL is only available through the OPE content endpoint. Non-OPE clients see the text description only.
+
+In both cases, the `content_metadata` fields (`duration_seconds`, `media_type`, `file_size_bytes`) describe the *full* entitled resource, not the preview.
+
 ## 10. Content Retrieval
 
 ### 10.1 Single Item
+
+**Article retrieval:**
 
 ```
 GET /api/content/post-123
@@ -415,11 +573,56 @@ Content-Type: application/json
 {
   "id": "post-123",
   "title": "Deep Essay on Protocol Design",
+  "resource_type": "article",
   "content_html": "<p>Full article content...</p>",
   "published": "2026-03-03T00:00:00Z",
   "author": { "name": "Jason Shellen", "url": "https://shellen.com" }
 }
 ```
+
+**Media retrieval (podcast episode):**
+
+```
+GET /api/content/episode-42
+Authorization: Bearer <grant_token>
+Accept: application/json
+```
+
+```
+200 OK
+Cache-Control: private, max-age=3600
+Content-Type: application/json
+```
+
+```json
+{
+  "id": "episode-42",
+  "title": "Interview: The Future of Open Podcasting",
+  "resource_type": "podcast_episode",
+  "published": "2026-03-10T00:00:00Z",
+  "author": { "name": "Jason Shellen" },
+  "media": {
+    "url": "https://shellen.com/podcast/ep42-full.mp3",
+    "mime_type": "audio/mpeg",
+    "size_bytes": 54800000,
+    "duration_seconds": 3420,
+    "bitrate_kbps": 128
+  },
+  "media_alternatives": [
+    {
+      "url": "https://shellen.com/podcast/ep42-full-hq.mp3",
+      "mime_type": "audio/mpeg",
+      "size_bytes": 82200000,
+      "bitrate_kbps": 192
+    }
+  ],
+  "content_html": "<p>Show notes: In this episode we discuss...</p>"
+}
+```
+
+The `media` object provides the primary media file for non-text resources. The `media_alternatives` array allows publishers to offer multiple quality levels or formats (e.g., MP3 and AAC, SD and HD video). For streaming content, the `media.url` MAY point to an HLS manifest (`.m3u8`) or DASH manifest (`.mpd`). The `content_html` field MAY still be present for media resources to provide show notes, liner notes, video descriptions, or other supplementary text.
+
+Media URLs returned by the content endpoint MAY be signed URLs with limited TTL. Publishers SHOULD set URL expiry to match or exceed the grant token's TTL. Clients MUST NOT cache or redistribute media URLs beyond the grant token's validity period.
 
 ### 10.2 Batch Retrieval
 
@@ -838,7 +1041,7 @@ Suggested namespace: `org.feedspec.ope.*`
           "publisher": { "type": "string", "description": "Publisher DID" },
           "subject": { "type": "string", "description": "User DID" },
           "grantType": { "type": "string",
-            "knownValues": ["subscription","gift","per_item","institutional","metered","locale_free","patronage","broker"] },
+            "knownValues": ["subscription","gift","per_item","institutional","metered","locale_free","patronage","broker","trial","rental","bundle","ad_supported","early_access","family"] },
           "scope": { "type": "array", "items": { "type": "string" } },
           "contentId": { "type": "string" },
           "brokerId": { "type": "string", "description": "Broker DID, if broker grant" },
@@ -875,10 +1078,23 @@ Suggested namespace: `org.feedspec.ope.*`
           "required": ["contentId"],
           "properties": {
             "contentId": { "type": "string" },
+            "resourceType": { "type": "string", "description": "Resource type: article, podcast_episode, video, etc." },
             "contentHtml": { "type": "string" },
             "contentMarkdown": { "type": "string" },
-            "publishedAt": { "type": "string", "format": "datetime" }
+            "publishedAt": { "type": "string", "format": "datetime" },
+            "media": { "$ref": "#defs/mediaObject" }
           }
+        }
+      },
+      "mediaObject": {
+        "type": "object",
+        "required": ["url", "mimeType"],
+        "properties": {
+          "url": { "type": "string", "description": "URL to the full media file (may be a signed URL)" },
+          "mimeType": { "type": "string", "description": "MIME type of the media file" },
+          "sizeBytes": { "type": "integer", "description": "File size in bytes" },
+          "durationSeconds": { "type": "integer", "description": "Duration in seconds for audio/video" },
+          "bitrateKbps": { "type": "integer", "description": "Bitrate in kilobits per second" }
         }
       },
       "errors": [
@@ -953,6 +1169,13 @@ Existing systems already implement partial equivalents:
 | Substack | Private feed tokens | Replace tokens with OPE OAuth flow |
 | Daring Fireball-style | HTTP Basic Auth on feed URLs | Add discovery, upgrade to OAuth2 |
 | Patreon | Per-tier RSS feeds | Map tiers to access levels in OPE metadata |
+| Apple Podcasts Subscriptions | Platform-locked premium episodes | Add OPE metadata to RSS feed, expose discovery; OPE grants complement Apple's IAP entitlement |
+| Spotify (premium podcasts) | Platform-exclusive gating | Publish OPE-enabled RSS alongside Spotify; portable grants unlock in any client |
+| Supercast / Supporting Cast | Private RSS feed per subscriber | Replace per-subscriber feed URLs with OPE OAuth + grant tokens on a single feed |
+| Acast+ / Wondery+ | Ad-free and bonus episodes | Map ad-free tier to `ad_supported` grant type; bonus content as `subscription` or `per_item` |
+| YouTube / Nebula / Floatplane | Platform-gated video | Add OPE metadata to JSON Feed or Atom; serve video via signed media URLs in content endpoint |
+| Bandcamp | Album/track purchase | Map purchases to `per_item` or `bundle` grants scoped to album content_ids |
+| Teachable / Podia / Kajabi | Course enrollment | Map enrollment to `bundle` grant with sequential content_ids per lesson |
 
 Migration strategy:
 
@@ -1025,13 +1248,19 @@ OPE supports multiple payment models. The `grant_type` field in the token indica
 | Model | grant_type | Description |
 | --- | --- | --- |
 | Subscription | subscription | Recurring payment, access to all content |
-| Per-item | per_item | Pay per article, token scoped to content_ids |
+| Per-item | per_item | Pay per article, episode, or track; token scoped to content_ids |
 | Gift | gift | Shareable unlock, typically time-limited |
 | Institutional | institutional | Domain/IP-based access (libraries, universities) |
-| Metered | metered | Free article limit, meter_remaining in token |
+| Metered | metered | Free content limit, meter_remaining in token |
 | Locale-free | locale_free | Regional free access based on user locale |
 | Patronage | patronage | Voluntary support, may grant all access |
 | Broker | broker | Access via entitlement broker bundle |
+| Trial | trial | Time-limited free access for new users; token includes trial expiry |
+| Rental | rental | Time-limited access to specific content (e.g., rent a film for 48 hours); token scoped to content_ids with short TTL |
+| Bundle | bundle | Access to a defined content collection (podcast season, album, course); token scoped to a set of content_ids |
+| Ad-supported | ad_supported | Free access with advertising; entitlement signals ad-free tier when present |
+| Early access | early_access | Pre-release access before public availability (common for patron-tier podcast episodes) |
+| Family / Group | family | Shared household or group access under a single subscription; token includes group_id |
 
 Compatible payment processors include Stripe, Paddle, Lemon Squeezy, PayPal, WooCommerce, Adyen, and self-hosted billing. Compatible payment protocols include x402, Stripe MPP, and any system that can trigger OPE grant issuance upon successful payment. Micropayment options include Lightning Network, Web Monetization (W3C WICG), and Nostr zaps.
 
@@ -1186,16 +1415,89 @@ Authorization: Bearer <jwt_grant_token>
 
 Alice reads the full article in Pull Read. Future gated articles from shellen.com will be automatically accessible until the grant token expires, at which point Pull Read refreshes it silently.
 
+### Worked Example: Podcast Episode
+
+**Scenario:** Bob uses Podcast App (an OPE-compatible podcast player). He subscribes to the "Shellen on Feeds" podcast RSS feed. Most episodes are free with ads, but premium subscribers get ad-free episodes and bonus content.
+
+#### Step 1: Podcast App fetches the RSS feed
+
+```
+GET https://shellen.com/podcast/feed.xml
+```
+
+```xml
+<rss version="2.0" xmlns:ope="https://feedspec.org/ope/ns/1.0">
+  <channel>
+    <title>Shellen on Feeds</title>
+    <item>
+      <title>Episode 41: RSS at 25</title>
+      <enclosure url="https://shellen.com/podcast/ep41.mp3" type="audio/mpeg" length="41000000"/>
+      <description>A look back at 25 years of RSS...</description>
+    </item>
+    <item>
+      <title>Episode 42: The Future of Open Podcasting (Premium)</title>
+      <enclosure url="https://shellen.com/podcast/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+      <description>Preview: A 2-minute clip from our conversation...</description>
+      <ope:access level="subscriber">
+        <ope:content-id>episode-42</ope:content-id>
+        <ope:metadata>
+          <ope:resource-type>podcast_episode</ope:resource-type>
+          <ope:duration-seconds>3420</ope:duration-seconds>
+          <ope:media-type>audio/mpeg</ope:media-type>
+          <ope:series-title>Shellen on Feeds</ope:series-title>
+          <ope:episode-number>42</ope:episode-number>
+          <ope:season-number>3</ope:season-number>
+          <ope:unlock-cta>Subscribe for $3/month for ad-free and bonus episodes</ope:unlock-cta>
+          <ope:unlock-url>https://shellen.com/podcast/subscribe?ope_unlock=1</ope:unlock-url>
+        </ope:metadata>
+      </ope:access>
+    </item>
+  </channel>
+</rss>
+```
+
+Podcast App plays Episode 41 normally (it's free). For Episode 42, it detects the `ope:access` element and shows the 2-minute preview clip with the unlock CTA.
+
+#### Step 2: Bob subscribes
+
+Bob taps "Subscribe for $3/month." Podcast App initiates the OPE OAuth flow (same as Steps 2-5 in the article example above). After authentication and payment, Bob receives a grant token with `grant_type: "subscription"`.
+
+#### Step 3: Podcast App retrieves the full episode
+
+```
+GET https://shellen.com/api/content/episode-42
+Authorization: Bearer <jwt_grant_token>
+```
+
+```json
+{
+  "id": "episode-42",
+  "title": "Interview: The Future of Open Podcasting",
+  "resource_type": "podcast_episode",
+  "published": "2026-03-10T00:00:00Z",
+  "media": {
+    "url": "https://shellen.com/podcast/ep42-full-adfree.mp3?sig=<signed_token>&exp=1710003600",
+    "mime_type": "audio/mpeg",
+    "size_bytes": 54800000,
+    "duration_seconds": 3420
+  },
+  "content_html": "<p><strong>Show notes:</strong> In this episode, Jason talks with...</p>"
+}
+```
+
+Podcast App downloads the full ad-free episode from the signed media URL and plays it. The signed URL expires alongside the grant token, preventing URL sharing. Future premium episodes are automatically accessible until the grant refreshes.
+
 ## 23. Why OPE Matters
 
-Historically, publishing stacks combine content, payments, and distribution into monolithic platforms. When a reader subscribes to a Substack newsletter, that subscription is locked to the Substack ecosystem. When a publisher leaves Substack, subscribers don't follow automatically.
+Historically, publishing stacks combine content, payments, and distribution into monolithic platforms. When a reader subscribes to a Substack newsletter, that subscription is locked to the Substack ecosystem. When a listener pays for a premium podcast on Apple Podcasts, that access doesn't transfer to their preferred podcast player. When a publisher leaves Substack, subscribers don't follow automatically.
 
 OPE separates these layers so that:
 
-- **Subscriptions are portable:** a reader's entitlement works in any OPE-compatible client.
-- **Readers choose their tools:** any reader app can present gated content, not just the publisher's website.
+- **Subscriptions are portable:** a user's entitlement works in any OPE-compatible client — feed reader, podcast player, video app, or browser.
+- **Users choose their tools:** any compatible app can present gated content, not just the publisher's website or a platform's proprietary player.
 - **Publishers retain control:** entitlement issuance and content delivery remain with the publisher.
-- **New models emerge:** brokers can create subscription bundles; gift links work cross-platform; institutional access standardizes.
+- **Media types are equal:** articles, podcasts, video, music, and courses all use the same entitlement layer — no per-format silos.
+- **New models emerge:** brokers can create subscription bundles; gift links work cross-platform; institutional access standardizes; ad-free tiers and trials compose naturally.
 - **Agents can participate:** OPE grant tokens work for machine clients as naturally as human ones, complementing agentic payment protocols.
 
 ## 24. Future Work
@@ -1203,13 +1505,18 @@ OPE separates these layers so that:
 - Reference gateway implementation (open-source OPE container for publishers).
 - Reference broker implementation demonstrating multi-publisher bundles and browser-based cross-publisher unlock.
 - Browser extension reference implementation demonstrating HTTP 402 detection, OPE header parsing, and cookie-based unlock.
+- Reference podcast gateway demonstrating OPE-enabled RSS feed with gated episodes and signed media URL delivery.
 - Formal alignment with ATProto permission spaces as the system reaches specification stage.
-- Standardized reader-to-reader entitlement portability (transferring an active subscription between reader clients without re-authentication).
-- Content format negotiation (request markdown vs. HTML vs. structured blocks).
+- Standardized client-to-client entitlement portability (transferring an active subscription between client apps without re-authentication).
+- Content format negotiation (request markdown vs. HTML vs. structured blocks vs. media quality/bitrate).
+- Adaptive streaming support: formalize HLS and DASH manifest delivery through the content endpoint for video and live audio.
+- Offline media access: standardize how clients cache entitled media files for offline playback within grant token validity windows.
 - Integration with ActivityPub for cross-protocol entitlement verification.
-- Publisher analytics extensions (anonymized read metrics returned to publisher without tracking individual users).
+- Integration with Podcasting 2.0 namespace (`podcast:`) for compatibility with modern podcast feed extensions.
+- Publisher analytics extensions (anonymized consumption metrics returned to publisher without tracking individual users).
 - Agent-to-agent entitlement flows, where OPE grants serve as capability attestations in A2A communication.
-- Metered reading analytics: standardized mechanism for publishers to track `meter_remaining` decrements across API and browser contexts.
+- Metered access analytics: standardized mechanism for publishers to track `meter_remaining` decrements across API and browser contexts.
+- DRM-free media protection: explore signed URL best practices and time-limited download tokens as an alternative to traditional DRM for entitled media.
 
 ## Acknowledgments
 

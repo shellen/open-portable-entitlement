@@ -2,13 +2,13 @@
 
 **A portable entitlement layer for the open web.**
 
-OPE standardizes how readers prove they have access to gated content — across any app, any feed format, and any platform. Subscribe once, read anywhere.
+OPE standardizes how users prove they have access to gated content — across any app, any feed format, and any platform. Subscribe once, access anywhere: articles, podcasts, video, music, courses, and more.
 
 ## Why OPE?
 
-The web's subscription ecosystem is fragmented. Every publisher builds their own paywall, every reader app negotiates its own deals, and subscribers are locked into platform-specific access. OPE proposes a standard entitlement layer that sits between content distribution (RSS, Atom, JSON Feed, AT Protocol) and payment processing (Stripe, x402, Lightning). Publishers keep control. Readers gain portability. The open web gets a missing piece.
+The web's subscription ecosystem is fragmented. Every publisher builds their own paywall, every podcast platform locks premium episodes to its app, every reader negotiates its own deals, and subscribers are locked into platform-specific access. OPE proposes a standard entitlement layer that sits between content distribution (RSS, Atom, JSON Feed, AT Protocol) and payment processing (Stripe, x402, Lightning). Publishers keep control. Users gain portability. The open web gets a missing piece.
 
-OPE doesn't handle payments — it proves you're allowed in. How you earned access (subscription, gift, institutional, patronage) is up to the publisher. OPE standardizes how that access is verified.
+OPE doesn't handle payments — it proves you're allowed in. How you earned access (subscription, gift, institutional, patronage, trial, ad-free tier) is up to the publisher. OPE standardizes how that access is verified — for articles, podcast episodes, video, music, courses, and any other gated resource.
 
 ## Read the Spec
 
@@ -41,6 +41,10 @@ OPE is a working draft. Feedback, questions, and contributions are welcome:
 3. **Start a discussion** in GitHub Discussions for broader topics
 
 The specification source is `OPE-Specification.md`. The site is built with [Eleventy](https://www.11ty.dev/) and [Tailwind CSS](https://tailwindcss.com/).
+
+## License
+
+This specification and site are licensed under the [Apache License 2.0](./LICENSE).
 
 ## Author
 
