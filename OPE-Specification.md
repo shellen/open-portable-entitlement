@@ -9,7 +9,7 @@ Date: March 27, 2026
 
 *A portable entitlement layer for resources discovered through feeds and decentralized publishing. OPE standardizes entitlement verification—not payment systems—enabling portable subscriptions and content access across platforms, clients, and protocols.*
 
-**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Web-Based Entitlement (HTTP 402, cookie transport, browser unlock flows), Consent Screen requirements, Dynamic Client Registration (RFC 7591), PKCE requirement, Cross-Publisher Browser Flow via Entitlement Brokers, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states (text and media), Media Content Retrieval (signed URLs, streaming, media alternatives), RSS Enclosure Interaction for podcasts, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, Extended Grant Types (trial, rental, bundle, ad-supported, early access, family), Complete Worked Examples (article and podcast), and Migration Paths for podcast hosts, video platforms, and course providers.
+**This draft includes:** RFC 8414 OAuth Discovery alignment, Simple and Portable token modes, PAR/RAR/DPoP support, Web-Based Entitlement (HTTP 402, cookie transport, browser unlock flows), Consent Screen requirements, Dynamic Client Registration (RFC 7591), PKCE requirement, Cross-Publisher Browser Flow via Entitlement Brokers, Security Considerations, Implementer Guide with Reference Gateway, Entitlement Aggregation, Content Metadata for unentitled states (text and media), Media Content Retrieval (signed URLs, streaming, media alternatives), RSS Enclosure Interaction for podcasts, Batch Content Retrieval, Multi-publisher Session Management, ATProto Permission Spaces integration path, Payment Protocol landscape positioning, Grant Primitives (access, limit, signal) with composable fields replacing 14 named types, Complete Worked Examples (article and podcast), and Migration Paths for podcast hosts, video platforms, and course providers.
 
 ---
 
@@ -105,11 +105,7 @@ GET /.well-known/ope
       { "id": "annual", "name": "Annual", "currency": "USD", "amount": 5000 }
     ]
   },
-  "grants_supported": [
-    "subscription", "gift", "per_item", "institutional",
-    "metered", "locale_free", "patronage", "broker",
-    "trial", "rental", "bundle", "ad_supported", "early_access", "family"
-  ],
+  "grants_supported": ["access", "limit", "signal"],
   "broker_support": true,
   "client_registration_endpoint": "https://example.com/api/ope/register",
   "web": {
@@ -182,7 +178,12 @@ Publishers SHOULD support RAR for fine-grained permission definitions. RAR enabl
     {
       "type": "ope_entitlement",
       "publisher": "did:web:shellen.com",
-      "grant_type": "subscription",
+      "grant": {
+        "type": "access",
+        "scope": "all",
+        "duration": "recurring",
+        "source": "direct"
+      },
       "scopes": ["content:read", "content:batch"]
     }
   ]
@@ -275,26 +276,26 @@ Publishers declare their supported mode in the discovery document via `token_mod
 | iss | string | Publisher domain or DID |
 | sub | string | User identifier |
 | scope | string[] | Access scopes granted |
-| grant_type | string | Origin of the grant (subscription, gift, etc.) |
+| grant | object | Grant primitive (see Section 21). Contains `type` and composable fields |
 | exp | integer | Expiry timestamp (Unix epoch) |
 | iat | integer | Issued-at timestamp |
 | jti | string | Unique token identifier (for revocation) |
+
+The `grant` claim replaces the former `grant_type` string. It carries the full grant primitive object, enabling validators to check a single structured claim rather than inferring behavior from a flat string. See Section 21 for the complete field grammar.
 
 ### 8.3 Optional Claims
 
 | Claim | Type | Description |
 | --- | --- | --- |
-| content_ids | string[] | Specific content items (for per_item, rental, and bundle grants) |
-| meter_remaining | integer | Entitlements remaining in metered access (decrements per content retrieval, not per content creation) |
-| institutional_domain | string | Domain for institutional verification |
-| broker_id | string | Broker that issued the grant (for broker grants) |
+| content_ids | string[] | Specific content items (for `access` grants with scope `item` or `collection`) |
+| meter_remaining | integer | Entitlements remaining (for `limit` grants with kind `metered`; decrements per content retrieval) |
+| institutional_domain | string | Domain for institutional verification (for `signal` grants with kind `institutional`) |
+| broker_id | string | Broker that issued the grant (for grants with source `broker`) |
 | refresh_token | string | Token for refreshing the grant |
 | cnf | object | DPoP confirmation claim (RFC 9449) |
-| trial_expires_at | integer | Unix timestamp when trial period ends (for trial grants) |
-| rental_expires_at | integer | Unix timestamp when rental access ends (for rental grants; may differ from token exp) |
-| bundle_id | string | Identifier for the content bundle (for bundle grants) |
-| group_id | string | Household or group identifier (for family grants) |
-| ad_free | boolean | Whether this grant confers ad-free access (for ad_supported grants) |
+| rental_expires_at | integer | Unix timestamp when rental access ends (for `access` grants with `rental:Nh` duration; may differ from token exp) |
+| bundle_id | string | Identifier for the content bundle (for `access` grants with scope `collection`) |
+| group_id | string | Household or group identifier (for `signal` grants with kind `group-member`) |
 
 ### 8.4 Example Token (Portable Mode)
 
@@ -303,7 +304,12 @@ Publishers declare their supported mode in the discovery document via `token_mod
   "iss": "shellen.com",
   "sub": "user123",
   "scope": ["content:read", "content:batch"],
-  "grant_type": "subscription",
+  "grant": {
+    "type": "access",
+    "scope": "all",
+    "duration": "recurring",
+    "source": "direct"
+  },
   "exp": 1710000000,
   "iat": 1709996400,
   "jti": "grant_abc123",
@@ -337,7 +343,7 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
   "extensions": {
     "ope": {
       "required": { "level": "subscriber" },
-      "grants_allowed": ["subscription", "gift", "per_item", "broker"],
+      "grants_allowed": ["access", "signal"],
       "content_id": "post-123",
       "content_metadata": {
         "resource_type": "article",
@@ -370,7 +376,7 @@ Feeds declare entitlement requirements per item. OPE introduces structured conte
   "extensions": {
     "ope": {
       "required": { "level": "subscriber" },
-      "grants_allowed": ["subscription", "ad_supported", "per_item", "broker"],
+      "grants_allowed": ["access", "limit", "signal"],
       "content_id": "episode-42",
       "content_metadata": {
         "resource_type": "podcast_episode",
@@ -449,9 +455,8 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
   <ope:access level="subscriber">
     <ope:content-id>post-123</ope:content-id>
     <ope:grant-types>
-      <ope:type>subscription</ope:type>
-      <ope:type>gift</ope:type>
-      <ope:type>broker</ope:type>
+      <ope:type>access</ope:type>
+      <ope:type>signal</ope:type>
     </ope:grant-types>
     <ope:metadata>
       <ope:resource-type>article</ope:resource-type>
@@ -476,9 +481,9 @@ xmlns:ope="https://feedspec.org/ope/ns/1.0"
   <ope:access level="subscriber">
     <ope:content-id>episode-42</ope:content-id>
     <ope:grant-types>
-      <ope:type>subscription</ope:type>
-      <ope:type>ad_supported</ope:type>
-      <ope:type>per_item</ope:type>
+      <ope:type>access</ope:type>
+      <ope:type>signal</ope:type>
+      <ope:type>limit</ope:type>
     </ope:grant-types>
     <ope:metadata>
       <ope:resource-type>podcast_episode</ope:resource-type>
@@ -801,7 +806,7 @@ The most powerful application of web-based entitlement is cross-publisher access
 8. Reader sees full content
 ```
 
-This flow is structurally identical to OpenID Connect—the broker acts as an identity-and-entitlement provider. The `broker` grant type (already defined in Section 8) carries the authorization. See Section 14.1 for the broker's verification responsibilities.
+This flow is structurally identical to OpenID Connect—the broker acts as an identity-and-entitlement provider. An `access` grant with source `broker` (already defined in Section 21) carries the authorization. See Section 14.1 for the broker's verification responsibilities.
 
 ### 11.5 CORS Requirements for Web Clients
 
@@ -930,7 +935,7 @@ Reader → Publisher (present broker grant token for content)
 Publishers that support brokers MUST:
 
 - Declare `broker_support: true` in their discovery endpoint
-- Accept the `"broker"` grant type
+- Accept grants with source `"broker"`
 - Verify the broker's identity using a pre-established trust relationship (e.g., a signed broker certificate or a registered broker_id)
 - Validate that the broker's token includes the required content scope
 
@@ -1032,19 +1037,37 @@ Suggested namespace: `org.feedspec.ope.*`
   "lexicon": 1,
   "id": "org.feedspec.ope.entitlement.grant",
   "defs": {
+    "grant": {
+      "type": "object",
+      "description": "Grant primitive object (see Section 21)",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "knownValues": ["access", "limit", "signal"] },
+        "scope": { "type": "string", "knownValues": ["all", "item", "collection", "pre-release"],
+          "description": "Content scope (access grants only)" },
+        "kind": { "type": "string",
+          "description": "Qualifier for limit or signal grants (e.g., metered, locale-gated, patron, institutional, ad-free, group-member)" },
+        "duration": { "type": "string",
+          "description": "Time behavior (access grants only): perpetual, recurring, time-limited, or rental:Nh" },
+        "transferable": { "type": "boolean", "description": "Whether the grant can be shared (access grants only)" },
+        "quota": { "type": "integer", "description": "Number of items allowed per period (limit grants only)" },
+        "period": { "type": "string", "description": "Reset cadence (limit grants only): month, week, day" },
+        "source": { "type": "string", "knownValues": ["direct", "broker", "institution", "family-plan"],
+          "description": "Origin of entitlement" }
+      }
+    },
     "main": {
       "type": "record",
       "record": {
         "type": "object",
-        "required": ["publisher", "subject", "grantType", "expiresAt"],
+        "required": ["publisher", "subject", "grant", "expiresAt"],
         "properties": {
           "publisher": { "type": "string", "description": "Publisher DID" },
           "subject": { "type": "string", "description": "User DID" },
-          "grantType": { "type": "string",
-            "knownValues": ["subscription","gift","per_item","institutional","metered","locale_free","patronage","broker","trial","rental","bundle","ad_supported","early_access","family"] },
+          "grant": { "type": "ref", "ref": "#grant", "description": "Grant primitive (see Section 21)" },
           "scope": { "type": "array", "items": { "type": "string" } },
           "contentId": { "type": "string" },
-          "brokerId": { "type": "string", "description": "Broker DID, if broker grant" },
+          "brokerId": { "type": "string", "description": "Broker DID, if source is broker" },
           "spaceKey": { "type": "string", "description": "Permission space key, if space-scoped" },
           "expiresAt": { "type": "string", "format": "datetime" }
         }
@@ -1165,17 +1188,17 @@ Existing systems already implement partial equivalents:
 | Platform | Existing Behavior | OPE Migration |
 | --- | --- | --- |
 | WordPress | Member RSS feeds | Add OPE namespace to existing feeds, expose discovery |
-| Ghost | Subscriber RSS | Map tiers to grant types, add discovery endpoint |
+| Ghost | Subscriber RSS | Map tiers to grant primitives (`access`, `limit`, `signal`), add discovery endpoint |
 | Substack | Private feed tokens | Replace tokens with OPE OAuth flow |
 | Daring Fireball-style | HTTP Basic Auth on feed URLs | Add discovery, upgrade to OAuth2 |
 | Patreon | Per-tier RSS feeds | Map tiers to access levels in OPE metadata |
 | Apple Podcasts Subscriptions | Platform-locked premium episodes | Add OPE metadata to RSS feed, expose discovery; OPE grants complement Apple's IAP entitlement |
 | Spotify (premium podcasts) | Platform-exclusive gating | Publish OPE-enabled RSS alongside Spotify; portable grants unlock in any client |
 | Supercast / Supporting Cast | Private RSS feed per subscriber | Replace per-subscriber feed URLs with OPE OAuth + grant tokens on a single feed |
-| Acast+ / Wondery+ | Ad-free and bonus episodes | Map ad-free tier to `ad_supported` grant type; bonus content as `subscription` or `per_item` |
+| Acast+ / Wondery+ | Ad-free and bonus episodes | Map ad-free tier to `signal` grant (kind: `ad-free`); bonus content as `access` grants |
 | YouTube / Nebula / Floatplane | Platform-gated video | Add OPE metadata to JSON Feed or Atom; serve video via signed media URLs in content endpoint |
-| Bandcamp | Album/track purchase | Map purchases to `per_item` or `bundle` grants scoped to album content_ids |
-| Teachable / Podia / Kajabi | Course enrollment | Map enrollment to `bundle` grant with sequential content_ids per lesson |
+| Bandcamp | Album/track purchase | Map purchases to `access` grants (scope: `item` or `collection`) scoped to album content_ids |
+| Teachable / Podia / Kajabi | Course enrollment | Map enrollment to `access` grant (scope: `collection`) with sequential content_ids per lesson |
 
 Migration strategy:
 
@@ -1241,26 +1264,75 @@ Publisher reference architecture:
 - Entitlement service (OAuth2 + grant token issuance, refresh, revocation)
 - Content API (authenticated content retrieval with batch support)
 
-## 21. Payment Models (Informative)
+## 21. Grant Primitives
 
-OPE supports multiple payment models. The `grant_type` field in the token indicates how entitlement was obtained:
+OPE defines three grant primitives. Every entitlement is expressed as one of these types with a small set of composable fields:
 
-| Model | grant_type | Description |
-| --- | --- | --- |
-| Subscription | subscription | Recurring payment, access to all content |
-| Per-item | per_item | Pay per article, episode, or track; token scoped to content_ids |
-| Gift | gift | Shareable unlock, typically time-limited |
-| Institutional | institutional | Domain/IP-based access (libraries, universities) |
-| Metered | metered | Free content limit, meter_remaining in token |
-| Locale-free | locale_free | Regional free access based on user locale |
-| Patronage | patronage | Voluntary support, may grant all access |
-| Broker | broker | Access via entitlement broker bundle |
-| Trial | trial | Time-limited free access for new users; token includes trial expiry |
-| Rental | rental | Time-limited access to specific content (e.g., rent a film for 48 hours); token scoped to content_ids with short TTL |
-| Bundle | bundle | Access to a defined content collection (podcast season, album, course); token scoped to a set of content_ids |
-| Ad-supported | ad_supported | Free access with advertising; entitlement signals ad-free tier when present |
-| Early access | early_access | Pre-release access before public availability (common for patron-tier podcast episodes) |
-| Family / Group | family | Shared household or group access under a single subscription; token includes group_id |
+| Primitive | Meaning |
+| --- | --- |
+| `access` | Reader may view this content |
+| `limit` | Reader may view up to a threshold |
+| `signal` | Reader has a status that unlocks treatment |
+
+### 21.1 Field Grammar
+
+Every grant is expressed as a JSON object with the following fields:
+
+| Field | Type | Applies to | Description |
+| --- | --- | --- | --- |
+| `type` | string | all | **Required.** One of `access`, `limit`, or `signal` |
+| `scope` | string | access | Content scope: `all`, `item`, `collection`, or `pre-release` |
+| `kind` | string | limit, signal | Qualifier for the limit or signal (e.g., `metered`, `locale-gated`, `patron`, `institutional`, `ad-free`, `group-member`) |
+| `duration` | string | access | Time behavior: `perpetual`, `recurring`, `time-limited`, or `rental:Nh` (where N = hours) |
+| `transferable` | boolean | access | Whether the grant can be shared to another user. Default `false` |
+| `quota` | integer | limit | Number of items allowed in the period |
+| `period` | string | limit | Reset cadence (e.g., `month`, `week`, `day`) |
+| `source` | string | all | Origin of entitlement: `direct`, `broker`, `institution`, or `family-plan` |
+
+Example grant object:
+
+```json
+{
+  "type": "access",
+  "scope": "all",
+  "duration": "recurring",
+  "source": "direct"
+}
+```
+
+### 21.2 Named Grant Aliases
+
+The following names are retained as friendly aliases for documentation, UI, and the grant builder. They are not load-bearing in the protocol — validators only need to check the three primitive types and their conditional fields.
+
+| Name | type | scope / kind | duration | source | notes |
+| --- | --- | --- | --- | --- | --- |
+| Subscription | `access` | scope: `all` | `recurring` | `direct` | |
+| Per-item | `access` | scope: `item` | `perpetual` | `direct` | |
+| Gift | `access` | scope: `item` | `time-limited` | `direct` | `transferable: true` |
+| Institutional | `signal` | kind: `institutional` | — | `institution` | |
+| Metered | `limit` | kind: `metered` | — | `direct` | requires `quota` + `period` |
+| Locale-free | `limit` | kind: `locale-gated` | — | `direct` | |
+| Patronage | `signal` | kind: `patron` | — | `direct` | |
+| Broker | `access` | scope: `collection` | `recurring` | `broker` | |
+| Trial | `access` | scope: `all` | `time-limited` | `direct` | |
+| Rental | `access` | scope: `item` | `rental:Nh` | `direct` | N = hours, e.g. `rental:72h` |
+| Bundle | `access` | scope: `collection` | `perpetual` | `direct` | |
+| Ad-supported | `signal` | kind: `ad-free` | — | `direct` | signals ad-free eligibility |
+| Early access | `access` | scope: `pre-release` | `time-limited` | `direct` | |
+| Family / Group | `signal` | kind: `group-member` | — | `family-plan` | |
+
+### 21.3 Why Primitives
+
+Fourteen named types created schema sprawl — each required its own validation path, documentation section, and client-side handler. Most differed by only one or two fields. Collapsing them to primitives means:
+
+- Validators check `type`, then a small set of conditional fields
+- New grant behaviors compose from existing fields rather than requiring new type definitions
+- Publishers and brokers share one object shape across all entitlement scenarios
+- The 14 friendly names remain usable in UI and docs without being load-bearing in the protocol
+
+### 21.4 Payment Models (Informative)
+
+OPE is compatible with multiple payment models. The grant primitive fields indicate how entitlement was obtained — OPE standardizes verification, not payment.
 
 Compatible payment processors include Stripe, Paddle, Lemon Squeezy, PayPal, WooCommerce, Adyen, and self-hosted billing. Compatible payment protocols include x402, Stripe MPP, and any system that can trigger OPE grant issuance upon successful payment. Micropayment options include Lightning Network, Web Monetization (W3C WICG), and Nostr zaps.
 
@@ -1295,7 +1367,7 @@ GET https://shellen.com/feed.json
       "extensions": {
         "ope": {
           "required": { "level": "subscriber" },
-          "grants_allowed": ["subscription", "gift"],
+          "grants_allowed": ["access"],
           "content_id": "post-789",
           "content_metadata": {
             "word_count": 4500,
@@ -1389,7 +1461,12 @@ Authorization: Bearer <oauth_access_token>
   "grant_token": "<jwt_grant_token>",
   "refresh_token": "refresh_abc",
   "expires_in": 3600,
-  "grant_type": "subscription",
+  "grant": {
+    "type": "access",
+    "scope": "all",
+    "duration": "recurring",
+    "source": "direct"
+  },
   "scope": ["content:read", "content:batch"]
 }
 ```
@@ -1460,7 +1537,7 @@ Podcast App plays Episode 41 normally (it's free). For Episode 42, it detects th
 
 #### Step 2: Bob subscribes
 
-Bob taps "Subscribe for $3/month." Podcast App initiates the OPE OAuth flow (same as Steps 2-5 in the article example above). After authentication and payment, Bob receives a grant token with `grant_type: "subscription"`.
+Bob taps "Subscribe for $3/month." Podcast App initiates the OPE OAuth flow (same as Steps 2-5 in the article example above). After authentication and payment, Bob receives a grant token with an `access` grant (scope: `all`, duration: `recurring`).
 
 #### Step 3: Podcast App retrieves the full episode
 

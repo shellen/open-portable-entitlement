@@ -52,8 +52,8 @@ title: OPE Namespace — feedspec.org
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
         <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:type</code></h3>
-        <p class="text-sm text-zinc-600 leading-relaxed mb-2">A single grant type. Must be one of the eight OPE grant types.</p>
-        <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Allowed values:</span> <code>subscription</code>, <code>per_item</code>, <code>gift</code>, <code>institutional</code>, <code>metered</code>, <code>locale_free</code>, <code>patronage</code>, <code>broker</code></div>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-2">A single grant primitive type.</p>
+        <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Allowed values:</span> <code>access</code>, <code>limit</code>, <code>signal</code></div>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
@@ -120,9 +120,8 @@ title: OPE Namespace — feedspec.org
   &lt;<span class="text-emerald-400">ope:access</span> <span class="text-amber-300">level</span>=<span class="text-amber-300">"subscriber"</span>&gt;
     &lt;<span class="text-emerald-400">ope:content-id</span>&gt;post-123&lt;/<span class="text-emerald-400">ope:content-id</span>&gt;
     &lt;<span class="text-emerald-400">ope:grant-types</span>&gt;
-      &lt;<span class="text-emerald-400">ope:type</span>&gt;subscription&lt;/<span class="text-emerald-400">ope:type</span>&gt;
-      &lt;<span class="text-emerald-400">ope:type</span>&gt;gift&lt;/<span class="text-emerald-400">ope:type</span>&gt;
-      &lt;<span class="text-emerald-400">ope:type</span>&gt;broker&lt;/<span class="text-emerald-400">ope:type</span>&gt;
+      &lt;<span class="text-emerald-400">ope:type</span>&gt;access&lt;/<span class="text-emerald-400">ope:type</span>&gt;
+      &lt;<span class="text-emerald-400">ope:type</span>&gt;signal&lt;/<span class="text-emerald-400">ope:type</span>&gt;
     &lt;/<span class="text-emerald-400">ope:grant-types</span>&gt;
     &lt;<span class="text-emerald-400">ope:metadata</span>&gt;
       &lt;<span class="text-emerald-400">ope:word-count</span>&gt;3200&lt;/<span class="text-emerald-400">ope:word-count</span>&gt;
