@@ -19,7 +19,7 @@ Open Portable Entitlement (OPE) proposes a portable method for readers to access
 
 OPE standardizes entitlement verification, not payment systems. This enables portable subscriptions and resource access across platforms and readers while preserving compatibility with existing feed ecosystems.
 
-While the primary use case is content (articles, media, newsletters), the entitlement architecture is deliberately resource-agnostic. The grant token mechanism does not constrain what is being entitled—content, API access, capabilities, or any other gated resource. OPE grant tokens are transport-agnostic: they can be presented via HTTP `Authorization` headers (API clients) or `HttpOnly` cookies (browsers), using the same token format and verification logic in both cases.
+While the primary use case is content (articles, media, newsletters), the entitlement architecture is deliberately resource-agnostic. The grant token mechanism does not constrain what is being entitled—content, API access, capabilities, or any other gated resource. OPE grant tokens are transport-agnostic: they can be presented via HTTP `Authorization` headers (API clients) or optionally via `HttpOnly` cookies (browsers), using the same token format and verification logic in both cases. The web-based entitlement extension (Section 11) is optional and designed to complement—not replace—existing site authentication systems.
 
 ## 2. Status of This Document
 
@@ -485,9 +485,26 @@ Error responses MUST use the following JSON body format:
 
 ## 11. Web-Based Entitlement
 
-OPE Sections 1–10 define flows for programmatic consumers—feed readers, AI agents, browser extensions using the `Authorization` header. This section extends OPE to the most common entitlement scenario: a human reading a web page in a browser.
+This section is OPTIONAL. Publishers are not required to implement web-based OPE flows. Many publishers already have mature browser-based access control—session cookies, identity providers (Clerk, Auth0, Firebase Auth), or custom authentication middleware. OPE does not replace these systems.
 
-The core principle is **one token, two transports.** The same OPE grant token that an API client presents via `Authorization: Bearer <token>` can be delivered to a browser via an `HttpOnly` cookie. Publishers verify the same token using the same logic regardless of how it arrives.
+OPE Sections 1–10 define the core protocol for programmatic consumers—feed readers, AI agents, and other API clients using the `Authorization` header. This section defines an optional extension that allows the same OPE grant tokens to also work in browser contexts, bridging the gap between API-based entitlement and web-based access.
+
+**When to implement this section:**
+
+- You want feed readers to deep-link users to full content on your site
+- You want browser extensions or aggregator apps to unlock content on your pages
+- You want to accept cross-publisher entitlements from brokers in a browser context
+- You want a single entitlement system that serves both API and web clients
+
+**When to skip this section:**
+
+- Your existing site authentication already handles browser-based access
+- You only need OPE for programmatic consumers (feed readers, AI agents)
+- You prefer to keep site auth and API auth as separate concerns
+
+Publishers MAY implement web-based OPE alongside an existing site authentication system. The two are not mutually exclusive—a publisher can check its own session cookie first and fall back to an OPE grant cookie, or vice versa. The `web` block in the discovery document (Section 6) signals to clients that the publisher supports these flows.
+
+The core principle for publishers who opt in is **one token, two transports.** The same OPE grant token that an API client presents via `Authorization: Bearer <token>` can be delivered to a browser via an `HttpOnly` cookie. Publishers verify the same token using the same logic regardless of how it arrives.
 
 ### 11.1 HTTP 402 and OPE Response Headers
 
@@ -538,12 +555,13 @@ Cookie requirements:
 - **`Max-Age`:** SHOULD match the grant token's TTL. MUST NOT exceed the token's `exp` claim.
 - **`Path`:** SHOULD be set to `/` unless the publisher scopes content to a subpath.
 
-When processing content requests, publishers MUST check for entitlement in this order:
+Publishers that implement cookie-based transport SHOULD check for entitlement in this order:
 
-1. `Authorization: Bearer <token>` header (API clients)
-2. `ope_grant` cookie (browser clients)
+1. The publisher's own session mechanism, if any (e.g., Clerk, Auth0, custom session cookies)
+2. `Authorization: Bearer <token>` header (API clients)
+3. `ope_grant` cookie (browser clients presenting OPE grants)
 
-The same token verification logic applies regardless of transport. This is not a separate authentication system—it is the same grant token delivered via a different HTTP mechanism.
+This allows OPE web-based entitlement to coexist with existing site authentication. A publisher running Clerk for its logged-in users can still accept OPE grant cookies from broker flows or feed reader handoffs — the two systems compose rather than conflict. The same OPE token verification logic applies regardless of whether the token arrives via header or cookie.
 
 ### 11.3 Browser Unlock Flow
 
@@ -552,15 +570,15 @@ The browser unlock flow connects feed discovery to web page access. When a feed 
 ```
 1. User clicks "Read on web" in a feed reader
 2. Feed reader opens: https://publisher.com/post-123?ope_unlock=1
-3. Publisher detects ope_unlock parameter, checks for existing cookie
-4. If no cookie: redirect to OAuth authorization endpoint
-5. User authenticates and consents (Section 7.5)
-6. OAuth callback → publisher issues grant token
-7. Publisher sets ope_grant cookie and redirects to /post-123
+3. Publisher detects ope_unlock parameter, checks for existing session or cookie
+4. If already authenticated (site session or OPE cookie): skip to step 8
+5. If no session: redirect to OAuth authorization endpoint (or publisher's own login)
+6. User authenticates and consents
+7. Publisher issues OPE grant token and sets ope_grant cookie, redirects to /post-123
 8. Browser loads /post-123 with cookie → full content rendered
 ```
 
-For users who already have an active session (cookie present and valid), step 3 short-circuits directly to step 8.
+Step 5 is intentionally flexible. Publishers MAY use OPE's OAuth flow (Section 7), their existing login system, or a combination. A publisher using Clerk could authenticate the user via Clerk, check their subscription status internally, and then issue an OPE grant cookie — using OPE as the cross-system entitlement format while keeping their own auth for the login step.
 
 ### 11.4 Cross-Publisher Browser Flow
 
@@ -584,7 +602,7 @@ This flow is structurally identical to OpenID Connect—the broker acts as an id
 
 ### 11.5 CORS Requirements for Web Clients
 
-Publishers MUST set appropriate CORS headers on OPE API endpoints to support browser-based consumers (extensions, SPAs, aggregator web apps):
+Publishers that implement web-based entitlement SHOULD set appropriate CORS headers on OPE API endpoints to support browser-based consumers (extensions, SPAs, aggregator web apps):
 
 ```http
 Access-Control-Allow-Origin: <requesting-origin>
@@ -603,7 +621,7 @@ This section is normative. Implementations that do not address these concerns SH
 ### 12.1 Token Security
 
 - **Transport:** All OPE endpoints MUST be served over HTTPS. Grant tokens MUST NOT be transmitted over unencrypted connections.
-- **Storage:** Readers MUST store grant tokens in secure, application-private storage. Tokens MUST NOT be logged, included in URLs, or stored in browser `localStorage`. For browser-based transport, tokens MUST be stored in `HttpOnly; Secure; SameSite=Lax` cookies only (see Section 11.2). JavaScript-accessible storage (`localStorage`, `sessionStorage`, non-`HttpOnly` cookies) is prohibited for grant tokens.
+- **Storage:** Readers MUST store grant tokens in secure, application-private storage. Tokens MUST NOT be logged, included in URLs, or stored in browser `localStorage`. Publishers that implement web-based entitlement (Section 11) MUST use `HttpOnly; Secure; SameSite=Lax` cookies for browser-based token transport. JavaScript-accessible storage (`localStorage`, `sessionStorage`, non-`HttpOnly` cookies) is prohibited for grant tokens in any context.
 - **Token Binding:** Publishers SHOULD bind tokens to a client identifier using DPoP (RFC 9449). When DPoP is supported, the `cnf` claim in the grant token binds it to the client's DPoP key, preventing token theft from being useful across clients.
 - **Short-lived tokens:** Grant tokens SHOULD have a TTL of no more than 1 hour. Readers use the refresh endpoint to obtain new tokens. This limits the window of exposure if a token is compromised. Short TTLs are the primary mitigation for token compromise—revocation lists are belt-and-suspenders.
 
