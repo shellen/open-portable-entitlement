@@ -1,0 +1,144 @@
+---
+layout: landing.njk
+title: OPE Namespace — feedspec.org
+---
+
+<!-- Namespace Header -->
+<section class="py-20 sm:py-28">
+  <div class="max-w-3xl mx-auto px-6 lg:px-8">
+    <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-600 ring-1 ring-inset ring-emerald-400/20">XML Namespace</span>
+    <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">OPE Namespace 1.0</h1>
+    <p class="mt-4 text-sm text-zinc-600 leading-relaxed max-w-lg">This is the namespace URI for the Open Portable Entitlement (OPE) feed extensions. It is used in Atom and RSS feeds to identify OPE elements.</p>
+
+    <div class="mt-8 bg-zinc-900 rounded-2xl overflow-hidden font-[family-name:var(--font-mono)] text-xs">
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">Namespace Declaration</span>
+      </div>
+      <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed"><span class="text-sky-300">xmlns:ope</span>=<span class="text-amber-300">"https://feedspec.org/ope/ns/1.0"</span></pre>
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
+      <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- Elements Reference -->
+<section class="py-16 border-t border-zinc-900/5">
+  <div class="max-w-3xl mx-auto px-6 lg:px-8">
+    <h2 class="text-xs font-semibold text-zinc-900 mb-3">Elements</h2>
+    <p class="text-2xl font-semibold tracking-tight text-zinc-900 mb-8">OPE namespace elements</p>
+
+    <div class="space-y-6">
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:access</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-2">Container element indicating that a feed entry requires entitlement. Wraps all other OPE elements for an entry.</p>
+        <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Attributes:</span> <code>level</code> — access level required (e.g., <code>"subscriber"</code>)</div>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-id</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Unique identifier for the gated content item. Used when requesting full content from the publisher's API.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:grant-types</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Container for the list of grant types the publisher accepts for this content.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:type</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-2">A single grant type. Must be one of the eight OPE grant types.</p>
+        <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Allowed values:</span> <code>subscription</code>, <code>per_item</code>, <code>gift</code>, <code>institutional</code>, <code>metered</code>, <code>locale_free</code>, <code>patronage</code>, <code>broker</code></div>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:metadata</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Container for structured content metadata. Provides information readers can display as rich previews for gated content.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:word-count</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Word count of the full content. Helps readers display reading length estimates.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:estimated-read-time-minutes</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Estimated reading time in minutes.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-type</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Type of the content (e.g., <code>"essay"</code>, <code>"article"</code>, <code>"podcast"</code>).</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:preview-image</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">URL of a hero or preview image for the content.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-cta</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Publisher-specified call-to-action string displayed to readers who don't have access (e.g., "Subscribe to read the full essay").</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-url</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">Browser-openable URL that triggers the web-based entitlement flow. Bridges feed discovery to browser access.</p>
+      </div>
+
+      <div class="p-5 rounded-2xl border border-zinc-900/5">
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:per-item-price</code></h3>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-2">Price for per-item access. Uses the smallest currency unit (e.g., cents for USD).</p>
+        <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Attributes:</span> <code>currency</code>, <code>amount</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Example -->
+<section class="py-16 border-t border-zinc-900/5">
+  <div class="max-w-3xl mx-auto px-6 lg:px-8">
+    <h2 class="text-xs font-semibold text-zinc-900 mb-3">Example</h2>
+    <p class="text-2xl font-semibold tracking-tight text-zinc-900 mb-8">Atom feed entry with OPE</p>
+
+    <div class="bg-zinc-900 rounded-2xl overflow-hidden font-[family-name:var(--font-mono)] text-xs">
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="w-2 h-2 rounded-full bg-white/10"></span>
+        <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">Atom entry</span>
+      </div>
+      <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed">&lt;<span class="text-sky-300">entry</span>&gt;
+  &lt;<span class="text-sky-300">id</span>&gt;https://example.com/post-123&lt;/<span class="text-sky-300">id</span>&gt;
+  &lt;<span class="text-sky-300">title</span>&gt;Deep Essay on Protocol Design&lt;/<span class="text-sky-300">title</span>&gt;
+  &lt;<span class="text-sky-300">summary</span>&gt;Preview: The history of feed formats...&lt;/<span class="text-sky-300">summary</span>&gt;
+  &lt;<span class="text-emerald-400">ope:access</span> <span class="text-amber-300">level</span>=<span class="text-amber-300">"subscriber"</span>&gt;
+    &lt;<span class="text-emerald-400">ope:content-id</span>&gt;post-123&lt;/<span class="text-emerald-400">ope:content-id</span>&gt;
+    &lt;<span class="text-emerald-400">ope:grant-types</span>&gt;
+      &lt;<span class="text-emerald-400">ope:type</span>&gt;subscription&lt;/<span class="text-emerald-400">ope:type</span>&gt;
+      &lt;<span class="text-emerald-400">ope:type</span>&gt;gift&lt;/<span class="text-emerald-400">ope:type</span>&gt;
+      &lt;<span class="text-emerald-400">ope:type</span>&gt;broker&lt;/<span class="text-emerald-400">ope:type</span>&gt;
+    &lt;/<span class="text-emerald-400">ope:grant-types</span>&gt;
+    &lt;<span class="text-emerald-400">ope:metadata</span>&gt;
+      &lt;<span class="text-emerald-400">ope:word-count</span>&gt;3200&lt;/<span class="text-emerald-400">ope:word-count</span>&gt;
+      &lt;<span class="text-emerald-400">ope:unlock-cta</span>&gt;Subscribe to read the full essay&lt;/<span class="text-emerald-400">ope:unlock-cta</span>&gt;
+      &lt;<span class="text-emerald-400">ope:unlock-url</span>&gt;https://example.com/post-123?ope_unlock=1&lt;/<span class="text-emerald-400">ope:unlock-url</span>&gt;
+    &lt;/<span class="text-emerald-400">ope:metadata</span>&gt;
+  &lt;/<span class="text-emerald-400">ope:access</span>&gt;
+&lt;/<span class="text-sky-300">entry</span>&gt;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- Link to spec -->
+<section class="bg-zinc-900 py-16">
+  <div class="max-w-3xl mx-auto px-6 lg:px-8 text-center">
+    <p class="text-sm text-zinc-400 mb-6">For the full specification including JSON Feed extensions, grant token formats, discovery endpoints, and more:</p>
+    <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Full Specification</a>
+  </div>
+</section>
