@@ -2,10 +2,11 @@
 {# ABOUTME: Provides head, sticky nav, content block, and footer. #}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="content-language" content="en">
   <title>{{ title }}{% if title != "feedspec.org" %} — feedspec.org{% endif %}</title>
   <meta name="description" content="{{ description | default('Open specifications for the feed ecosystem. feedspec.org publishes specs to fill gaps in feed infrastructure.') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,14 +19,17 @@
 </head>
 <body class="font-[family-name:var(--font-sans)] text-zinc-900 bg-white antialiased">
 
+  <!-- Skip to main content link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Nav -->
-  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-zinc-900/5">
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-zinc-900/5" aria-label="Primary">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-14">
       <div class="flex items-center gap-6">
         <a href="{{ '/' | url }}" class="font-semibold text-sm tracking-tight text-zinc-900 no-underline">
           feedspec.org
         </a>
-        <span class="hidden md:block text-zinc-200">/ </span>
+        <span class="hidden md:block text-zinc-200" aria-hidden="true">/ </span>
         <a href="{{ '/' | url }}" class="hidden md:block text-zinc-500 text-sm hover:text-zinc-900 no-underline transition-colors">Docs</a>
       </div>
       <ul class="flex items-center gap-5 list-none m-0 p-0">
@@ -34,10 +38,12 @@
     </div>
   </nav>
 
+  <main id="main-content">
   {% block content %}{% endblock %}
+  </main>
 
   <!-- Footer -->
-  <footer class="py-10 border-t border-zinc-900/5 text-center">
+  <footer class="py-10 border-t border-zinc-900/5 text-center" role="contentinfo">
     <p class="text-xs text-zinc-400">
       feedspec.org is a project by <a href="https://shellen.com" class="text-zinc-500 hover:text-zinc-900 transition-colors">Jason Shellen</a>.
       Contribute on <a href="https://github.com/shellen/open-portable-entitlement" class="text-zinc-500 hover:text-zinc-900 transition-colors">GitHub</a>.

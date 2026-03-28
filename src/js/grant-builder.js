@@ -141,10 +141,11 @@
   };
 
   function pill(label, active, color, onclick) {
+    var ariaPressed = ' aria-pressed="' + (active ? "true" : "false") + '"';
     if (active) {
-      return '<button onclick="' + esc(onclick) + '" class="rounded-full px-3 py-1 text-xs font-medium transition-colors" style="background:' + color.bg + ";color:" + color.text + ";box-shadow:inset 0 0 0 1px " + color.ring + '">' + esc(label) + "</button>";
+      return '<button onclick="' + esc(onclick) + '"' + ariaPressed + ' class="rounded-full px-3 py-1 text-xs font-medium transition-colors" style="background:' + color.bg + ";color:" + color.text + ";box-shadow:inset 0 0 0 1px " + color.ring + '">' + esc(label) + "</button>";
     }
-    return '<button onclick="' + esc(onclick) + '" class="rounded-full px-3 py-1 text-xs font-medium text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 transition-colors">' + esc(label) + "</button>";
+    return '<button onclick="' + esc(onclick) + '"' + ariaPressed + ' class="rounded-full px-3 py-1 text-xs font-medium text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 transition-colors">' + esc(label) + "</button>";
   }
 
   function fieldGroup(label, items, active, fnTpl, col) {
@@ -152,7 +153,7 @@
     var tags = items.map(function (v) {
       return pill(v, v === active, c, fnTpl.replace("{v}", v));
     }).join("");
-    return '<div class="mb-5"><div class="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">' + label + '</div><div class="flex flex-wrap gap-1.5">' + tags + "</div></div>";
+    return '<div class="mb-5" role="group" aria-label="' + esc(label) + '"><div class="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">' + label + '</div><div class="flex flex-wrap gap-1.5">' + tags + "</div></div>";
   }
 
   function render() {
@@ -163,10 +164,10 @@
     var match = findPreset(g);
 
     // Tab buttons
-    var tabs = '<div class="flex gap-2 mb-8">'
-      + '<button onclick="_gb.setView(\'builder\')" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors '
+    var tabs = '<div class="flex gap-2 mb-8" role="tablist" aria-label="Grant builder views">'
+      + '<button onclick="_gb.setView(\'builder\')" role="tab" aria-selected="' + (state.view === "builder") + '" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors '
       + (state.view === "builder" ? "bg-zinc-900 text-white" : "text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900") + '">Builder</button>'
-      + '<button onclick="_gb.setView(\'examples\')" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors '
+      + '<button onclick="_gb.setView(\'examples\')" role="tab" aria-selected="' + (state.view === "examples") + '" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors '
       + (state.view === "examples" ? "bg-zinc-900 text-white" : "text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900") + '">All 14 Presets</button>'
       + "</div>";
 
@@ -225,13 +226,13 @@
       + "</div>";
 
     // JSON panel — matches site code block style
-    var jsonPanel = '<div class="bg-zinc-900 rounded-2xl overflow-hidden relative">'
+    var jsonPanel = '<div class="bg-zinc-900 rounded-2xl overflow-hidden relative" aria-label="Grant JSON output" role="region">'
       + '<div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">'
       + '<span class="w-2 h-2 rounded-full bg-white/10"></span>'
       + '<span class="w-2 h-2 rounded-full bg-white/10"></span>'
       + '<span class="w-2 h-2 rounded-full bg-white/10"></span>'
       + '<span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">grant object</span>'
-      + '<button onclick="_gb.copy()" class="ml-auto text-xs font-[family-name:var(--font-mono)] px-2 py-0.5 rounded transition-colors '
+      + '<button onclick="_gb.copy()" aria-label="Copy JSON to clipboard" class="ml-auto text-xs font-[family-name:var(--font-mono)] px-2 py-0.5 rounded transition-colors '
       + (state.copied ? "text-emerald-400 bg-emerald-400/10" : "text-zinc-500 hover:text-zinc-300") + '">'
       + (state.copied ? "Copied" : "Copy") + "</button>"
       + "</div>"
@@ -276,7 +277,7 @@
       var bg = isActive ? c.bg : "#fff";
 
       // Mobile: stacked layout. Desktop: grid
-      html += '<div onclick="_gb.loadPreset(' + i + ')" class="cursor-pointer border-b border-zinc-900/5 last:border-b-0 transition-colors hover:bg-zinc-50" style="background:' + bg + '">';
+      html += '<div onclick="_gb.loadPreset(' + i + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_gb.loadPreset(' + i + ')}" tabindex="0" role="button" aria-label="Load ' + esc(p.name) + ' preset" class="cursor-pointer border-b border-zinc-900/5 last:border-b-0 transition-colors hover:bg-zinc-50" style="background:' + bg + '">';
 
       // Desktop row
       html += '<div class="hidden sm:grid grid-cols-[140px_1fr_72px_140px_110px_80px] gap-2 px-5 py-3 items-center">';
