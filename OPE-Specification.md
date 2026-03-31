@@ -1596,7 +1596,7 @@ OPE separates these layers so that:
 
 ## Acknowledgments
 
-Thanks to [Max Engel](https://github.com/maxengel) for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the Drafty team for implementation feedback that identified critical gaps in web-based permissioning flows, consent requirements, and error response standardization. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 15.
+Thanks to [Max Engel](https://github.com/maxengel) for feedback on OAuth discovery alignment, token architecture, revocation enforcement, and the reference gateway concept. Thanks to the ATProto team, particularly Daniel Holmgren, for the permission spaces design that informs Section 15.
 
 ---
 
