@@ -46,6 +46,23 @@ x402 moves money. ACP handles checkout. OPE proves you're allowed in.
 
 A publisher could accept payment via x402 micropayment and issue an OPE grant token as the result. The grant token doesn't care how money changed hands—only that the entitlement was legitimately issued.
 
+### 3.2 Relationship to Content Licensing Standards
+
+OPE is adjacent to — and overlaps in places with — emerging content licensing standards, particularly Really Simple Licensing (RSL). RSL is a machine-readable XML vocabulary for declaring how digital assets may be accessed and used, with discovery via `robots.txt`, HTTP `Link` headers, and embedded metadata.
+
+Both standards describe what's licensable, who may access it, and at what cost. They specialize in different primitives:
+
+- **RSL specializes in declarative content-side rules.** Terms apply to classes of requesters (any commercial user, any crawler in the EU, any AI training pipeline), travel with the content, and are discovered alongside it. RSL's distinctive verbs describe processing actions: `ai-train`, `ai-input`, `ai-index`, `search` — what a system may do with content once retrieved.
+- **OPE specializes in subject-bound credentials.** Grants apply to specific identified subjects (this subscriber, this institution's network, this broker's bundle members), travel with the subject, and are presented to gain access. OPE's distinctive verbs describe access actions: subscribe, rent, gift, meter, signal — whether and how a subject may receive content in the first place.
+
+The two operate at different stages of the content lifecycle. RSL governs the post-retrieval surface (what processing is permitted once content is in hand). OPE governs the pre-retrieval surface (how a subject obtains content at all). The same content can carry both layers without semantic conflict.
+
+A single article can be covered by both. RSL terms can govern whether an AI system may train on it; OPE feed extensions and grants can govern whether a specific subscriber may read it in their reader of choice. The two compose.
+
+Where they overlap — both can express "this content costs $5 per access" — RSL approaches it from the content side ("here is the price for any requester") and OPE from the subject side ("this subscriber has paid and holds this credential"). Publishers can run both side by side; the same payment event can produce an RSL `<payment>` declaration *and* mint an OPE grant token.
+
+Adjacent work in this space includes Creative Commons, IPTC RightsML, W3C ODRL, and Schema.org for rights metadata, and the IETF AI Preferences vocabulary and Cloudflare Content Signals for crawler-facing usage signals.
+
 ## 4. Terminology
 
 | Term | Definition |
