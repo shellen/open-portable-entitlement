@@ -127,3 +127,26 @@ article :not(pre) > code {
   font-size: 0.8125em;
   font-weight: 500;
 }
+
+/* Part headings (# Part I: Core) divide the spec into groups of sections.
+   The spec puts a horizontal rule before each Part, so the heading draws none of its own. */
+.prose h1.spec-part {
+  margin-top: 4rem;
+  margin-bottom: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #047857; /* emerald-700: 5.5:1 on white, AA at this size */
+}
+
+.prose hr + h1.spec-part {
+  margin-top: 0;
+}
+
+/* The first section of a Part sits directly under its label, without a second rule */
+.prose h1.spec-part + h2 {
+  margin-top: 1rem;
+  padding-top: 0;
+  border-top: 0;
+}

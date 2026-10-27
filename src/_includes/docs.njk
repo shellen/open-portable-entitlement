@@ -4,6 +4,7 @@
 {% extends "base.njk" %}
 
 {% block content %}
+{% set doc = spec.versions[spec_version] if spec_version else spec %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   <div class="lg:grid lg:grid-cols-[14rem_1fr] lg:gap-10">
 
@@ -19,7 +20,12 @@
     <aside id="sidebar" class="hidden lg:block fixed lg:sticky top-14 z-30 lg:z-auto h-[calc(100vh-3.5rem)] w-64 lg:w-auto bg-white lg:bg-transparent border-r lg:border-r-0 border-zinc-900/5 overflow-y-auto py-8 px-4 lg:px-0" role="complementary" aria-label="Sidebar navigation">
       <nav aria-label="Specification sections">
         <ul class="list-none m-0 p-0 space-y-0.5 text-sm" role="tree">
-          {% for section in spec.nav %}
+          {% for section in doc.nav %}
+          {% if section.part %}
+          <li role="treeitem" class="pt-5 first:pt-0">
+            <a href="#{{ section.id }}" class="nav-link nav-part block py-1 px-2 text-[0.6875rem] font-semibold uppercase tracking-wider text-zinc-900 no-underline" data-section="{{ section.id }}">{{ section.text }}</a>
+          </li>
+          {% else %}
           <li role="treeitem" {% if section.children.length > 0 %}aria-expanded="false"{% endif %}>
             <a href="#{{ section.id }}" class="nav-link flex items-center gap-1.5 py-1.5 px-2 rounded-lg text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 no-underline transition-colors" data-section="{{ section.id }}">
               {% if section.children.length > 0 %}
@@ -37,6 +43,7 @@
             </ul>
             {% endif %}
           </li>
+          {% endif %}
           {% endfor %}
         </ul>
       </nav>

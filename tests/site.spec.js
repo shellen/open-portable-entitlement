@@ -97,3 +97,47 @@ test.describe("Spec Page", () => {
     expect(count).toBeGreaterThan(3);
   });
 });
+
+test.describe("Spec Versions", () => {
+  test("current spec is v0.2 and links to v0.1", async ({ page }) => {
+    await page.goto("/ope/spec/");
+    await expect(page.locator("article")).toContainText("Draft Specification v0.2");
+    await page.getByRole("link", { name: "Previous version: v0.1" }).click();
+    await expect(page).toHaveURL(/\/ope\/spec\/0\.1\/$/);
+  });
+
+  test("Part headings appear as sidebar group labels", async ({ page }) => {
+    await page.goto("/ope/spec/");
+    const parts = page.locator("#sidebar .nav-part");
+    await expect(parts).toHaveCount(3);
+    await expect(parts.first()).toHaveText("Part I: Core");
+  });
+
+  test("key/value tables have no empty header row", async ({ page }) => {
+    await page.goto("/ope/spec/");
+    const emptyHeaders = page.locator("article thead th:empty");
+    await expect(emptyHeaders).toHaveCount(0);
+  });
+
+  test("v0.1 is archived with a superseded notice", async ({ page }) => {
+    await page.goto("/ope/spec/0.1/");
+    await expect(page.locator("article")).toContainText("Draft Specification v0.1");
+    const notice = page.getByRole("note");
+    await expect(notice).toContainText("Superseded");
+    await notice.getByRole("link", { name: "v0.2" }).click();
+    await expect(page).toHaveURL(/\/ope\/spec\/$/);
+  });
+
+  test("v0.1 keeps its sidebar and anchors", async ({ page }) => {
+    await page.goto("/ope/spec/0.1/");
+    await expect(page.locator("#sidebar .nav-link").first()).toBeAttached();
+    await expect(page.locator('article h2[id="8-grant-tokens"]')).toBeAttached();
+  });
+
+  test("markdown is served for both versions", async ({ request }) => {
+    const current = await request.get("/ope/spec.md");
+    expect(await current.text()).toContain("Draft Specification v0.2");
+    const archived = await request.get("/ope/spec/0.1.md");
+    expect(await archived.text()).toContain("Draft Specification v0.1");
+  });
+});

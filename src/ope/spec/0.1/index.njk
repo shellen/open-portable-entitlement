@@ -1,0 +1,26 @@
+---
+layout: docs.njk
+title: Specification v0.1 (superseded)
+spec_version: "0.1"
+alternate_formats:
+  - url: /ope/spec/0.1.md
+    type: text/markdown
+    title: Markdown version of the superseded v0.1 specification
+---
+{# ABOUTME: Archived OPE v0.1 specification, kept so existing links and anchors keep working. #}
+{# ABOUTME: Renders archive/OPE-Specification-0.1.md with a banner pointing to the current version. #}
+<div class="not-prose mb-8 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900 ring-1 ring-inset ring-amber-900/10" role="note">
+  <strong class="font-semibold">Superseded.</strong> This is the v0.1 draft of March 27, 2026, kept for reference.
+  The current specification is <a href="{{ '/ope/spec/' | url }}" class="font-semibold text-amber-900 underline">v0.2</a>;
+  its Appendix C maps every v0.1 construct to its replacement.
+</div>
+<div class="not-prose mb-8 flex items-center gap-4 text-sm text-zinc-500">
+  <a href="{{ '/ope/spec/0.1.md' | url }}" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Available in Markdown
+  </a>
+  <a href="https://github.com/shellen/open-portable-entitlement/blob/main/archive/OPE-Specification-0.1.md" class="inline-flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 no-underline transition-colors">
+    View source on GitHub
+  </a>
+</div>
+{{ spec.versions["0.1"].html | safe }}
