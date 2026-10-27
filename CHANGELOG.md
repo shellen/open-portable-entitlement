@@ -7,9 +7,38 @@ versions; this file is the short index. Site-only changes are not listed.
 ## 0.2 — Working Draft
 
 The current version, published at <https://feedspec.org/ope/spec/>. v0.2 is a
-restructuring release: a 0–17 section core built on OAuth 2.0 and its RFCs, five
+restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
+
+### Revision 5 — 2026-10-27
+
+Review pass: fixes from two adversarial reviews and a cross-check against the RSL 1.0
+text. Several changes are breaking for revision 4 implementers.
+
+- **Breaking:** Protected Resource metadata is per URL, as RFC 9728 §3.3 requires; the
+  new `ope.asset` member names the Asset a URL serves or exercises (§5.6, §7.1).
+- **Breaking:** the License Server chooses the token's `resource` (the requested Asset or
+  a scope containing it) and returns it in the token response. One `resource` per
+  authorization request (§5.6, §8.1, §8.5).
+- **Breaking:** `coverage` is `item` or `collection` and only describes `resource`;
+  `pre-release` is now a `kind` (§10).
+- **Breaking:** `ope.offer` became the `ope.offers` array; Offers may carry an `id`
+  (§6.2, §7.1).
+- **Breaking:** RFC 9728 `protected_resources` replaces `ope.resources_served` (§7.2).
+- Publisher identifiers: `ope.publisher` and the `publisher` claim (§5.8).
+- `aud` is derived from `resource` and `ope.audience` (§9.2).
+- Enforcement has six steps; `status` grants no access by itself; `rental_expires_at`
+  is enforced (§10.4, §11.2).
+- Error codes defined: `no_entitlement`, `entitlement_suspended`, `quota_exceeded`;
+  requests without a token get challenges without an error code (§11.4).
+- Introspection returns `publisher` and `cnf`, and accepts RSL's `resource` parameter
+  and `permitted` member (§12.4).
+- Bundles authorized by bundle identifier and narrowed per Publisher (§13.6).
+- Web profile recast as site-mediated unlock (Profile B).
+- A step-by-step Client algorithm (Appendix B).
+- New §18, IANA Considerations.
+- Text license settled as Apache 2.0 (D1); D14 closed.
 
 ### Revision 4 — 2026-10-05
 
