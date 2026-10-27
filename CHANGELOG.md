@@ -21,8 +21,9 @@ text. Several changes are breaking for revision 4 implementers.
 - **Breaking:** the License Server chooses the token's `resource` (the requested Asset or
   a scope containing it) and returns it in the token response. One `resource` per
   authorization request (§5.6, §8.1, §8.5).
-- **Breaking:** `coverage` is `item` or `collection` and only describes `resource`;
-  `pre-release` is now a `kind` (§10).
+- **Breaking:** `coverage` is `item` or `collection`, required for every type, and says
+  whether `resource` is a scope; `pre-release` is now a `kind` (§5.5, §10).
+- **Breaking:** the token response must carry `resource` and `entitlement` (§8.5).
 - **Breaking:** `ope.offer` became the `ope.offers` array; Offers may carry an `id`
   (§6.2, §7.1).
 - **Breaking:** RFC 9728 `protected_resources` replaces `ope.resources_served` (§7.2).
@@ -34,7 +35,10 @@ text. Several changes are breaking for revision 4 implementers.
   requests without a token get challenges without an error code (§11.4).
 - Introspection returns `publisher` and `cnf`, and accepts RSL's `resource` parameter
   and `permitted` member (§12.4).
-- Bundles authorized by bundle identifier and narrowed per Publisher (§13.6).
+- Bundles carry Terms and may be authorized by bundle identifier, then narrowed per
+  Publisher (§13.6).
+- A Publisher selling over a scope keeps metadata uniform across it (§5.6).
+- Group and institutional tokens live at most an hour (§9.4).
 - Web profile recast as site-mediated unlock (Profile B).
 - A step-by-step Client algorithm (Appendix B).
 - New §18, IANA Considerations.

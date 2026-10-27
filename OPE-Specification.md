@@ -102,7 +102,7 @@ OPE's role names are the same words Really Simple Licensing uses for the same ro
 
 | Term | Definition |
 |---|---|
-| **Asset** | Anything a Publisher gates and identifies by an absolute URI: a document, a media file, a feature of a service, an API, a seat, a bundle, an allotment. See §5. |
+| **Asset** | Anything a Publisher gates and identifies by an `https` URL: a document, a media file, a feature of a service, an API, a seat, a bundle, an allotment. See §5. |
 | **Publisher** | The party that controls an Asset and decides who may have it. May be an organization or an individual. May publish under its own origin or under another party's (§13.3). Identified in metadata and tokens by a Publisher identifier (§5.8). |
 | **Terms** | The Publisher's statement of what is permitted, prohibited, and charged for an Asset, in whatever form the Publisher chooses. OPE references Terms by URL (§6.1); it does not define their contents. |
 | **Offer** | A small machine-readable object stating what a Client needs to present an Asset for purchase: name, payment type, amount, and where to buy (§6.2). An Asset may have several. |
@@ -112,7 +112,7 @@ OPE's role names are the same words Really Simple Licensing uses for the same ro
 | **Subject** | The person who holds an Entitlement. Identified by the `sub` claim. Distinct from the Client that presents the token. |
 | **License Token** | An OAuth access token structured as §9 defines and identified by the JOSE header `typ: license+jwt`. Presented with the `DPoP` scheme when sender-constrained and the `License` scheme otherwise (§11.1). |
 | **Entitlement** | The Subject's holding: what kind of access or standing they have, for how long, from what source. Carried in the `entitlement` claim (§10); the Assets it covers are named by the token's `resource` claim. |
-| **Coverage** | Whether a token's `resource` names one Asset (`item`) or a scope of Assets (`collection`) (§10.4). Descriptive; the `resource` claim is what is enforced. Called `scope` in v0.1; renamed to avoid collision with the OAuth `scope` parameter. |
+| **Coverage** | Whether a token's `resource` names one Asset (`item`) or a scope of Assets (`collection`), which tells a Resource Server how to match it (§10.4). Called `scope` in v0.1; renamed to avoid collision with the OAuth `scope` parameter. |
 | **Advisory check** | A check of a License Token by a party that cannot be trusted to enforce the result, such as a Client toggling a feature on the Subject's own device (§11.3). |
 
 ### 2.3 Terms Deliberately Not Used
@@ -136,8 +136,8 @@ To keep one word per concept, OPE does not use these words in normative text:
 
 OPE defines conformance for four roles. An implementation conforms to one or more.
 
-- **OPE License Server:** implements §7.2, §8, §9, §10, §12, §17, and the License Server requirements of §11 and §14.
-- **OPE Multi-Publisher License Server:** an OPE License Server that issues for Assets belonging to more than one Publisher. Additionally implements §13 in full.
+- **OPE License Server:** implements §5.6, §5.8, §6.1, §7.2, §8, §9, §10, §12, §13.1, §13.2, §17, and the License Server requirements of §11 and §14.
+- **OPE Multi-Publisher License Server:** an OPE License Server that issues for Assets belonging to more than one Publisher. Additionally implements the rest of §13.
 - **OPE Resource Server:** implements the §5 comparison and matching rules, §7.1, §11, and the Resource Server requirements of §9, §13.4, and §14.
 - **OPE Client:** implements §7 discovery, §8 authorization, §12 lifecycle, and the Client requirements of §11 and §14.
 
@@ -218,13 +218,13 @@ When an Asset identifier is an `https` URL, a request to it SHOULD return one of
 
 - the Asset, if the request carries a valid License Token or the Asset is free;
 - `401` or `402` with a `WWW-Authenticate` challenge carrying `resource_metadata` (RFC 9728 §5), pointing at the Asset's Protected Resource metadata;
-- for Assets that are not documents, a short description of the Asset with the same header.
+- for Assets that are not documents, a `401` or `402` whose body is a short description of the Asset, with the same header.
 
 Resolving the identifier is how a Client discovers that an Asset is gated and where to obtain a token. No feed is required.
 
 ### 5.5 Scopes
 
-An Entitlement MAY cover a set of Assets rather than one. A scope is identified by an `https` URL prefix ending in `/`, and an Asset is in scope if its identifier begins with that prefix by simple string comparison. Scopes MAY nest within one Publisher (a course inside a creator's catalog); where more than one scope matches an Asset, the longest prefix governs it. Scopes belonging to different Publishers MUST NOT nest or overlap; on an origin shared by several Publishers, the origin's operator assigns prefixes and is responsible for this (§13.3). Every Asset in a scope belongs to the scope's Publisher (§5.8).
+An Entitlement MAY cover a set of Assets rather than one. A scope is identified by an `https` URL prefix ending in `/`, and an Asset is in scope if its identifier begins with that prefix by simple string comparison. Because an Asset identifier may also end in `/` (a page at `https://site.example/2026/10/post/`), a token says which it carries: its `resource` is a scope exactly when `entitlement.coverage` is `collection` (§10.2). Scopes MAY nest within one Publisher (a course inside a creator's catalog); where more than one scope matches an Asset, the longest prefix governs it. Scopes belonging to different Publishers MUST NOT nest or overlap; on an origin shared by several Publishers, the origin's operator assigns prefixes and is responsible for this (§13.3). Every Asset in a scope belongs to the scope's Publisher (§5.8).
 
 ### 5.6 One Identifier, Three Places
 
@@ -236,9 +236,11 @@ An Asset identifier appears in three places:
 | Authorization and token requests | `resource` (RFC 8707) | The `ope.asset` value, exactly |
 | License Token | `resource` claim (§9.2) | The requested Asset identifier, or a scope (§5.5) that contains it |
 
-Protected Resource metadata is published per URL, as RFC 9728 requires: its `resource` member MUST be identical to the URL a Client requested (RFC 9728 §3.3). For a document or media file, that URL is the Asset identifier and `ope.asset` is omitted. For an endpoint that exercises an Asset named elsewhere, such as an API call that uses a paid feature (Profile C), the metadata's `resource` is the endpoint and `ope.asset` names the feature.
+Protected Resource metadata is published per URL, as RFC 9728 requires: its `resource` member MUST be identical to the URL a Client requested (RFC 9728 §3.3). For a document or media file, that URL is the Asset identifier and `ope.asset` is omitted. Wherever a URL differs from the Asset identifier, `ope.asset` names the Asset: an endpoint that exercises a paid feature (Profile C), the target of a redirect from a moved Asset (§5.2), or a signed media URL (Feeds profile).
 
-A Client requests one Asset. The License Server decides how much the token covers: the Asset alone when the Subject holds that Asset only, or the smallest scope the Subject's Entitlement covers, so one token serves every Asset in it. A License Server MUST NOT issue a token whose `resource` neither equals nor contains the requested Asset identifier. The token response states the issued `resource` (§8.5) so the Client can reuse the token across the scope.
+A Client requests one Asset. The License Server decides how much the token covers: the Asset alone when the Subject holds that Asset only, or the scope the Subject's Entitlement record names (§17.1), so one token serves every Asset in it. A scope `resource` MUST begin with the token's `publisher` when the Publisher identifier is itself a scope.
+
+Because a scope token is issued after reading one Asset's metadata and then used on others, a Publisher that sells Entitlements over a scope MUST publish the same `authorization_servers`, `ope.publisher`, `ope.audience`, and `client_policy` for every URL in that scope. A Publisher that needs different values for some Assets gives them a scope of their own. A License Server MUST NOT issue a token whose `resource` neither equals nor contains the requested Asset identifier. The token response states the issued `resource` (§8.5) so the Client can reuse the token across the scope.
 
 ### 5.7 Non-Goals
 
@@ -268,7 +270,7 @@ A Terms reference is an object:
 | `sha256` | REQUIRED in tokens, OPTIONAL in metadata | base64url SHA-256 of the Terms representation the License Server holds at issuance (below), so that later changes are detectable |
 | `type` | OPTIONAL | Media type of the body. A Publisher using RSL sets `application/rsl+xml`. |
 
-A License Server MUST hold a copy of the Terms fetched within the last 24 hours, compute `sha256` over it, and place the reference in the token's `terms` claim (§9.2). The digest identifies that copy, which is the one the Subject was shown at consent (§8.4); "at issuance" means "as held at issuance", not a fetch per token.
+A License Server MUST hold a copy of the Terms fetched within the last 24 hours, compute `sha256` over it, and place the reference in the token's `terms` claim (§9.2). The digest identifies that copy, the one current when the Subject consented (§8.4); "at issuance" means "as held at issuance", not a fetch per token.
 
 The digest input is the representation returned by an unauthenticated `GET` of `url` with no cookies and with `Accept` set to `type` when `type` is present, after any content coding (such as `gzip`) is removed. A Publisher SHOULD serve its Terms as a static representation that is identical for every such request: no per-visitor markup, nonces, or consent banners. Terms that vary by locale or experiment cannot be digested stably; see D3.
 
@@ -296,7 +298,7 @@ A Client needs to show a Subject what is for sale before sending them to authori
 | `payment.type` | REQUIRED | One of `subscription`, `purchase`, `rental`, `free`, `contribution`, `institutional`. `purchase`, `subscription`, `contribution`, and `free` are the same words RSL 1.0 uses for its payment types, so that a Publisher using both writes them once; `rental` and `institutional` are OPE's (D2). |
 | `payment.amount`, `payment.currency` | OPTIONAL | Decimal string and ISO 4217 code. Omit for `free` and `institutional`. |
 | `payment.period` | OPTIONAL | Billing period for `subscription`, or rental length for `rental`, as an ISO 8601 duration (`P1M`, `P1Y`, `PT72H`) |
-| `purchase_url` | REQUIRED unless `type` is `free` or `institutional` | Where a Subject with no Entitlement goes to get one. A Client opens it in a browser. |
+| `purchase_url` | REQUIRED unless `type` is `free` or `institutional` | Where a Subject with no Entitlement goes to get one. A Client opens it in a browser. For `institutional`, it MAY point at information on how to get access through an institution. |
 | `entitlement_types` | OPTIONAL | Informational: which of `access`, `limit`, `status` (§10) the Offer results in, so a Client can label it. Nothing in the protocol depends on it. |
 | `terms` | REQUIRED | Terms reference (§6.1) |
 | `preview_note` | OPTIONAL | One line for unentitled display |
@@ -376,7 +378,7 @@ An OPE License Server MUST publish OAuth 2.0 Authorization Server Metadata (RFC 
 
 The metadata MUST include `issuer`, `authorization_endpoint`, `token_endpoint`, `jwks_uri`, `revocation_endpoint`, `introspection_endpoint`, `code_challenge_methods_supported` (including `S256`), `grant_types_supported` (including `authorization_code` and `refresh_token`), and `protected_resources` (RFC 9728 §4). It SHOULD include `registration_endpoint` (RFC 7591) and `dpop_signing_alg_values_supported` (RFC 9449).
 
-`protected_resources` lists the Assets and scopes this License Server is willing to issue for. OPE reads an entry ending in `/` as covering every Asset whose identifier begins with it (§5.5). It is the License Server's half of the trust relationship (§13.1).
+`protected_resources` lists the Assets and scopes this License Server is willing to issue for, and the value checked against it is the requested Asset identifier (`ope.asset`), not the URL whose metadata named it. OPE profiles the member's RFC 9728 §4 meaning in two ways: an entry ending in `/` covers every Asset whose identifier begins with it (§5.5), and an Asset the list does not cover is refused rather than merely unadvertised. It is the License Server's half of the trust relationship (§13.1).
 
 OPE-specific values are carried as one extension member, `ope`:
 
@@ -407,7 +409,7 @@ OPE-specific values are carried as one extension member, `ope`:
 | `version` | REQUIRED | OPE version implemented |
 | `entitlement_types_supported` | REQUIRED | Subset of `access`, `limit`, `status` |
 | `max_token_lifetime` | REQUIRED | Longest `exp` minus `iat` this server issues, in seconds |
-| `bundles` | OPTIONAL | Bundles this server sells across Publishers (§13.6): an array of objects with `resource` (the bundle identifier), `name`, and `publishers` (Publisher identifiers) |
+| `bundles` | OPTIONAL | Bundles this server sells across Publishers (§13.6): an array of objects with `resource` (the bundle identifier), `name`, `publishers` (Publisher identifiers), and `terms` (the bundle's Terms reference, §6.1) |
 | `profiles` | OPTIONAL | Profiles from Part II this server supports |
 
 Servers MAY continue to serve v0.1's `/.well-known/ope` during transition; it is not part of v0.2 conformance.
@@ -422,7 +424,7 @@ Clients SHOULD cache both metadata documents for no less than one hour and no mo
 
 A License Server MUST support the OAuth 2.0 Authorization Code flow with PKCE (`S256`) for issuing License Tokens to Subjects. This is the only authorization path OPE defines.
 
-The authorization request MUST include exactly one `resource` parameter (RFC 8707): the `ope.asset` of the Asset's Protected Resource metadata (§5.6), or a bundle identifier (§13.6). A License Server MUST reject a request carrying more than one `resource` with `invalid_target` (RFC 8707 §2). The token request repeats that `resource`, except after a bundle authorization, where the Client names one Asset in the bundle on each token request (RFC 8707 §2.2, §13.6).
+The authorization request MUST include exactly one `resource` parameter (RFC 8707): the `ope.asset` of the Asset's Protected Resource metadata (§5.6), or a bundle identifier (§13.6). A License Server MUST reject a request carrying more than one `resource` with `invalid_target` (RFC 8707 §2). A request with no `resource` is likewise rejected with `invalid_target`. The token request, including a refresh, repeats that `resource`, except after a bundle authorization, where the Client names one Asset in the bundle on each token request (§13.6).
 
 ```
 GET /authorize
@@ -461,9 +463,9 @@ When the `resource` is a bundle identifier (§13.6), the consent screen MUST nam
 
 ### 8.5 Token Response
 
-The token endpoint response MUST set `token_type` to `DPoP` when the token is DPoP-bound (RFC 9449 §5) and to `License` otherwise, and MUST include `expires_in` and `resource`. It SHOULD include `refresh_token`. `expires_in` MUST NOT be `0`; non-expiring tokens are not permitted because they cannot be revoked at a Resource Server that validates locally.
+The token endpoint response MUST set `token_type` to `DPoP` when the token is DPoP-bound (RFC 9449 §5) and to `License` otherwise, and MUST include `expires_in`, `resource`, and `entitlement`. It SHOULD include `refresh_token`. `expires_in` MUST NOT be `0`; non-expiring tokens are not permitted because they cannot be revoked at a Resource Server that validates locally.
 
-`resource` is a copy of the token's `resource` claim: the Asset requested, or the scope containing it that the License Server chose (§5.6). A Client uses it to reuse the token for other Assets in that scope without parsing the token (§9.5).
+`resource` is a copy of the token's `resource` claim: the Asset requested, or the scope containing it that the License Server chose (§5.6). With `entitlement.coverage`, which says whether `resource` is a scope, a Client uses it to reuse the token for other Assets in that scope without parsing the token (§9.5).
 
 ```json
 {
@@ -476,7 +478,7 @@ The token endpoint response MUST set `token_type` to `DPoP` when the token is DP
 }
 ```
 
-The response MAY include `entitlement`, a copy of the token's `entitlement` claim, so a Client can make advisory checks (§11.3) without parsing the token. It is a convenience for display and proves nothing.
+`entitlement` is a copy of the token's `entitlement` claim, so a Client can match Assets and make advisory checks (§11.3) without parsing the token. It proves nothing; only the token does.
 
 ## 9. Structured License Token
 
@@ -496,7 +498,7 @@ The RFC 9068 §2.2 claim rules apply except where this table differs.
 | `aud` | REQUIRED | The origin of `resource`, plus each origin in the Asset's `ope.audience` (§7.1). RFC 8707 would have the audience be the `resource` value itself; OPE uses origins so that one token serves every URL of a scope. |
 | `resource` | REQUIRED | The requested Asset identifier, or a scope containing it (§5.6) |
 | `publisher` | REQUIRED | The Publisher identifier (§5.8) from the Asset's metadata. Exactly one. |
-| `terms` | REQUIRED | Terms reference (§6.1), with `sha256` populated, of the Offer under which the Entitlement was obtained |
+| `terms` | REQUIRED | Terms reference (§6.1), with `sha256` populated: the Terms of the Offer under which the Entitlement was obtained, or of the bundle (§13.6) when it came from one |
 | `entitlement` | REQUIRED | The Subject's holding (§10) |
 | `exp`, `iat`, `jti` | REQUIRED | Per RFC 9068 |
 | `cnf` | OPTIONAL, SHOULD for public Clients | DPoP or mTLS confirmation |
@@ -531,7 +533,7 @@ The License Server MUST publish its signing keys at `jwks_uri`. Resource Servers
 
 ### 9.4 Lifetime
 
-`exp` minus `iat` MUST NOT exceed the server's advertised `max_token_lifetime` and SHOULD NOT exceed 3600 seconds. For group and institutional Entitlements (S4) it SHOULD NOT exceed 1800 seconds. Short lifetimes are the primary mitigation for compromise; revocation is secondary.
+`exp` minus `iat` MUST NOT exceed the server's advertised `max_token_lifetime` and SHOULD NOT exceed 3600 seconds. For group and institutional Entitlements it MUST NOT exceed 3600 seconds, so that a removed member loses access within an hour (S4, §13.7), and SHOULD NOT exceed 1800 seconds. Short lifetimes are the primary mitigation for compromise; revocation is secondary.
 
 ### 9.5 Opacity for Clients
 
@@ -552,7 +554,7 @@ Clients MUST treat the token as opaque and MUST NOT parse it to make decisions. 
 | Field | Type | Applies to | Description |
 |---|---|---|---|
 | `type` | string | all | REQUIRED. `access`, `limit`, or `status` |
-| `coverage` | string | access, limit | REQUIRED for those types. `item` when the token's `resource` is an Asset identifier, `collection` when it is a scope (§5.5). Describes `resource`; it is not separately enforced (§10.4). |
+| `coverage` | string | all | REQUIRED. `item` when the token's `resource` is an Asset identifier, `collection` when it is a scope (§5.5). It tells a Resource Server how to match `resource` (§10.4). |
 | `kind` | string | all | OPTIONAL qualifier: `metered`, `locale-gated`, `pre-release`, `patron`, `institutional`, `ad-free`, `group-member`. Extensible. A Resource Server that does not recognize a value MUST treat the Entitlement as if no `kind` were present; an unrecognized `kind` never grants anything. |
 | `duration` | string | access | `perpetual`, `recurring`, `time-limited`, or `rental`. Informational, except that `rental` requires `rental_expires_at`. The end of a `time-limited` Entitlement is enforced through `exp`: the License Server stops issuing when it ends. |
 | `rental_expires_at` | integer | access, `duration: rental` | Unix time the rental ends. The License Server MUST NOT issue a token whose `exp` is later, and the Resource Server MUST refuse the token at or after it (§11.2). |
@@ -582,14 +584,14 @@ These names are for documentation and interfaces, not protocol values. A Publish
 | Broker bundle | access | collection | | recurring | broker |
 | Institutional access (S4) | access | collection | | recurring | institution |
 | Metered | limit | collection | metered | | direct |
-| Institutional status | status | | institutional | | institution |
-| Group / family | status | | group-member | | group |
-| Patron | status | | patron | | direct |
-| Ad-free | status | | ad-free | | direct |
+| Institutional status | status | collection | institutional | | institution |
+| Group / family | status | collection | group-member | | group |
+| Patron | status | collection | patron | | direct |
+| Ad-free | status | collection | ad-free | | direct |
 
 ### 10.4 Entitlement and Coverage
 
-The token's `resource` is what a Resource Server enforces: it MUST refuse, with `403` and `insufficient_scope`, a request for an Asset that `resource` does not equal or contain (§5.5). `coverage` only describes `resource`. A License Server MUST set `coverage` to `item` exactly when `resource` is an Asset identifier, and a Resource Server MUST NOT serve an Asset on the strength of `coverage` that `resource` does not cover.
+The token's `resource` is what a Resource Server enforces, matched as `coverage` says: with `item`, the requested Asset MUST equal `resource`; with `collection`, it MUST begin with `resource` (§5.5). A Resource Server MUST refuse any other request with `403` and `insufficient_scope`. A License Server MUST set `coverage` to `item` exactly when `resource` is an Asset identifier, and to `collection` exactly when it is a scope.
 
 The three types differ in what a Resource Server may do with a token that passes that check:
 
@@ -626,7 +628,7 @@ A Resource Server MUST, for each request for a gated Asset:
 
 1. Verify the signature against the JWKS of an issuer listed in its own Protected Resource metadata (§9.3).
 2. Verify `typ`, `iss`, `aud`, `exp`, and `iat`.
-3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's Protected Resource metadata, or the URL itself (§5.6). Verify that `resource` equals that Asset or is a scope containing it (§5.5), and that `publisher` equals the Asset's `ope.publisher`.
+3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's Protected Resource metadata, or the URL itself (§5.6). Verify that `resource` covers that Asset as `entitlement.coverage` says (§10.4), and that `publisher` equals the Asset's `ope.publisher`.
 4. Verify that the Entitlement permits serving (§10.4): its `type` is `access` or `limit`, a `limit` is within quota, and, when `duration` is `rental`, the current time is before `rental_expires_at`.
 5. Verify `cnf` when present, per RFC 9449 or RFC 8705.
 6. Check revocation: either the token is within a lifetime the Resource Server accepts without introspection (§12.3), or the Resource Server calls `/introspect`.
@@ -645,10 +647,10 @@ A Client MAY inspect the token response it received to decide what to show the S
 |---|---|---|
 | `401 Unauthorized` | No token; or the token is invalid, expired, or revoked | Obtain a token, or refresh |
 | `402 Payment Required` | MAY be returned instead of `401` for a request with no token, to say the Asset is for sale | As for `401`; the Client MAY show the Offers first |
-| `403 Forbidden` | The token is valid but does not cover the Asset, a `limit` is spent, or the Resource Server's own policy refuses | Do not retry with the same token. On `insufficient_scope`, authorize for this Asset. |
+| `403 Forbidden` | The token is valid but does not cover the Asset, its Entitlement does not permit serving, a `limit` is spent, or the Resource Server's own policy refuses | Do not retry with the same token. On `insufficient_scope`, authorize for this Asset. On `no_entitlement`, show the Offers. |
 | `503 Service Unavailable` | Introspection failed and local validation is not possible | Retry per `Retry-After` |
 
-`401` and `402` responses MUST include a `WWW-Authenticate` challenge for each scheme the Resource Server accepts (§11.1), each with `resource_metadata` (§7.1). A challenge carries `error` only when the request carried a token: a request with no credentials gets a challenge with no error code (RFC 6750 §3.1). `403` responses SHOULD carry the same challenge with `error`. v0.1's `OPE-*` response headers are withdrawn.
+`401` and `402` responses MUST include a `WWW-Authenticate` challenge for each scheme the Resource Server accepts (§11.1), each with `resource_metadata` (§7.1). A challenge carries `error` only when the request carried a token: a request with no credentials gets a challenge with no error code (RFC 6750 §3.1). A License Token presented under a scheme the Resource Server does not accept for it, such as `Bearer` (§14, downgrade), counts as no credentials. `403` responses SHOULD carry the same challenge with `error`. v0.1's `OPE-*` response headers are withdrawn.
 
 Error codes:
 
@@ -657,18 +659,18 @@ Error codes:
 | `invalid_token` | Resource Server, `401` | Token invalid, expired, or revoked (RFC 6750 §3.1) |
 | `insufficient_scope` | Resource Server, `403` | Token valid, but its `resource` does not cover the Asset (RFC 6750 §3.1) |
 | `quota_exceeded` | Resource Server, `403` | A `limit` Entitlement is spent for the current period (Profile C) |
-| `no_entitlement` | License Server: authorization error response (RFC 6749 §4.1.2.1) or token endpoint `400` (RFC 6749 §5.2) | The Subject holds no Entitlement for the requested resource. The Client shows the Offers. |
+| `no_entitlement` | License Server: authorization error response (RFC 6749 §4.1.2.1) or token endpoint `400` (RFC 6749 §5.2). Resource Server: `403` when the token covers the Asset but fails §11.2 step 4 (a `status`-only Entitlement, a rental past its end). | The Subject holds no Entitlement that lets them have the Asset. The Client shows the Offers and does not re-authorize for the same Asset. |
 | `entitlement_suspended` | License Server, as for `no_entitlement` | The Subject's Entitlement is suspended (§17.2) |
 
 ## 12. Token Lifecycle
 
 ### 12.1 Refresh
 
-A License Server that issues `refresh_token` MUST rotate it on use and MUST invalidate the previous value, for every Client. This is stricter than RFC 9700 §4.14, which requires rotation or sender-constraint, and only for public Clients. A refresh MUST re-check that the Entitlement is `active` (§17.2). Refresh tokens issued to public Clients MUST be sender-constrained (DPoP) or MUST expire within 30 days of last use.
+A License Server that issues `refresh_token` MUST rotate it on use and MUST invalidate the previous value, for every Client. This is stricter than RFC 9700 §4.14, which requires rotation or sender-constraint, and only for public Clients. Invalidating the previous refresh token on rotation is not revocation (§12.2): access tokens already issued from it stay valid, which matters when one bundle refresh token serves several Publishers (§13.6). A refresh MUST re-check that the Entitlement is `active` (§17.2). Refresh tokens issued to public Clients MUST be sender-constrained (DPoP) or MUST expire within 30 days of last use.
 
 ### 12.2 Revocation
 
-A License Server MUST expose `revocation_endpoint` conforming to RFC 7009. Parameters: `token` (REQUIRED), `token_type_hint` (OPTIONAL, `access_token` or `refresh_token` per RFC 7009 §2.1). Authentication: as RFC 7009 §2.1 specifies; a public Client identifies itself with `client_id` and, for a DPoP-bound token, a DPoP proof. Response `200` regardless of prior state (RFC 7009 §2.2). After revocation `/introspect` MUST return `active: false` for that token. Revoking a refresh token MUST also revoke the access tokens issued from it.
+A License Server MUST expose `revocation_endpoint` conforming to RFC 7009. Parameters: `token` (REQUIRED), `token_type_hint` (OPTIONAL, `access_token` or `refresh_token` per RFC 7009 §2.1). Authentication: as RFC 7009 §2.1 specifies; a public Client identifies itself with `client_id`. Response `200` regardless of prior state (RFC 7009 §2.2). After revocation `/introspect` MUST return `active: false` for that token. Revoking a refresh token SHOULD also revoke the access tokens issued from it (RFC 7009 §2.1).
 
 Publishers revoke through the License Server. A License Server MUST also support the operator actions in §17.3, including revocation by `sub`, `group_id`, `resource`, and `client_id`. How the operator triggers them is out of scope; their effects are not.
 
@@ -680,7 +682,7 @@ Because a locally validated token remains valid until `exp`, a License Server MU
 
 The License Server MUST expose `introspection_endpoint` conforming to RFC 7662. For an active token the response includes `active`, `token_type` (`DPoP` or `License`), `sub`, `client_id`, `aud`, `resource`, `publisher`, `terms`, `entitlement`, `exp`, `iat`, and `cnf` when the token is sender-constrained, so that an introspecting Resource Server can still verify the DPoP proof (RFC 9449 §6.2). Resource Servers authenticate to introspection with their own credentials (§13.4).
 
-The request MAY include `resource`: the Asset identifier the Resource Server is deciding about. When it does, the response includes `permitted`, a boolean stating whether the token passes §11.2 steps 3 and 4 for that Asset. This is the same parameter and response member that RSL 1.0's introspection endpoint uses, so one endpoint can serve both specifications.
+The request MAY include `resource`: the Asset identifier the Resource Server is deciding about. When it does, the response includes `permitted`, a boolean stating whether the token passes §11.2 steps 3 and 4 for that Asset, apart from the quota check, which only the Resource Server can make (Profile C). This is the same parameter and response member that RSL 1.0's introspection endpoint uses, so one endpoint can serve both specifications.
 
 ## 13. License Servers Operated for Others
 
@@ -688,7 +690,7 @@ A License Server may serve one Publisher or many: a platform hosting creators, a
 
 ### 13.1 The Trust Relationship Is the Resource Metadata
 
-A License Server is authorized to issue for an Asset if, and only if, both sides say so: its `issuer` appears in `authorization_servers` in the Asset's Protected Resource metadata (§7.1), and the Asset is covered by its own `protected_resources` (§7.2), as RFC 9728 §4 recommends cross-checking. There is no separate allowlist, registry, or broker agreement in the protocol. A Publisher grants the relationship by listing the server and ends it by removing it; a License Server accepts it by listing the Publisher's Assets. A Publisher cannot conscript a License Server by naming it, and a License Server MUST NOT fetch metadata for, or issue for, a requested `resource` its `protected_resources` does not cover.
+A License Server is authorized to issue for an Asset if, and only if, both sides say so: its `issuer` appears in `authorization_servers` in the Asset's Protected Resource metadata (§7.1), and the Asset is covered by its own `protected_resources` (§7.2), as RFC 9728 §4 recommends cross-checking. There is no separate allowlist, registry, or broker agreement in the protocol. A Publisher grants the relationship by listing the server and ends it by removing it; a License Server accepts it by listing the Publisher's Assets. A Publisher cannot conscript a License Server by naming it, and a License Server MUST NOT fetch metadata for, or issue for, a requested `resource` its `protected_resources` does not cover. The one exception is a bundle identifier listed in the License Server's own `ope.bundles` (§13.6), which has no Protected Resource metadata: it is accepted at the authorization endpoint, and both checks then apply to each Asset the Client names at the token endpoint.
 
 A License Server MUST NOT issue a token for a resource whose metadata it has not resolved, whose metadata does not list it, or whose metadata it cannot refresh within 24 hours. A Resource Server MUST resolve signing keys only from issuers its own metadata lists (§9.3), so a token from any other issuer fails at step 1 of §11.2 regardless of what the token claims.
 
@@ -707,14 +709,13 @@ A License Server MUST obtain each resource's Protected Resource metadata and Ter
 A Publisher need not control a domain. A creator selling a course, a tool, or a newsletter through a platform is a Publisher whose Assets live under the platform's origin:
 
 ```
-https://platform.example/creators/alice/courses/woodworking-101
+https://platform.example/creators/alice/courses/woodworking-101/lessons/01-tools
 ```
 
 For such Publishers:
 
-- the platform publishes Protected Resource metadata per URL (§7.1), such as `/.well-known/oauth-protected-resource/creators/alice/courses/woodworking-101`, each carrying that creator's Publisher identifier (`https://platform.example/creators/alice/`), Offers, Terms, and `client_policy`;
+- the platform publishes Protected Resource metadata per URL (§7.1), such as `/.well-known/oauth-protected-resource/creators/alice/courses/woodworking-101/lessons/01-tools`, each carrying that creator's Publisher identifier (`https://platform.example/creators/alice/`), Offers, Terms, and `client_policy`;
 - the License Server's `protected_resources` (§7.2) lists the creator's scope;
-- when the platform also operates the Resource Server, `aud` MAY equal `iss`. The audience check in §11.2 still applies.
 
 Two Publishers under one origin MUST have non-overlapping scopes (§5.5). The platform, not the creator, assigns scope prefixes. This puts the creator's metadata, and so their choice of License Server, in the platform's hands, and a creator who leaves the platform cannot take their Asset identifiers along (§5.2 asks that identifiers not change). OPE does not solve this in v0.2; a platform that wants to offer it can let creators sign their own metadata (RFC 9728 `signed_metadata`) or serve their Assets from a creator-controlled origin.
 
@@ -726,13 +727,13 @@ When the Resource Server belongs to the Publisher and the License Server does no
 - MUST record, for each Resource Server credential, the Publisher identifiers (§5.8) it serves, and MUST return `active: false` when the introspected token's `publisher` is not among them; a Resource Server MUST NOT be able to introspect tokens for another Publisher's Assets, even on a shared origin;
 - MUST serve `jwks_uri` without authentication, so that a Resource Server with no introspection credential can still validate locally.
 
-A Resource Server with no introspection credential cannot introspect, so it MUST NOT accept a token whose remaining lifetime exceeds its documented tolerance (§12.3); it refuses such a token with `401` and `invalid_token`, and the Client refreshes.
+A Resource Server with no introspection credential cannot introspect, so its tolerance (§12.3) MUST be at least the `max_token_lifetime` of every issuer its metadata lists; otherwise it would refuse even freshly issued tokens. Revocation then reaches it only through expiry.
 
 ### 13.5 Audience and Source
 
 A License Server operated for others:
 
-- MUST set `aud` from the Asset as §9.2 describes, never to itself, except as §13.3 allows;
+- MUST set `aud` from the Asset as §9.2 describes;
 - MUST set `entitlement.source` to `broker` when the Subject's Entitlement was purchased from the operator (a collective subscription, a platform bundle) and to `direct` when the Subject purchased from the Publisher and the operator only issues;
 - MUST NOT store or serve Asset content on the Subject's behalf beyond what is needed to complete a request.
 
@@ -740,13 +741,15 @@ A License Server operated for others:
 
 An Entitlement MAY cover Assets from more than one Publisher: a collective subscription, a platform pass. A License Server that sells one:
 
-- issues tokens one Publisher at a time. Every token names exactly one `publisher` (§9.2), its `resource` is that Publisher's Asset or a scope within it, and its `aud` is that Publisher's origins, so no Resource Server can replay a token against another Publisher's;
-- needs nothing new for the common case. A Client asks for an Asset as usual (§8.1); the License Server sees that the Subject's bundle covers it and issues a token for that Publisher with `source: broker` (§13.5). The Subject sees one consent per Publisher.
+- issues tokens one Publisher at a time. Every token names exactly one `publisher` (§9.2), and its `resource` is that Publisher's Asset or a scope within it, so a Resource Server refuses it for any other Publisher's Asset at §11.2 step 3, even when two Publishers share an origin and so an `aud`;
+- needs nothing new for the common case. A Client asks for an Asset as usual (§8.1); the License Server sees that the Subject's bundle covers it and issues a token for that Publisher with `source: broker` (§13.5) and the bundle's Terms. The Subject sees one consent per Publisher.
 
 A License Server MAY also let a Client authorize the whole bundle at once. It then lists the bundle in `ope.bundles` (§7.2) with a bundle identifier: an `https` URL on the License Server's own origin. An authorization request whose `resource` is a bundle identifier:
 
 - MUST show the bundle consent in §8.4, naming the bundle and every Publisher in it;
-- never yields an access token for the bundle identifier itself. The Client names an Asset identifier as `resource` on the token request: at the code exchange for its first Publisher, then with the `refresh_token` grant for each further one (RFC 8707 §2.2). The License Server issues for that Asset if the bundle covers it, and refuses with `invalid_target` a code exchange or refresh that names no Asset or the bundle identifier.
+- never yields an access token for the bundle identifier itself. The Client names an Asset identifier as `resource` on the token request: at the code exchange for its first Publisher, then with the `refresh_token` grant for each further one. This uses the `resource` parameter on the token endpoint as RFC 8707 §2.2 does, but extends it: RFC 8707 narrows to resources named in the authorization request, while OPE lets the Client name any Asset the bundle covers;
+- issues for that Asset if the bundle covers it and both trust checks pass (§13.1), and otherwise refuses with: `invalid_target` when the request names no Asset, names the bundle identifier, or names an Asset outside `protected_resources`; `no_entitlement` when the bundle no longer covers the Asset's Publisher; `unauthorized_client` (RFC 6749 §5.2) when the Publisher's `client_policy` refuses the Client;
+- puts the bundle's Terms in the token's `terms` (§9.2). The Publisher's current Terms still govern every request (§10.4).
 
 ### 13.7 Groups and Institutions
 
@@ -779,7 +782,7 @@ This section is normative.
 
 ## 15. Privacy Considerations
 
-- `sub` MUST be an opaque, issuer-scoped identifier (§8.3). A License Server issuing for more than one Publisher SHOULD make `sub` pairwise per Publisher identifier (§5.8), so that two Publishers' Resource Servers cannot correlate one Subject across them, including two creators on one platform origin. `sub` MUST NOT vary by Client: S2 and §8.3 depend on one `sub` across Clients. The License Server holds the mapping and MUST still resolve every variant to one Entitlement. The exception is group administration (§13.7), where an institution's own Resource Servers MAY receive a `sub` stable across that institution's Assets.
+- `sub` MUST be an opaque, issuer-scoped identifier (§8.3). A License Server issuing for more than one Publisher SHOULD make `sub` pairwise per Publisher identifier (§5.8), so that two Publishers' Resource Servers cannot correlate one Subject across them, including two creators on one platform origin. `sub` MUST NOT vary by Client: S2 and §8.3 depend on one `sub` across Clients. The License Server holds the mapping and MUST still resolve every variant to one Entitlement.
 - The `terms` claim is a URL and a digest, not the Terms themselves; it reveals nothing beyond the Asset's identity.
 - Resource Servers SHOULD log `jti` and `client_id`, not `sub`, for access accounting.
 - Advertising status (`kind: ad-free`) is sensitive; Clients MUST NOT expose it to third parties.
@@ -912,13 +915,13 @@ A Publisher that also publishes RSL MAY include its `rsl:` elements alongside; O
 
 ## B. Web Profile
 
-Applies when a website unlocks its own gated pages in the Subject's browser: the site-mediated unlock. Here the site is both the Resource Server and an OAuth Client of the License Server. It runs the authorization flow from its server, as a confidential Client authenticated with a client secret or `private_key_jwt`, and the License Token never leaves the site. A browser-based Client that reads across many sites, such as a web reader or an extension, is an ordinary public Client under §8.2; this profile does not apply to it.
+Applies when a website unlocks its own gated pages in the Subject's browser: the site-mediated unlock. Here the site is both the Resource Server and an OAuth Client of the License Server. It runs the authorization flow from its server, as a confidential Client authenticated with a client secret or `private_key_jwt`, and the License Token is never handed to another Client: it stays at the site, or in the site's own `HttpOnly` cookie. A browser-based Client that reads across many sites, such as a web reader or an extension, is an ordinary public Client under §8.2; this profile does not apply to it.
 
-**Signaling.** A page that gates content returns `401` or `402` with the `WWW-Authenticate` challenge(s) in §11.4. A page that returns `200` with a paywall MAY include the same challenge for discovery, but Clients that follow RFC 9728 act on challenges only in `401` and `402` responses. The page SHOULD include `<link rel="terms-of-service" href="<terms url>">` (RFC 6903) in `<head>`; `rel="license"` is for the content's own license (RFC 4946) and RSL documents, not for purchase terms. It SHOULD mark paywalled sections with Schema.org `isAccessibleForFree: false` and `hasPart` / `cssSelector` for search engines. v0.1's `OPE-Content-Id`, `OPE-Access-Level`, `OPE-Unlock-URL` headers and `rel="ope-discovery"` are withdrawn.
+**Signaling.** A page that gates content returns `401` or `402` with the `WWW-Authenticate` challenge(s) in §11.4. A page that returns `200` with a paywall MAY include the same challenge for discovery, but OPE Clients act on challenges only in `401` and `402` responses (§7.1). The page SHOULD include `<link rel="terms-of-service" href="<terms url>">` (RFC 6903) in `<head>`; `rel="license"` is for the content's own license (RFC 4946) and RSL documents, not for purchase terms. It SHOULD mark paywalled sections with Schema.org `isAccessibleForFree: false` and `hasPart` / `cssSelector` for search engines. v0.1's `OPE-Content-Id`, `OPE-Access-Level`, `OPE-Unlock-URL` headers and `rel="ope-discovery"` are withdrawn.
 
 **Unlock flow.** The Subject follows a `purchase_url` or the page's own unlock link. The site checks for an existing session; otherwise it runs Authorization Code with PKCE against a License Server its metadata lists (which MAY be the site itself), validates the returned token per §11.2, and redirects to the Asset.
 
-**Cookie transport.** After the unlock, the site keeps the Subject's access in a cookie: either its own session, established after validating the License Token, or the License Token itself. A token kept in a cookie is unbound, since a browser cannot attach a DPoP proof to a cookie; the site obtains it as an unbound token for its own `client_id`. The cookie is `HttpOnly; Secure; SameSite=Lax` with `Max-Age` no longer than the token lifetime. On an origin shared by several Publishers, its `Path` is the Publisher's scope prefix, so one creator's pages never receive another's token. The cookie name is site-defined; v0.1's default `ope_grant` is withdrawn as a protocol constant. Sites check, in order: their own session, the `Authorization` header (§11.1), then the cookie. The same validation logic (§11.2) applies to all three.
+**Cookie transport.** After the unlock, the site keeps the Subject's access in a cookie: either its own session, established after validating the License Token, or the License Token itself. A token kept in a cookie is unbound, since a browser cannot attach a DPoP proof to a cookie; the site obtains it as an unbound token for its own `client_id`. The cookie is `HttpOnly; Secure; SameSite=Lax` with `Max-Age` no longer than the token lifetime. On an origin shared by several Publishers, its `Path` is the Publisher's scope prefix, so one creator's pages are not sent another's token. `Path` is not a security boundary against script running on the same origin; a platform that lets creators run script on its origin keeps tokens in its own session instead. The cookie name is site-defined; v0.1's default `ope_grant` is withdrawn as a protocol constant. Sites check, in order: their own session, the `Authorization` header (§11.1), then the cookie. The same validation logic (§11.2) applies to all three.
 
 **Cross-Publisher flow.** Identical to the unlock flow with a third-party License Server (§13). The site redirects to that server's `authorization_endpoint` with `resource` set to the Asset and its own registered `redirect_uri`; the server authenticates the Subject, checks the Subject's holding covers this Asset, issues a token with `aud` set from the Asset (§9.2), and redirects back. The site validates per §11.2 and sets the cookie.
 
@@ -1009,15 +1012,16 @@ A member buys the pro tier of *Inkwell*, a writing tool, and wants "pro export" 
 
 **Client (minimum).** A Client that follows these steps meets the Client requirements of Part I:
 
-1. **Find the metadata.** Request the Asset, or read the item's `ope:offer`. On `401` or `402`, take `resource_metadata` from the challenge; from a feed, take `metadata` only if it is on the Asset's origin; otherwise construct the well-known URL (§7.1).
-2. **Check it.** Discard the document unless its `resource` is identical to the URL requested or the feed's `resource`. Read `ope.asset` (default: `resource`), `ope.offers`, and `authorization_servers`.
-3. **Reuse a token if one fits.** Tokens are cached by License Server `issuer` and the `resource` from the token response. A cached token from a listed issuer whose `resource` equals or contains the Asset (§5.5) is used as is (step 7).
-4. **Choose a License Server.** Prefer one listed in `authorization_servers` that the Client is already registered with; otherwise the first one listed. If the Subject has a known account at one of several, the Client MAY let them choose.
-5. **Register if needed.** Fetch its RFC 8414 metadata (§7.2). If the Client has no `client_id` there, register through `registration_endpoint`; if there is none, the Client needs a `client_id` issued out of band, and without one it tries the next listed License Server.
-6. **Authorize.** Optionally show the Offers. Run Authorization Code + PKCE with `resource` set to the Asset (§8.1), with DPoP. On `no_entitlement`, show the Offers and open `purchase_url`; retry when the Subject returns (§6.2). On `entitlement_suspended`, tell the Subject; do not retry.
-7. **Present.** Send the token with `Authorization: DPoP` (or `License` for unbound tokens) (§11.1).
-8. **Handle refusals.** On `401` with `invalid_token`, refresh once, then re-authorize. On `403` with `insufficient_scope`, authorize for this Asset. On `403` with `quota_exceeded`, tell the Subject; do not retry. On `503`, retry per `Retry-After`.
-9. **Refresh** before `exp`, and keep tokens in platform-private storage (§14).
+1. **Reuse a token if one fits.** Tokens are cached by License Server `issuer` and by the `resource` and `coverage` from the token response. If a cached token covers the Asset (§10.4), present it (step 8) without fetching metadata; fetch metadata only if it is refused.
+2. **Find the metadata.** Request the Asset, or read the item's `ope:offer`. On `401` or `402`, take `resource_metadata` from the challenge; from a feed, take `metadata` only if it is on the Asset's origin; otherwise construct the well-known URL (§7.1).
+3. **Check it.** Discard the document unless its `resource` is identical to the URL requested or the feed's `resource`. Read `ope.asset` (default: `resource`), `ope.publisher`, `ope.offers`, and `authorization_servers`.
+4. **Use a bundle if one applies.** If the Client holds a refresh token from a bundle authorization (§13.6) at a listed License Server, and that bundle's `publishers` include `ope.publisher`, refresh with `resource` set to the Asset and go to step 8. A Client learns of bundles from `ope.bundles` (§7.2); using them is optional.
+5. **Choose a License Server.** Prefer one listed in `authorization_servers` that the Client is already registered with; otherwise the first one listed. If the Subject has a known account at one of several, the Client MAY let them choose.
+6. **Register if needed.** Fetch its RFC 8414 metadata (§7.2). If the Client has no `client_id` there, register through `registration_endpoint`; if there is none, the Client needs a `client_id` issued out of band, and without one it returns to step 5 for the next listed License Server.
+7. **Authorize.** Optionally show the Offers. Run Authorization Code + PKCE with `resource` set to the Asset (§8.1), with DPoP. On `no_entitlement`, show the Offers and open `purchase_url`; retry when the Subject returns (§6.2). On `entitlement_suspended`, tell the Subject; do not retry.
+8. **Present.** Send the token with `Authorization: DPoP` (or `License` for unbound tokens) (§11.1).
+9. **Handle refusals.** On `401` with `invalid_token`, refresh once, then re-authorize. On `403` with `insufficient_scope`, authorize for this Asset. On `403` with `no_entitlement`, show the Offers; do not re-authorize. On `403` with `quota_exceeded`, tell the Subject; do not retry. On `503`, retry per `Retry-After`.
+10. **Refresh** before `exp`, sending the same `resource` the token was requested with (or, for a bundle, the Asset needed), and keep tokens in platform-private storage (§14).
 
 **Reference implementations.** Eleventy demo (<https://github.com/shellen/ope-eleventy-demo>) targets v0.1 and will be updated. The reference gateway remains planned. Neither is a substitute for the conformance kit in §16.
 
@@ -1027,13 +1031,13 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 
 **Revision 5 (2026-10-27) within v0.2.** Review pass: fixes from two adversarial reviews and a cross-check against the RSL 1.0 text.
 
-- *Discovery follows RFC 9728 exactly.* Protected Resource metadata is per URL, with `resource` identical to the requested URL (RFC 9728 §3.3), which revision 4's per-scope metadata could not satisfy. The new `ope.asset` names the Asset a URL serves or exercises, which also gives API endpoints a defined Asset (Profile C, worked example). Feed-supplied metadata URLs must be on the Asset's origin (§5.6, §7.1).
-- *Token coverage is decided by the License Server.* The Client requests one Asset; the token's `resource` is that Asset or a scope containing it, and the token response says which (§5.6, §8.5). One `resource` per request (§8.1). `coverage` is now `item` or `collection` and only describes `resource`; `all` became a `collection` over the Publisher's root scope, and `pre-release` became a `kind` (§10).
-- *Publishers are identified.* New `ope.publisher` metadata member and `publisher` claim (§5.8). Scope separation, one Publisher per token, introspection isolation, and pairwise `sub` are stated against it. Bundles are authorized with a bundle identifier and narrowed per Publisher at the token endpoint (RFC 8707 §2.2), or need nothing new at all (§13.6).
+- *Discovery follows RFC 9728 exactly.* Protected Resource metadata is per URL, with `resource` identical to the requested URL (RFC 9728 §3.3), which revision 4's per-scope metadata could not satisfy. The new `ope.asset` names the Asset a URL serves or exercises, which also gives API endpoints a defined Asset (Profile C, worked example). Feed-supplied metadata URLs must be on the Asset's origin (§7.1).
+- *Token coverage is decided by the License Server.* The Client requests one Asset; the token's `resource` is that Asset or a scope containing it, and the token response says which (§5.6, §8.5). One `resource` per request (§8.1). `coverage` is now `item` or `collection`, required for every type, and tells a Resource Server whether `resource` is a scope, since Asset identifiers may also end in `/`. `all` became a `collection` over the Publisher's root scope, and `pre-release` became a `kind` (§5.5, §10). A Publisher selling over a scope keeps its metadata uniform across it, so a scope token cannot bypass a per-Asset policy (§5.6). The token response must carry `resource` and `entitlement` (§8.5).
+- *Publishers are identified.* New `ope.publisher` metadata member and `publisher` claim (§5.8). Scope separation, one Publisher per token, introspection isolation, and pairwise `sub` are stated against it. Bundles need nothing new in the common case. They may also be authorized with a bundle identifier and narrowed per Publisher at the token endpoint, an OPE extension of RFC 8707 §2.2. Bundles carry their own Terms and are exempt from the per-Asset trust checks only at the authorization endpoint (§13.1, §13.6).
 - *Offers.* `ope.offers` is an array, Offers may carry an `id` echoed as `entitlement.offer`, and `entitlement_types` is informational (§6.2, §7.1).
 - *Audience.* `aud` is the origin of `resource` plus any `ope.audience` origins (§9.2).
 - *Trust is cross-checked from both sides.* RFC 9728's `protected_resources` replaces `ope.resources_served` and is required; a License Server does not fetch metadata for resources it does not list (§7.2, §13.1).
-- *Enforcement.* §11.2 now has six steps: the request's Asset comes from metadata, `publisher` is checked, `status` grants no access by itself, and `rental_expires_at` is enforced. Unknown `kind` values grant nothing (§10.2, §10.4).
+- *Enforcement.* §11.2 now has six steps: the request's Asset comes from metadata, `publisher` is checked, `status` grants no access by itself, and `rental_expires_at` is enforced. A Resource Server refuses step-4 failures with `no_entitlement`, so a `status`-only token does not loop the Client through re-authorization. Unknown `kind` values grant nothing (§10.2, §10.4). Group and institutional tokens MUST NOT live past an hour (§9.4). A Resource Server without an introspection credential sets its tolerance to the issuers' maximum lifetime (§13.4). Refresh-token rotation is not revocation (§12.1).
 - *Errors.* `401` for a request without a token carries no error code (RFC 6750 §3.1), and `402` is an optional alternative to it. `no_entitlement`, `entitlement_suspended`, and `quota_exceeded` are defined, and the License Server refuses with OAuth error responses rather than `402` (§11.4, §17.2).
 - *Introspection* returns `publisher` and `cnf`, and accepts RSL 1.0's `resource` parameter and `permitted` member (§12.4).
 - *Terms digest.* The digest input is defined, and the 24-hour copy is the one shown at consent (§6.1).
@@ -1050,6 +1054,7 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 - *New* §18 IANA Considerations. The text license is Apache 2.0 (D1 closed). D14 closed.
 
 Known issues carried to revision 6:
+
 - Request-target normalization before scope matching.
 - Scoping revoke-by-`client_id` per Publisher at multi-Publisher servers.
 - Emergency removal of a compromised signing key.
@@ -1074,7 +1079,7 @@ Known issues carried to revision 6:
 | Inline `auth` fallback | Removed | RFC 8414 is REQUIRED |
 | Separate entitlement grant, refresh, revocation endpoints | OAuth `token_endpoint`, `refresh_token`, RFC 7009 `revocation_endpoint`, RFC 7662 `introspection_endpoint` | Reuse |
 | Simple and Portable token modes | One mode: structured `license+jwt` | Simple mode could not be verified by third parties and did not meet the portability definition |
-| JWT, PASETO, macaroons | JWT (RFC 9068 profile) only | Surface area |
+| JWT, PASETO, macaroons | JWT only, modeled on RFC 9068 (§9.1) | Surface area |
 | `grant` claim with `type`, `scope`, `kind`, `duration`, `transferable`, `quota`, `period`, `source` | `entitlement` claim with `type`, `coverage`, `kind`, `duration`, `rental_expires_at`, `transferable`, `quota`, `period`, `remaining`, `source`, `group_id`, `offer`; the Assets covered are the token's `resource` | Rename `scope` to `coverage`; `rental:Nh` string replaced by a timestamp; `signal` renamed `status` |
 | `content_ids`, `meter_remaining`, `institutional_domain`, `broker_id`, `bundle_id`, `refresh_token` as token claims | `resource` claim; `entitlement.remaining`; `entitlement.group_id`; `iss`; refresh token outside the token | RFC 9068 alignment; no secrets inside tokens |
 | Own `content_metadata` vocabulary (16 fields) | Withdrawn; Offer carries price and name; Podcasting 2.0, iTunes, Schema.org carry the rest | Duplication |
