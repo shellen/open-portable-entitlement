@@ -210,7 +210,9 @@ Every Entitlement is for something. This section defines how that something is n
 
 ### 5.3 Comparison
 
-Asset identifiers are opaque. Clients, License Servers, and Resource Servers MUST compare them by simple string comparison (RFC 3986 §6.2.1) and MUST NOT infer meaning from their structure. Publishers SHOULD publish identifiers in normalized form so that string comparison is reliable.
+Asset identifiers are opaque. Clients, License Servers, and Resource Servers MUST compare them by simple string comparison (RFC 3986 §6.2.1) and MUST NOT infer meaning from their structure. Publishers MUST publish identifiers in normalized form (RFC 3986 §6.2.2) so that string comparison is reliable.
+
+A request URL is not an identifier until it is normalized. Before matching a request against a token's `resource` (§11.2 step 3), a Resource Server MUST apply RFC 3986 §6.2.2 normalization to it: lowercase scheme and host, uppercase percent-encoding hex digits, decode percent-encoded unreserved characters, and remove dot-segments. Otherwise `https://platform.example/creators/alice/../bob/x` would match Alice's scope while serving Bob's page. A Resource Server MUST refuse with `400` a request for a gated Asset whose path contains `%2F` or `%5C` (an encoded `/` or `\`), because servers and proxies disagree on whether those separate path segments; no Asset identifier needs them.
 
 ### 5.4 Resolution
 
@@ -416,7 +418,7 @@ Servers MAY continue to serve v0.1's `/.well-known/ope` during transition; it is
 
 ### 7.3 Caching
 
-Clients SHOULD cache both metadata documents for no less than one hour and no more than 24 hours, honoring `Cache-Control`. Resource Servers SHOULD cache JWKS documents per their `Cache-Control` and MUST refetch on an unknown `kid`. License Servers MUST refetch a resource's Protected Resource metadata at least every 24 hours and before issuing if the cached copy is older (§13.2).
+Clients SHOULD cache both metadata documents for no less than one hour and no more than 24 hours, honoring `Cache-Control`. Resource Servers MUST refetch a JWKS document on an unknown `kid` and at least every 5 minutes, whatever its `Cache-Control` says, so that a key the License Server withdraws stops validating everywhere within 5 minutes (§17.3). License Servers MUST refetch a resource's Protected Resource metadata at least every 24 hours and before issuing if the cached copy is older (§13.2).
 
 ## 8. Authorization
 
@@ -628,7 +630,7 @@ A Resource Server MUST, for each request for a gated Asset:
 
 1. Verify the signature against the JWKS of an issuer listed in its own Protected Resource metadata (§9.3).
 2. Verify `typ`, `iss`, `aud`, `exp`, and `iat`.
-3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's Protected Resource metadata, or the URL itself (§5.6). Verify that `resource` covers that Asset as `entitlement.coverage` says (§10.4), and that `publisher` equals the Asset's `ope.publisher`.
+3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's Protected Resource metadata, or the URL itself (§5.6). The URL is first normalized (§5.3). Verify that `resource` covers that Asset as `entitlement.coverage` says (§10.4), and that `publisher` equals the Asset's `ope.publisher`.
 4. Verify that the Entitlement permits serving (§10.4): its `type` is `access` or `limit`, a `limit` is within quota, and, when `duration` is `rental`, the current time is before `rental_expires_at`.
 5. Verify `cnf` when present, per RFC 9449 or RFC 8705.
 6. Check revocation: either the token is within a lifetime the Resource Server accepts without introspection (§12.3), or the Resource Server calls `/introspect`.
@@ -645,6 +647,7 @@ A Client MAY inspect the token response it received to decide what to show the S
 
 | Status | When | Client action |
 |---|---|---|
+| `400 Bad Request` | The request path contains an encoded `/` or `\` (§5.3) | Do not retry the same URL |
 | `401 Unauthorized` | No token; or the token is invalid, expired, or revoked | Obtain a token, or refresh |
 | `402 Payment Required` | MAY be returned instead of `401` for a request with no token, to say the Asset is for sale | As for `401`; the Client MAY show the Offers first |
 | `403 Forbidden` | The token is valid but does not cover the Asset, its Entitlement does not permit serving, a `limit` is spent, or the Resource Server's own policy refuses | Do not retry with the same token. On `insufficient_scope`, authorize for this Asset. On `no_entitlement`, show the Offers. |
@@ -666,7 +669,7 @@ Error codes:
 
 ### 12.1 Refresh
 
-A License Server that issues `refresh_token` MUST rotate it on use and MUST invalidate the previous value, for every Client. This is stricter than RFC 9700 §4.14, which requires rotation or sender-constraint, and only for public Clients. Invalidating the previous refresh token on rotation is not revocation (§12.2): access tokens already issued from it stay valid, which matters when one bundle refresh token serves several Publishers (§13.6). A refresh MUST re-check that the Entitlement is `active` (§17.2). Refresh tokens issued to public Clients MUST be sender-constrained (DPoP) or MUST expire within 30 days of last use.
+A License Server that issues `refresh_token` MUST rotate it on use and MUST invalidate the previous value, for every Client. This is stricter than RFC 9700 §4.14, which requires rotation or sender-constraint, and only for public Clients. Invalidating the previous refresh token on rotation is not revocation (§12.2): access tokens already issued from it stay valid, which matters when one bundle refresh token serves several Publishers (§13.6). If a refresh token that was already rotated away is presented again, the License Server MUST treat it as stolen and revoke the whole grant: every refresh and access token issued from that authorization (RFC 9700 §4.14.2). The Subject then authorizes again. A refresh MUST re-check that the Entitlement is `active` (§17.2). Refresh tokens issued to public Clients MUST be sender-constrained (DPoP) or MUST expire within 30 days of last use.
 
 ### 12.2 Revocation
 
@@ -681,6 +684,8 @@ Because a locally validated token remains valid until `exp`, a License Server MU
 ### 12.4 Introspection
 
 The License Server MUST expose `introspection_endpoint` conforming to RFC 7662. For an active token the response includes `active`, `token_type` (`DPoP` or `License`), `sub`, `client_id`, `aud`, `resource`, `publisher`, `terms`, `entitlement`, `exp`, `iat`, and `cnf` when the token is sender-constrained, so that an introspecting Resource Server can still verify the DPoP proof (RFC 9449 §6.2). Resource Servers authenticate to introspection with their own credentials (§13.4).
+
+For an inactive token, the response MAY include `revocation_reason`, but only to a Resource Server registered for the token's own `publisher` (§13.4); every other caller gets `active: false` alone, as RFC 7662 §2.2 advises. Values: `expired`, `entitlement_ended`, `entitlement_suspended`, `client_revoked`, `key_withdrawn`, `operator`. It is for the Resource Server's logs and its own messaging; it reveals nothing about other Publishers' decisions, and the License Server does not notify the Subject.
 
 The request MAY include `resource`: the Asset identifier the Resource Server is deciding about. When it does, the response includes `permitted`, a boolean stating whether the token passes §11.2 steps 3 and 4 for that Asset, apart from the quota check, which only the Resource Server can make (Profile C). This is the same parameter and response member that RSL 1.0's introspection endpoint uses, so one endpoint can serve both specifications.
 
@@ -774,6 +779,8 @@ This section is normative.
 - **Sender constraint.** Public Clients SHOULD use DPoP. A Resource Server that receives a token with `cnf` MUST verify the proof.
 - **Lifetime.** §9.4 and §12.3. Non-expiring tokens are prohibited.
 - **Audience.** Resource Servers MUST reject tokens whose `aud` does not include their origin (RFC 9700 §2.3).
+- **Request normalization.** Resource Servers normalize request URLs before matching them against `resource`, and refuse encoded path separators (§5.3). This matters most on origins shared by several Publishers, where a dot-segment can cross from one Publisher's scope into another's.
+- **Key compromise.** A withdrawn key stops validating within 5 minutes because Resource Servers refetch JWKS at least that often (§7.3, §17.3). A stolen refresh token is detected by reuse after rotation and ends the whole grant (§12.1).
 - **Issuer binding.** A Resource Server MUST accept only issuers its own Protected Resource metadata lists (§7.1, §9.3). Never resolve keys from a URL found inside the token.
 - **Redirect URIs.** Exact match, per RFC 9700 §4.1. Custom-scheme redirects for native apps per RFC 8252.
 - **Consent.** §8.4. Auto-approve without consent is prohibited on first authorization.
@@ -794,8 +801,8 @@ A conforming v0.2 implementation MUST validate against the following, published 
 
 - JSON Schema for the `ope` member of Protected Resource metadata (§7.1), including the Offer and Terms reference.
 - JSON Schema for the `ope` member of Authorization Server metadata (§7.2) and for the `entitlement` object (§10).
-- A set of signed test vectors: valid tokens, expired tokens, wrong `aud`, wrong `typ`, `alg: none`, issuer not listed in resource metadata, `resource` not covering the Asset, `publisher` not matching the Asset, a `status`-only token for a gated Asset, a rental past `rental_expires_at`, revoked `jti`, with expected Resource Server outcomes.
-- For the Multi-Publisher License Server target: resource metadata not listing the issuer (MUST refuse to issue), requested `resource` outside its own `protected_resources` (MUST refuse without fetching), stale metadata older than 24 hours (MUST refetch or refuse), nested scopes of one Publisher (longer prefix wins), introspection of another Publisher's token (MUST refuse), an access token naming two Publishers or a bundle identifier (MUST NOT issue), `client_policy` deny (MUST refuse), group removal followed by a token request (MUST refuse), and the operator actions in §17.3 (each MUST be observable through `/introspect`).
+- A set of signed test vectors: valid tokens, expired tokens, wrong `aud`, wrong `typ`, `alg: none`, issuer not listed in resource metadata, `resource` not covering the Asset, `publisher` not matching the Asset, a `status`-only token for a gated Asset, a rental past `rental_expires_at`, revoked `jti`, a dot-segment request crossing into another Publisher's scope, an encoded `/` in a gated path, and a token signed by a withdrawn key, with expected Resource Server outcomes.
+- For the Multi-Publisher License Server target: resource metadata not listing the issuer (MUST refuse to issue), requested `resource` outside its own `protected_resources` (MUST refuse without fetching), stale metadata older than 24 hours (MUST refetch or refuse), nested scopes of one Publisher (longer prefix wins), introspection of another Publisher's token (MUST refuse), an access token naming two Publishers or a bundle identifier (MUST NOT issue), `client_policy` deny (MUST refuse), group removal followed by a token request (MUST refuse), a replayed refresh token (MUST revoke the grant), revocation by `client_id` and `publisher` (MUST leave other Publishers' tokens active), and the operator actions in §17.3 (each MUST be observable through `/introspect`).
 
 Location: `conformance/` in the specification repository. *Status: the schemas and vectors are a v0.2 deliverable and are not yet published. This specification will not advance past Working Draft until they are.* An implementer who cannot run them should treat every MUST above as untested.
 
@@ -830,9 +837,11 @@ A License Server MUST support the following actions through an interface of the 
 | Revoke by `group_id` | All tokens issued under a group Entitlement die |
 | Revoke by `sub` and `group_id` | All of one Subject's tokens issued under a group Entitlement die (member removed, §13.7) |
 | Revoke by `resource` | All tokens for an Asset or scope die (Terms change, Asset withdrawn) |
-| Revoke by `client_id` | All tokens issued through a Client die (compromised or abusive Client) |
+| Revoke by `client_id` | All tokens issued through a Client die, for every Publisher (compromised or abusive Client). Operator only. |
+| Revoke by `client_id` and `publisher` | A Client's tokens for one Publisher's Assets die; other Publishers are unaffected. Available to the Publisher, through the operator's interface. |
 | Suspend and resume an Entitlement | §17.2; suspend revokes, resume does not reissue |
 | Rotate signing keys | New `kid` published to `jwks_uri` before use; old key remains published until the longest outstanding `exp` has passed |
+| Withdraw a compromised key | The key is removed from `jwks_uri` at once. Resource Servers stop accepting tokens it signed within 5 minutes (§7.3); Clients holding such tokens get `401` and refresh onto the current key. |
 | Refuse issuance for a Publisher | Stop issuing for a scope without waiting for metadata to change |
 
 Each action MUST take effect for new token requests immediately and for outstanding tokens within `max_token_lifetime`.
@@ -850,7 +859,7 @@ OPE extends registries that OAuth and HTTP already maintain. None of these regis
 | OAuth Authorization Server Metadata (RFC 8414 §7.1) | `ope` | §7.2 |
 | OAuth Protected Resource Metadata (RFC 9728 §8.1) | `ope` | §7.1 |
 | JSON Web Token Claims (RFC 7519 §10.1) | `resource`, `publisher`, `terms`, `entitlement` | §9.2 |
-| OAuth Token Introspection Response (RFC 7662 §3.1) | `resource`, `publisher`, `terms`, `entitlement`, `permitted` | §12.4 |
+| OAuth Token Introspection Response (RFC 7662 §3.1) | `resource`, `publisher`, `terms`, `entitlement`, `permitted`, `revocation_reason` | §12.4 |
 | OAuth Parameters (RFC 6749 §11.2) | `entitlement` and `resource` as token response parameters; `resource` as an introspection request parameter | §8.5, §12.4 |
 | OAuth Extensions Error (RFC 6749 §11.4) | `no_entitlement`, `entitlement_suspended`, `quota_exceeded` | §11.4 |
 | OAuth Access Token Types (RFC 6749 §11.1) | `License` | §8.5 |
@@ -870,40 +879,127 @@ Profiles specify how the core applies to a surface. Each is short by design and 
 
 Applies to RSS 2.0, Atom (RFC 4287), and JSON Feed 1.1.
 
-**OPE element.** A gated item carries an `ope:offer` element in namespace `https://feedspec.org/ope/ns/1.0` (unchanged from v0.1, D9) for each of the Asset's Offers, all naming the same `resource`. It names the Asset and repeats the Offer so a Client can present the item without a round trip; the Protected Resource metadata remains authoritative.
+**Namespace.** OPE feed elements are in the namespace `https://feedspec.org/ope/ns/0.2`, conventionally prefixed `ope`. v0.1 used `https://feedspec.org/ope/ns/1.0` for a different, incompatible element set (`ope:access` and its children); that namespace is withdrawn, so a Client that sees it knows it is reading a v0.1 feed (D9).
+
+**Where Offers go.** A feed can declare Offers once for everything it gates, per item, or both:
+
+- **Channel level.** One or more `ope:offer` elements on the RSS `<channel>` or Atom `<feed>`, all naming the same scope (§5.5) as `resource`. They apply to every gated item whose Asset is in that scope. This is the newsletter case: one subscription, hundreds of issues, declared once.
+- **Item level.** One or more `ope:offer` elements on an `<item>` or `<entry>`, all naming that item's Asset as `resource`. They replace the channel-level Offers for that item: a one-off paid episode in a free feed, or a special issue with its own price.
+- **Gated item without its own Offers.** An item covered by channel-level Offers carries an empty `ope:asset` element naming its Asset. An item with neither `ope:asset` nor `ope:offer` is not gated by OPE.
+
+The Protected Resource metadata remains authoritative (§7.1); feed Offers let a Client present items without a round trip per item.
+
+**RSS, item level** (a paid episode in a podcast):
 
 ```xml
-<item>
-  <title>Interview: The Future of Open Podcasting</title>
-  <enclosure url="https://cosmiccourier.example/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
-  <podcast:alternateEnclosure type="audio/mpeg" length="54800000" title="Full episode (subscribers)">
-    <podcast:source uri="https://cosmiccourier.example/ep42-full.mp3"/>
-  </podcast:alternateEnclosure>
-  <ope:offer resource="https://cosmiccourier.example/ep42-full.mp3"
-             metadata="https://cosmiccourier.example/.well-known/oauth-protected-resource/ep42-full.mp3">
-    <ope:name>Cosmic Courier Plus</ope:name>
-    <ope:payment type="subscription" amount="5.00" currency="USD" period="P1M"/>
-    <ope:purchase-url>https://cosmiccourier.example/subscribe</ope:purchase-url>
-    <ope:entitlement-types>access status</ope:entitlement-types>
-    <ope:terms>https://cosmiccourier.example/terms</ope:terms>
-    <ope:preview-note>Preview clip. Subscribers hear the full 57 minutes.</ope:preview-note>
-  </ope:offer>
-</item>
+<rss version="2.0"
+     xmlns:ope="https://feedspec.org/ope/ns/0.2"
+     xmlns:podcast="https://podcastindex.org/namespace/1.0">
+<channel>
+  ...
+  <item>
+    <title>Interview: The Future of Open Podcasting</title>
+    <enclosure url="https://cosmiccourier.example/ep42-preview.mp3" type="audio/mpeg" length="2400000"/>
+    <podcast:alternateEnclosure type="audio/mpeg" length="54800000" title="Full episode (subscribers)">
+      <podcast:source uri="https://cosmiccourier.example/ep42-full.mp3"/>
+    </podcast:alternateEnclosure>
+    <ope:offer id="plus-monthly" resource="https://cosmiccourier.example/ep42-full.mp3"
+               metadata="https://cosmiccourier.example/.well-known/oauth-protected-resource/ep42-full.mp3">
+      <ope:name>Cosmic Courier Plus</ope:name>
+      <ope:payment type="subscription" amount="5.00" currency="USD" period="P1M"/>
+      <ope:purchase-url>https://cosmiccourier.example/subscribe</ope:purchase-url>
+      <ope:terms url="https://cosmiccourier.example/terms" type="text/html"/>
+      <ope:preview-note>Preview clip. Subscribers hear the full 57 minutes.</ope:preview-note>
+    </ope:offer>
+  </item>
+</channel>
+</rss>
 ```
+
+**Atom, channel level** (a newsletter):
+
+```xml
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:ope="https://feedspec.org/ope/ns/0.2">
+  <title>The Lamplighter</title>
+  <ope:offer id="monthly" resource="https://lamplighter.example/issues/">
+    <ope:name>The Lamplighter, paid</ope:name>
+    <ope:payment type="subscription" amount="6.00" currency="USD" period="P1M"/>
+    <ope:purchase-url>https://lamplighter.example/subscribe</ope:purchase-url>
+    <ope:entitlement-types>access</ope:entitlement-types>
+    <ope:terms url="https://lamplighter.example/terms"/>
+  </ope:offer>
+  <entry>
+    <title>Issue 42: Night Trains</title>
+    <link rel="alternate" href="https://lamplighter.example/issues/42"/>
+    <summary>The first three paragraphs, free. The rest is for paid subscribers.</summary>
+    <ope:asset resource="https://lamplighter.example/issues/42"/>
+  </entry>
+</feed>
+```
+
+**JSON Feed, channel level** (the same newsletter). JSON Feed reserves `_`-prefixed keys for extensions and asks each to carry an `about` URL:
+
+```json
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "The Lamplighter",
+  "_ope": {
+    "about": "https://feedspec.org/ope/ns/0.2",
+    "resource": "https://lamplighter.example/issues/",
+    "offers": [
+      {
+        "id": "monthly",
+        "name": "The Lamplighter, paid",
+        "payment": { "type": "subscription", "amount": "6.00", "currency": "USD", "period": "P1M" },
+        "purchase_url": "https://lamplighter.example/subscribe",
+        "entitlement_types": ["access"],
+        "terms": { "url": "https://lamplighter.example/terms" }
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "https://lamplighter.example/issues/42",
+      "url": "https://lamplighter.example/issues/42",
+      "title": "Issue 42: Night Trains",
+      "summary": "The first three paragraphs, free. The rest is for paid subscribers.",
+      "_ope": { "resource": "https://lamplighter.example/issues/42" }
+    }
+  ]
+}
+```
+
+In JSON Feed, `_ope` appears at the top level for channel-level Offers and on an item for item-level ones. Each has `resource` and, optionally, `metadata` and `offers`; an item `_ope` without `offers` is the equivalent of `ope:asset`. v0.1's `extensions.ope` was not conformant JSON Feed and is withdrawn.
+
+**Elements and attributes.**
 
 | Element or attribute | Required | Meaning |
 |---|---|---|
-| `resource` attribute | REQUIRED | Asset identifier (§5) |
-| `metadata` attribute | OPTIONAL | URL of the Asset's Protected Resource metadata (§7.1). A Client uses it only if it has the same origin as `resource`, and discards the document unless its `resource` is identical to the attribute (§7.1). |
-| `id` attribute | OPTIONAL | Offer `id` (§6.2) |
+| `ope:offer` | | One Offer (§6.2) for an Asset or, at channel level, a scope |
+| `ope:offer/@resource`, `ope:asset/@resource` | REQUIRED | Asset identifier (§5), or a scope at channel level |
+| `ope:offer/@metadata`, `ope:asset/@metadata` | OPTIONAL | URL of the Asset's Protected Resource metadata (§7.1). A Client uses it only if it has the same origin as `resource`, and discards the document unless its `resource` is identical to the attribute. Not used at channel level, where `resource` is a scope. |
+| `ope:offer/@id` | OPTIONAL | Offer `id` (§6.2) |
 | `ope:name` | REQUIRED | Offer name |
 | `ope:payment` | REQUIRED | `type` REQUIRED; `amount`, `currency`, `period` OPTIONAL (§6.2) |
 | `ope:purchase-url` | REQUIRED unless `type` is `free` or `institutional` | Where to buy |
 | `ope:entitlement-types` | OPTIONAL | Space-separated subset of `access limit status`. Informational (§6.2). |
-| `ope:terms` | REQUIRED | Terms URL (§6.1) |
+| `ope:terms` | REQUIRED | Empty element: `url` REQUIRED; `sha256` and `type` OPTIONAL (§6.1) |
 | `ope:preview-note` | OPTIONAL | One line for unentitled display |
+| `ope:asset` | | Empty element marking a gated item covered by channel-level Offers |
 
-JSON Feed form, on the item: `_ope: { "resource": "...", "metadata": "...", "offers": [ ...Offer objects as in §6.2... ] }`. The underscore prefix is what JSON Feed reserves for extensions; v0.1's `extensions.ope` was not conformant and is withdrawn.
+**Mapping between XML and JSON (normative).** A Client that reads one form and a Publisher that writes the other MUST convert by this table, so that both forms carry the same Offer:
+
+| XML | JSON | Rule |
+|---|---|---|
+| `ope:offer/@resource`, `ope:offer/@metadata` | `_ope.resource`, `_ope.metadata` | Wrapper members, not Offer members. All Offers in one place share them. |
+| `ope:offer/@id` | `id` | Copied |
+| `ope:name` | `name` | Text content, whitespace trimmed |
+| `ope:payment/@type`, `@amount`, `@currency`, `@period` | `payment.type`, `payment.amount`, `payment.currency`, `payment.period` | Attribute values as strings; `amount` stays a decimal string |
+| `ope:purchase-url` | `purchase_url` | Text content, trimmed |
+| `ope:entitlement-types` | `entitlement_types` | Split on whitespace into an array, in order |
+| `ope:terms/@url`, `@sha256`, `@type` | `terms.url`, `terms.sha256`, `terms.type` | Copied |
+| `ope:preview-note` | `preview_note` | Text content, trimmed |
+| `ope:asset/@resource`, `@metadata` | item `_ope.resource`, `_ope.metadata`, no `offers` | Copied |
 
 A Publisher that also publishes RSL MAY include its `rsl:` elements alongside; OPE Clients ignore them, and the two do not conflict.
 
@@ -942,8 +1038,9 @@ Applies when a Client acts for a Subject under delegated, narrowed rights (S3). 
 
 - Delegation uses OAuth Token Exchange (RFC 8693). The Subject's Client presents the Subject's License Token as `subject_token`; the agent's `client_id` is the actor; the License Server issues a new License Token with `act: { "sub": "<agent client_id>" }` and an Entitlement no broader than the original.
 - Narrowing is by `resource` (an Asset within the original scope), by `type` (an `access` may be exchanged for a `limit`), and by an OPTIONAL `entitlement.operations` array (`read`, `download`) whose grammar is open in v0.2.
+- Delegation is one hop: an agent may act for a Subject, but a License Server MUST refuse a Token Exchange whose `subject_token` already carries `act`. An agent of an agent is out of scope for v0.2.
 - Machines acting for themselves do not use this profile.
-- Open questions: whether `act` chains (agent of an agent) are permitted; audit expectations; how a Subject revokes delegated tokens without revoking their own.
+- Open questions: audit expectations; how a Subject revokes delegated tokens without revoking their own.
 
 ## E. ATProto Profile (Deferred)
 
@@ -1013,7 +1110,7 @@ A member buys the pro tier of *Inkwell*, a writing tool, and wants "pro export" 
 **Client (minimum).** A Client that follows these steps meets the Client requirements of Part I:
 
 1. **Reuse a token if one fits.** Tokens are cached by License Server `issuer` and by the `resource` and `coverage` from the token response. If a cached token covers the Asset (§10.4), present it (step 8) without fetching metadata; fetch metadata only if it is refused.
-2. **Find the metadata.** Request the Asset, or read the item's `ope:offer`. On `401` or `402`, take `resource_metadata` from the challenge; from a feed, take `metadata` only if it is on the Asset's origin; otherwise construct the well-known URL (§7.1).
+2. **Find the metadata.** Request the Asset, or read the item's `ope:offer` or `ope:asset` and any channel-level Offers (Feeds profile). On `401` or `402`, take `resource_metadata` from the challenge; from a feed, take `metadata` only if it is on the Asset's origin; otherwise construct the well-known URL (§7.1).
 3. **Check it.** Discard the document unless its `resource` is identical to the URL requested or the feed's `resource`. Read `ope.asset` (default: `resource`), `ope.publisher`, `ope.offers`, and `authorization_servers`.
 4. **Use a bundle if one applies.** If the Client holds a refresh token from a bundle authorization (§13.6) at a listed License Server, and that bundle's `publishers` include `ope.publisher`, refresh with `resource` set to the Asset and go to step 8. A Client learns of bundles from `ope.bundles` (§7.2); using them is optional.
 5. **Choose a License Server.** Prefer one listed in `authorization_servers` that the Client is already registered with; otherwise the first one listed. If the Subject has a known account at one of several, the Client MAY let them choose.
@@ -1053,15 +1150,16 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
     - The undefined "shortest tolerance" is replaced (§13.4).
 - *New* §18 IANA Considerations. The text license is Apache 2.0 (D1 closed). D14 closed.
 
-Known issues carried to revision 6:
+- *Editor decisions of 2026-10-29.*
+    - Resource Servers normalize request URLs before matching and refuse encoded `/` and `\` in gated paths (§5.3).
+    - Resource Servers refetch JWKS at least every 5 minutes, so an operator can withdraw a compromised key at once (§7.3, §17.3).
+    - A replayed refresh token revokes the whole grant (§12.1).
+    - Client revocation: by `client_id` everywhere for the operator, or by `client_id` and `publisher` for one Publisher (§17.3).
+    - Introspection may give the token's own Publisher a `revocation_reason` (§12.4).
+    - Agent delegation is one hop (Profile D).
+    - Feeds: a new namespace, `ns/0.2` (D9 closed); channel-level Offers; `ope:asset`; `ope:terms` as an element with attributes, aligned with the JSON Offer; a normative XML-to-JSON mapping; Atom and JSON Feed examples (Profile A).
 
-- Request-target normalization before scope matching.
-- Scoping revoke-by-`client_id` per Publisher at multi-Publisher servers.
-- Emergency removal of a compromised signing key.
-- Grant revocation on refresh-token replay.
-- A channel-level `ope:offer` and several Assets per feed item.
-- A normative mapping between the XML and JSON Offer shapes, with Atom and JSON Feed examples.
-- `act` chaining in the Agents profile (D6).
+Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
 
 **Revision 4 (2026-10-05) within v0.2.** Correctness pass. DPoP-bound tokens now use RFC 9449's `DPoP` scheme and `token_type`; revision 3's use of `License` for them conflicted with RFC 9449 (§8.5, §11.1, §14). Clients follow a `resource_metadata` URL when given and request the metadata's `resource` when metadata is published per scope (§5.6, §7.1); feeds may carry the metadata URL. Scopes may nest within a Publisher, longest prefix wins (§5.5; revision 3 forbade overlap and then gave an overlap rule). Durations in Offers and limit Entitlements are ISO 8601 (`P1M`, `PT72H`), removing the last numbers encoded in strings. Token response MAY carry `entitlement` for advisory display (§8.5, §9.5). `X-Entitlement-Remaining` renamed `Entitlement-Remaining` (RFC 6648). D13, D14 added.
 
@@ -1106,10 +1204,10 @@ Known issues carried to revision 6:
 | D3 | Terms `sha256` on content that varies by viewer (localized pages, A/B tests). Decide whether the digest should be of a canonical representation the Publisher nominates. | Editor | v0.3 |
 | D4 | Non-`https` Asset identifiers (§5.2), and scope matching for them (§5.5). Needs a discovery path, since RFC 9728 metadata requires `https`, and depends in part on atproto spaces' URI syntax. Revisit once that settles. | Editor, with ATProto community | Profile E revival |
 | D5 | Whether §5.2(3) should make query components MUST NOT rather than SHOULD NOT. | Editor | v0.3 |
-| D6 | Agents profile: `act` chaining, `operations` grammar, delegated revocation (Profile D). | Editor | v0.3 |
+| D6 | Agents profile: `operations` grammar and delegated revocation (Profile D). `act` chaining is settled for v0.2 as one hop only. | Editor | v0.3 |
 | D7 | Whether `remaining` belongs in the token at all, given the Resource Server is the source of truth (Profile C). | Editor | v0.3 |
 | D8 | Second implementer. No party other than the editor's own projects has implemented OPE. The specification SHOULD NOT advance past Working Draft without one independent Client and one independent License Server. | Editor | Ongoing |
-| D9 | Namespace `https://feedspec.org/ope/ns/1.0` is retained for the feed element despite the spec being 0.2. Decide whether to version the namespace at 1.0 or move to a permanent unversioned namespace. | Editor | v0.3 |
+| D9 | *Closed in revision 5.* Feed elements move to `https://feedspec.org/ope/ns/0.2`; v0.1's `ns/1.0` is withdrawn (Feeds profile). | | |
 | D10 | *Closed in revision 3.* Publisher-side Client allow/deny lists now live in `ope.client_policy` in Protected Resource metadata (§7.1). | | |
 | D11 | Resource Server introspection credentials (§13.4). Two mechanisms are allowed; decide whether to require DCR with a software statement so that any Publisher's Resource Server can onboard without an out-of-band step. | Editor | v0.3 |
 | D12 | The `License` HTTP authentication scheme is defined by RSL, whose §10.2 requests its IANA registration; OPE relies on that request (§18). Still open: whether RSL also registers `License` as an OAuth access token type, or OPE requests it. | Editor | With the alignment proposal |

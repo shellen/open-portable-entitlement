@@ -42,6 +42,15 @@ text. Several changes are breaking for revision 4 implementers.
 - Web profile recast as site-mediated unlock (Profile B).
 - A step-by-step Client algorithm (Appendix B).
 - New §18, IANA Considerations.
+- **Breaking:** feed elements move to the `https://feedspec.org/ope/ns/0.2` namespace;
+  `ope:terms` becomes an empty element with `url`, `sha256`, and `type` attributes; new
+  channel-level Offers and `ope:asset` (Profile A). D9 closed.
+- Resource Servers normalize request URLs and refuse encoded path separators (§5.3).
+- JWKS refetched at least every 5 minutes; compromised keys can be withdrawn at once
+  (§7.3, §17.3).
+- Refresh-token replay revokes the whole grant (§12.1).
+- Per-Publisher Client revocation and an optional `revocation_reason` (§12.4, §17.3).
+- Agent delegation is one hop (Profile D).
 - Text license settled as Apache 2.0 (D1); D14 closed.
 
 ### Revision 4 — 2026-10-05
