@@ -9,12 +9,12 @@
       var storyId = tab.getAttribute("data-story");
       // Update tab styles and ARIA states
       tabs.forEach(function (t) {
-        t.classList.remove("bg-emerald-500", "text-white");
+        t.classList.remove("bg-emerald-500", "text-zinc-900");
         t.classList.add("text-zinc-500", "ring-1", "ring-inset", "ring-zinc-900/10");
         t.setAttribute("aria-selected", "false");
         t.setAttribute("tabindex", "-1");
       });
-      tab.classList.add("bg-emerald-500", "text-white");
+      tab.classList.add("bg-emerald-500", "text-zinc-900");
       tab.classList.remove("text-zinc-500", "ring-1", "ring-inset", "ring-zinc-900/10");
       tab.setAttribute("aria-selected", "true");
       tab.removeAttribute("tabindex");

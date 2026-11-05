@@ -1,0 +1,15 @@
+---
+layout: docs.njk
+title: Specification v0.2 (proposed draft)
+spec_version: "0.2"
+alternate_formats:
+  - url: /ope/spec/0.2.md
+    type: text/markdown
+    title: Markdown version of the proposed v0.2 specification
+---
+{# ABOUTME: Permanent URL for OPE v0.2, published as a proposed draft for public comment. #}
+{# ABOUTME: Renders OPE-Specification.md with the shared version notice and toolbar. #}
+{% set v = spec.versions["0.2"] %}{% set md_url = '/ope/spec/0.2.md' %}
+{% include "spec-notice.njk" %}
+{% include "spec-toolbar.njk" %}
+{{ v.html | safe }}

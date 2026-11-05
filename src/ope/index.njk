@@ -2,19 +2,59 @@
 layout: landing.njk
 title: OPE
 ---
+{# ABOUTME: OPE landing page: what the protocol does, four story walkthroughs, and the entitlement builder. #}
+{# ABOUTME: Copy tracks the v0.2 specification (revision 5); stories map to its acceptance stories S1, S2, and S4. #}
+
+{% macro storyDeck(id, label, cards, hidden) %}
+<div class="story-deck{% if hidden %} hidden{% endif %}" id="story-{{ id }}" role="tabpanel" aria-labelledby="tab-{{ id }}" aria-roledescription="carousel" aria-label="{{ label }}">
+  <div class="relative overflow-hidden">
+    <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
+      {% for card in cards %}
+      <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
+        <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-xs font-medium text-emerald-700">{{ loop.index }} of {{ cards | length }}</span>
+          </div>
+          <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
+          <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="flex items-center justify-between mt-6">
+    <div class="flex gap-1.5 deck-dots" role="group" aria-label="Slide navigation">
+      {% for card in cards %}
+      <button class="deck-dot w-2 h-2 rounded-full transition-colors {% if loop.first %}bg-emerald-500{% else %}bg-zinc-300{% endif %}" data-index="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>
+      {% endfor %}
+    </div>
+    <div class="flex gap-2">
+      <button class="deck-prev w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" disabled aria-label="Previous slide">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 12L6 8l4-4"/></svg>
+      </button>
+      <button class="deck-next w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" aria-label="Next slide">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12l4-4-4-4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="sr-only deck-live" aria-live="polite" aria-atomic="true"></div>
+</div>
+{% endmacro %}
 
 <!-- Hero -->
 <section class="relative overflow-hidden bg-zinc-900 py-20 sm:py-28">
   <div class="absolute inset-0 pointer-events-none opacity-30" aria-hidden="true" style="background: radial-gradient(ellipse 60% 50% at 50% -10%, #36b49f, transparent), radial-gradient(ellipse 40% 40% at 80% 100%, #DBFF75, transparent)"></div>
   <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
     <div class="max-w-2xl">
-      <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft Specification v0.1</span>
-      <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Portable subscriptions for the open web</h1>
-      <p class="mt-4 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is a portable entitlement layer that lets users access gated content across any app, any feed format, any browser, and any platform. Subscribe once, read anywhere — articles in your feed reader, podcasts in your player, video in your app, or content on the web. No lock-in. No walled gardens.</p>
+      <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/20">Draft v0.2 · Proposed, open for comment</span>
+      <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-white">Your access, in every app</h1>
+      <p class="mt-4 text-base text-zinc-300 leading-relaxed max-w-lg">Buy from a publisher once. Use it in any app you choose.</p>
+      <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is an open protocol, built on OAuth 2.0, for proving that a person holds access to something (an article, a podcast episode, a course, a pro feature) and carrying that proof across the apps they use. Feed readers, podcast players, editors, and browsers all check it the same way. No lock-in. No walled gardens.</p>
       <div class="mt-8 flex flex-wrap gap-3">
-        <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
+        <a href="{{ '/ope/spec/0.2/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Read the v0.2 Draft</a>
         <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
       </div>
+      <p class="mt-4 text-xs text-zinc-400 leading-relaxed max-w-lg">This page describes v0.2, a proposed revision open for public comment. The published version is still <a href="{{ '/ope/spec/' | url }}" class="text-zinc-300 underline underline-offset-2 hover:text-white">v0.1</a>. <a href="{{ spec.commentsUrl }}" class="text-zinc-300 underline underline-offset-2 hover:text-white">Tell us what you think</a>.</p>
     </div>
   </div>
 </section>
@@ -22,34 +62,41 @@ title: OPE
 <!-- Principles -->
 <section class="border-b border-zinc-900/5 py-16">
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 18.3s6.7-3.3 6.7-8.3V4.2L10 1.7 3.3 4.2V10c0 5 6.7 8.3 6.7 8.3z"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement, not payments</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">OPE proves you're allowed in. Payment processors handle money. Clean separation.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M13 18V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Truly portable</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Your subscription works in any OPE-compatible app — feed reader, podcast player, or browser. No platform lock-in.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">What you hold works in any OPE-compatible app: feed reader, podcast player, browser, or the tool you already use. No platform lock-in.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.3 9.2a7.5 7.5 0 0 1 7.5 7.5"/><path d="M3.3 3.3a13.3 13.3 0 0 1 13.3 13.3"/><circle cx="4.2" cy="15.8" r=".8"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Works with any feed</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">RSS, Atom, JSON Feed, AT Protocol. OPE extends what you already use.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">RSS, Atom, and JSON Feed today, with AT Protocol planned. OPE extends what you already use, and works without a feed too.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-500 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6.5" cy="13.5" r="3.5"/><path d="M9 11l8-8"/><path d="M14 6l2 2"/><path d="M12 8l2 2"/></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">Built on OAuth</h3>
+        <p class="text-sm text-zinc-600 leading-relaxed">OAuth 2.0 and its published RFCs, plus a few claims that say what a person holds. Nothing exotic to implement.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.2 17.5v-1.7a3.3 3.3 0 0 0-3.3-3.3H4.2a3.3 3.3 0 0 0-3.3 3.3v1.7"/><circle cx="7.5" cy="5.8" r="3.3"/><path d="M19.2 17.5v-1.7a3.3 3.3 0 0 0-2.5-3.2"/><path d="M13.3 2.6a3.3 3.3 0 0 1 0 6.5"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Publisher-controlled</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Publishers issue grants and control access. Their content, their rules.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Publishers decide who's entitled, for how long, and can end it. Their content, their rules.</p>
       </div>
     </div>
   </div>
@@ -61,26 +108,26 @@ title: OPE
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">Design Philosophy</h2>
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">Four layers, cleanly separated</p>
-      <p class="text-sm text-zinc-600 mt-3">OPE occupies the space between content distribution and payment processing. Each concern stays independent.</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE occupies the space between distribution and payment. Each concern stays independent.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 1</div>
+        <div class="text-xs font-medium text-zinc-500 mb-2">Layer 1</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Content</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Articles, podcasts, video, courses, and more. Created and hosted by the publisher.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Articles, podcasts, video, courses, software features, and APIs. Created and served by the publisher.</p>
       </div>
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 2</div>
+        <div class="text-xs font-medium text-zinc-500 mb-2">Layer 2</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Distribution</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Feed formats (RSS, Atom, JSON Feed, ATProto) that catalog and deliver previews.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Feeds (RSS, Atom, JSON Feed), web pages, and apps that deliver previews and point to the full thing.</p>
       </div>
       <div class="p-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/5">
-        <div class="text-xs font-medium text-emerald-500 mb-2">Layer 3 — OPE</div>
+        <div class="text-xs font-medium text-emerald-700 mb-2">Layer 3: OPE</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement</h3>
-        <p class="text-sm text-zinc-600 leading-relaxed">Verification that a user has the right to access content. Portable across apps.</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">Proof that a person holds access, issued by the publisher's License Server and checked by its servers. Portable across apps.</p>
       </div>
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <div class="text-xs font-medium text-zinc-400 mb-2">Layer 4</div>
+        <div class="text-xs font-medium text-zinc-500 mb-2">Layer 4</div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Payments</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">How money changes hands. Stripe, x402, Lightning, or anything else. Out of scope.</p>
       </div>
@@ -93,121 +140,82 @@ title: OPE
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">The Flow</h2>
-      <p class="text-2xl font-semibold tracking-tight text-zinc-900">From feed to full content</p>
-      <p class="text-sm text-zinc-600 mt-3">Five steps from discovering content in your app to accessing the full thing.</p>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">From a locked preview to the full thing</p>
+      <p class="text-sm text-zinc-600 mt-3">Five steps, all standard OAuth except the parts that describe what a person holds.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8">
-      {% for step in [{n:"1",t:"Feed",d:"Client fetches a feed and finds OPE-gated items with preview content or trailer clips."},{n:"2",t:"Discovery",d:"Client fetches /.well-known/ope to learn the publisher's capabilities."},{n:"3",t:"Authenticate",d:"Client initiates OAuth 2.0 with PKCE. User logs in with the publisher."},{n:"4",t:"Grant",d:"Publisher issues a signed grant token proving entitlement."},{n:"5",t:"Access",d:"Client presents the token and retrieves full content — article, episode, or video. Done."}] %}
+      {% for step in [
+        {t:"Find", d:"An app meets something gated: a feed item, a web page, or a 401 or 402 from an API."},
+        {t:"Discover", d:"It fetches the publisher's resource metadata (RFC 9728): what's on offer, and which License Server issues access."},
+        {t:"Authorize", d:"The person signs in with that License Server through OAuth 2.0 with PKCE, and approves this app."},
+        {t:"License Token", d:"The License Server issues a signed License Token for the item, or for everything the person's subscription covers."},
+        {t:"Access", d:"The app presents the token. The publisher's server checks it and serves the article, episode, or feature."}
+      ] %}
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-500 mb-4">{{ step.n }}</div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-700 mb-4">{{ loop.index }}</div>
         <h4 class="text-sm font-semibold text-zinc-900 mb-1">{{ step.t }}</h4>
-        <p class="text-xs text-zinc-500 leading-relaxed">{{ step.d }}</p>
+        <p class="text-xs text-zinc-600 leading-relaxed">{{ step.d }}</p>
       </div>
       {% endfor %}
     </div>
   </div>
 </section>
 
-<!-- How It Works — Flipable Story Deck -->
+<!-- Stories -->
 <section class="py-20 border-t border-zinc-900/5" id="stories">
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="max-w-2xl mb-12">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">See It In Action</h2>
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">How OPE works for real people</p>
-      <p class="text-sm text-zinc-600 mt-3">Two people, two apps, one protocol. Flip through to see how it actually works.</p>
+      <p class="text-sm text-zinc-600 mt-3">A newsletter, a pro feature, a podcast, and a school course. Same protocol each time. Flip through to see how it works.</p>
     </div>
 
-    <!-- Story selector tabs -->
-    <div class="flex gap-2 mb-8" id="story-tabs" role="tablist" aria-label="Story examples">
-      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors bg-emerald-500 text-white" data-story="alice" role="tab" aria-selected="true" aria-controls="story-alice" id="tab-alice">Alice reads an article</button>
-      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900" data-story="bob" role="tab" aria-selected="false" aria-controls="story-bob" id="tab-bob">Bob listens to a podcast</button>
+    <div class="flex flex-wrap gap-2 mb-8" id="story-tabs" role="tablist" aria-label="Story examples">
+      {% for tab in [
+        {id:"alice", label:"Alice reads a newsletter"},
+        {id:"priya", label:"Priya uses a pro feature"},
+        {id:"bob", label:"Bob listens to a podcast"},
+        {id:"school", label:"A school buys a course"}
+      ] %}
+      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors {% if loop.first %}bg-emerald-500 text-zinc-900{% else %}text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900{% endif %}" data-story="{{ tab.id }}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="story-{{ tab.id }}" id="tab-{{ tab.id }}"{% if not loop.first %} tabindex="-1"{% endif %}>{{ tab.label }}</button>
+      {% endfor %}
     </div>
 
-    <!-- Alice's story (article) -->
-    <div class="story-deck" id="story-alice" role="tabpanel" aria-labelledby="tab-alice" aria-roledescription="carousel" aria-label="Alice's story walkthrough">
-      <div class="relative overflow-hidden">
-        <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
-          {% for card in [
-            {step:"1 of 6", icon:"rss", title:"Alice adds a feed", body:"Alice opens her favorite feed reader and subscribes to <strong>The Cosmic Courier</strong>, a space and science publication. Most articles show full content, but one piece — <strong>\"The Hidden Cost of Walled Gardens\"</strong> — shows only a preview. The teaser says: <em>4,500 words &middot; 18 min read.</em> Intriguing."},
-            {step:"2 of 6", icon:"search", title:"Her reader discovers OPE", body:"The feed reader spots the <code>ope</code> extension in the JSON Feed and fetches the publisher's <code>/.well-known/ope</code> endpoint. One tiny JSON file tells it everything: OAuth server, content API, grant types, and pricing. No special integration required."},
-            {step:"3 of 6", icon:"lock", title:"Alice taps 'Subscribe'", body:"The gated article shows a rich preview with word count, estimated read time, and a clear call-to-action. Alice taps <strong>\"Subscribe for $5/month\"</strong> and her reader opens the publisher's OAuth login. Quick and familiar."},
-            {step:"4 of 6", icon:"key", title:"Authentication & grant", body:"Alice logs in with The Cosmic Courier. After a quick consent screen, the publisher issues a <strong>signed grant token</strong> — a portable JWT that proves Alice is a subscriber. Her reader stores it securely. That's it."},
-            {step:"5 of 6", icon:"doc", title:"Full content, instantly", body:"Her reader presents the token to the content API and pulls down the full 4,500-word article. Alice reads it right where she is — no browser switch, no paywall interstitial, no friction. Just the article."},
-            {step:"6 of 6", icon:"refresh", title:"It just keeps working", body:"Every future gated article from The Cosmic Courier is <strong>automatically accessible.</strong> The token refreshes silently in the background. Alice can also read on the publisher's website — same token, works via a browser cookie. One subscription, every surface."}
-          ] %}
-          <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
-            <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
-              <div class="flex items-center gap-3 mb-4">
-                <span class="text-xs font-medium text-emerald-500">{{ card.step }}</span>
-              </div>
-              <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
-              <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <!-- Navigation -->
-      <div class="flex items-center justify-between mt-6">
-        <div class="flex gap-1.5 deck-dots" role="group" aria-label="Slide navigation">
-          {% for i in range(0, 6) %}
-          <button class="deck-dot w-2 h-2 rounded-full transition-colors {% if i == 0 %}bg-emerald-500{% else %}bg-zinc-300{% endif %}" data-index="{{ i }}" aria-label="Go to slide {{ i + 1 }}"></button>
-          {% endfor %}
-        </div>
-        <div class="flex gap-2">
-          <button class="deck-prev w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" disabled aria-label="Previous slide">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 12L6 8l4-4"/></svg>
-          </button>
-          <button class="deck-next w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" aria-label="Next slide">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12l4-4-4-4"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="sr-only deck-live" aria-live="polite" aria-atomic="true"></div>
-    </div>
+    {{ storyDeck("alice", "Alice's story walkthrough", [
+      {title:"Alice follows a newsletter", body:"Alice adds <strong>The Lamplighter</strong> to her feed reader. Free issues show in full. Paid issues, like <em>\"Issue 42: Night Trains\"</em>, show their first three paragraphs and a note: paid subscribers read the rest."},
+      {title:"Her reader finds the offer", body:"The feed carries one <code>ope:offer</code> for every paid issue: <strong>\"The Lamplighter, paid, $6/month.\"</strong> The reader checks it against the publisher's resource metadata, which also names the License Server to use. No special deal between this reader and this publisher."},
+      {title:"Alice subscribes", body:"She taps <strong>Subscribe</strong>. The reader opens the publisher's own checkout in her browser, and she pays with whatever the publisher accepts. Back in the reader, she taps <strong>Unlock</strong>."},
+      {title:"One sign-in, one token", body:"The reader sends her through a quick OAuth sign-in. The consent screen names the reader, the subscription, and the publisher's terms. She gets a <strong>License Token</strong> covering every paid issue, not just this one."},
+      {title:"Every issue unlocks", body:"The reader presents the same token for each paid issue, and the publisher's server checks it each time. New issues arrive unlocked. The token refreshes quietly in the background."},
+      {title:"A second reader, no second subscription", body:"Alice tries a different reader on her tablet. She signs in and approves that app, and it gets its own token for the <strong>same subscription</strong>. If she ever cancels, both stop working within the hour."}
+    ], false) }}
 
-    <!-- Bob's story (podcast) -->
-    <div class="story-deck hidden" id="story-bob" role="tabpanel" aria-labelledby="tab-bob" aria-roledescription="carousel" aria-label="Bob's story walkthrough">
-      <div class="relative overflow-hidden">
-        <div class="deck-track flex transition-transform duration-300 ease-in-out" style="transform: translateX(0)">
-          {% for card in [
-            {step:"1 of 6", title:"Bob subscribes to a podcast feed", body:"Bob adds <strong>\"Sound and Signal\"</strong> — a music and culture podcast — to his podcast player via its RSS feed. Most episodes play fine. But Episode 12, <em>\"Why Vinyl Sounds Better (And Why It Doesn't),\"</em> only has a 2-minute teaser. The feed says: <em>57 min &middot; Season 2, Episode 12.</em>"},
-            {step:"2 of 6", title:"Preview clip plays, full episode is gated", body:"Bob listens to the teaser from the RSS <code>&lt;enclosure&gt;</code>. His player detects OPE metadata on the episode and shows: <strong>\"Subscribe for $3/month for ad-free and bonus episodes.\"</strong> The full episode is behind entitlement. Fair enough — he's hooked."},
-            {step:"3 of 6", title:"Bob taps Subscribe", body:"His podcast player opens the publisher's OAuth login. Bob signs up and subscribes. It's the same OAuth + PKCE flow every OPE client uses — the player doesn't need any special deal with this particular show."},
-            {step:"4 of 6", title:"Grant token issued", body:"Sound and Signal verifies Bob's subscription and issues a <strong>portable grant token.</strong> It includes an <code>access</code> grant that covers all premium episodes — not just this one. His player stores it alongside tokens from other publishers."},
-            {step:"5 of 6", title:"Full episode downloads", body:"The player calls the content API with the grant token. Back comes a <strong>signed media URL</strong> for the full ad-free MP3 (54.8 MB, 57 min). Bob downloads it for his commute. Show notes arrive as HTML. Nice."},
-            {step:"6 of 6", title:"Every premium episode, any app", body:"New premium episodes are <strong>automatically unlocked.</strong> Signed URLs expire with the token, so links can't be shared. And here's the kicker: because the grant token is portable, Bob could switch to any other OPE-compatible podcast player without re-subscribing. His entitlement follows him."}
-          ] %}
-          <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
-            <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
-              <div class="flex items-center gap-3 mb-4">
-                <span class="text-xs font-medium text-emerald-500">{{ card.step }}</span>
-              </div>
-              <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
-              <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <!-- Navigation -->
-      <div class="flex items-center justify-between mt-6">
-        <div class="flex gap-1.5 deck-dots" role="group" aria-label="Slide navigation">
-          {% for i in range(0, 6) %}
-          <button class="deck-dot w-2 h-2 rounded-full transition-colors {% if i == 0 %}bg-emerald-500{% else %}bg-zinc-300{% endif %}" data-index="{{ i }}" aria-label="Go to slide {{ i + 1 }}"></button>
-          {% endfor %}
-        </div>
-        <div class="flex gap-2">
-          <button class="deck-prev w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" disabled aria-label="Previous slide">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 12L6 8l4-4"/></svg>
-          </button>
-          <button class="deck-next w-9 h-9 rounded-full ring-1 ring-zinc-900/10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors disabled:opacity-30" aria-label="Next slide">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12l4-4-4-4"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="sr-only deck-live" aria-live="polite" aria-atomic="true"></div>
-    </div>
+    {{ storyDeck("priya", "Priya's story walkthrough", [
+      {title:"Priya pays for Inkwell Pro", body:"Priya subscribes to <strong>Inkwell Pro</strong>, the paid tier of a writing tool, for $8/month. Pro includes <strong>pro export</strong>: polished PDFs and EPUBs."},
+      {title:"She writes in another editor", body:"Priya drafts in <strong>Margin</strong>, a different editor. When she picks pro export, Margin asks Inkwell's server for the feature and gets a 402 that points to Inkwell's metadata, with monthly and annual Pro offers."},
+      {title:"She signs in once", body:"Margin opens her browser to the License Server Inkwell uses. The consent screen names Margin, \"Inkwell Pro\", and a link to Inkwell's terms. She approves."},
+      {title:"Margin gets a License Token", body:"Margin receives a License Token for pro export, <strong>bound to Margin's own key</strong> with DPoP. A copied token is useless anywhere else."},
+      {title:"Inkwell's server decides", body:"When Priya exports, Margin calls Inkwell's export API with the token. Inkwell checks it and runs the export. A \"Pro\" badge in Margin proves nothing; the real check happens <strong>on Inkwell's side</strong>."},
+      {title:"Cancel once, it ends everywhere", body:"If Priya cancels, the License Server revokes her access. Margin's token stops working when it expires, within the hour, along with any other editor she connected."}
+    ], true) }}
+
+    {{ storyDeck("bob", "Bob's story walkthrough", [
+      {title:"Bob subscribes to a podcast feed", body:"Bob adds <strong>\"Sound and Signal\"</strong>, a music and culture podcast, to his player. Episode 12, <em>\"Why Vinyl Sounds Better (And Why It Doesn't)\"</em>, plays a 2-minute teaser. The full 57 minutes is for subscribers."},
+      {title:"His player sees the offer", body:"The episode carries an <code>ope:offer</code>: <strong>\"Sound and Signal Plus, $3/month.\"</strong> The full episode sits in a Podcasting 2.0 <code>alternateEnclosure</code>. Players without OPE just play the teaser, as always."},
+      {title:"Bob subscribes and signs in", body:"He subscribes through the show's checkout, then signs in from his player with the same OAuth flow every OPE app uses. The player needs no special deal with this show."},
+      {title:"A token for every premium episode", body:"His <strong>License Token</strong> covers the whole premium catalog, not just Episode 12. The player stores it next to tokens from other shows."},
+      {title:"The full episode downloads", body:"The player requests the full MP3 with the token. The server checks it and can hand back a <strong>signed URL that expires with the token</strong>, so links can't be passed around. Bob downloads it for his commute."},
+      {title:"Switch players, keep the subscription", body:"Bob later tries another player. He signs in, it gets its own token, and every premium episode is there. <strong>No re-subscribing.</strong> His access follows him."}
+    ], true) }}
+
+    {{ storyDeck("school", "School course story walkthrough", [
+      {title:"A school buys a course", body:"Maple Ridge School buys 200 seats in <strong>\"Woodworking 101\"</strong>, a course a creator sells on an online course platform. The school sends its class roster to the platform's License Server."},
+      {title:"Students sign in with school accounts", body:"Jordan, a student, opens the course in whichever learning app they like and signs in with their school account. The License Server finds them on the roster."},
+      {title:"Access comes from the school", body:"Jordan's <strong>License Token</strong> covers every lesson in the course and is marked as coming from the institution. Jordan never sees a price."},
+      {title:"Short-lived by design", body:"School-issued tokens last <strong>an hour at most</strong> and refresh quietly. Every refresh checks that Jordan is still on the roster."},
+      {title:"A student leaves", body:"Jordan transfers to another school, and Maple Ridge updates its roster. The License Server revokes Jordan's school access, and it ends <strong>within the hour</strong>. Nobody has to chase down which apps Jordan used."},
+      {title:"Their own purchase still counts", body:"Had Jordan bought the course themselves, that purchase would take over and keep working. The school seat is a fallback, not a merge."}
+    ], true) }}
   </div>
 </section>
 
@@ -216,10 +224,17 @@ title: OPE
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-start">
       <div>
-        <h2 class="text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Simple discovery, powerful access</h2>
-        <p class="text-sm text-zinc-600 mb-6 leading-relaxed">Publishers expose a single well-known endpoint. Reader apps handle the rest — OAuth, token management, content retrieval — all standardized.</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Publish one document, use standard OAuth</h2>
+        <p class="text-sm text-zinc-600 mb-6 leading-relaxed">A publisher adds one metadata document: for a whole subscription (every issue of a newsletter, say) or for a single gated item or API. It says who sells it, what's on offer, and which License Servers may issue access. Apps do the rest with ordinary OAuth.</p>
         <dl class="space-y-3">
-          {% for item in [{k:"Discovery",v:"JSON manifest at a well-known URL"},{k:"Auth",v:"OAuth 2.0 with PKCE, consent, dynamic registration"},{k:"Tokens",v:"JWT, PASETO, or Macaroons — API or cookie transport"},{k:"Content",v:"Single item or batch retrieval, HTTP 402 signaling"},{k:"Web",v:"Cookie-based grants, browser unlock, cross-publisher SSO"},{k:"Feeds",v:"Non-breaking extensions with unlock URLs"}] %}
+          {% for item in [
+            {k:"Discovery", v:"OAuth Protected Resource Metadata (RFC 9728) and Authorization Server Metadata (RFC 8414). No custom well-known URL."},
+            {k:"Auth", v:"Authorization Code with PKCE, consent, and dynamic client registration"},
+            {k:"Tokens", v:"One format: a signed JWT License Token, bound to the app's key with DPoP"},
+            {k:"Offers", v:"Several per item (monthly, annual, student), in metadata and in feeds"},
+            {k:"Web", v:"Sites unlock their own pages with HttpOnly cookies and 401/402 challenges"},
+            {k:"Feeds", v:"ope:offer in RSS, Atom, and JSON Feed, for a whole feed or one item"}
+          ] %}
           <div class="flex gap-3 text-sm">
             <dt class="font-semibold text-zinc-900 whitespace-nowrap">{{ item.k }}</dt>
             <dd class="text-zinc-600">{{ item.v }}</dd>
@@ -232,23 +247,25 @@ title: OPE
           <span class="w-2 h-2 rounded-full bg-white/10"></span>
           <span class="w-2 h-2 rounded-full bg-white/10"></span>
           <span class="w-2 h-2 rounded-full bg-white/10"></span>
-          <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">/.well-known/ope</span>
+          <span class="ml-2 text-zinc-400 text-xs font-[family-name:var(--font-mono)] truncate">/.well-known/oauth-protected-resource/features/pro-export</span>
         </div>
-        <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed">{
-  <span class="text-emerald-400">"version"</span>: <span class="text-amber-300">"0.1"</span>,
-  <span class="text-emerald-400">"oauth_server"</span>: <span class="text-amber-300">"https://example.com/.well-known/oauth-authorization-server"</span>,
-  <span class="text-emerald-400">"entitlement"</span>: {
-    <span class="text-emerald-400">"grant_url"</span>: <span class="text-amber-300">"https://example.com/api/entitlement/grant"</span>,
-    <span class="text-emerald-400">"token_format"</span>: <span class="text-amber-300">"jwt"</span>,
-    <span class="text-emerald-400">"token_mode"</span>: <span class="text-amber-300">"portable"</span>,
-    <span class="text-emerald-400">"default_ttl_seconds"</span>: <span class="text-sky-300">3600</span>
-  },
-  <span class="text-emerald-400">"content"</span>: {
-    <span class="text-emerald-400">"endpoint_template"</span>: <span class="text-amber-300">"https://example.com/api/content/{id}"</span>,
-    <span class="text-emerald-400">"batch_endpoint"</span>: <span class="text-amber-300">"https://example.com/api/content/batch"</span>,
-    <span class="text-emerald-400">"formats_available"</span>: [<span class="text-amber-300">"html"</span>, <span class="text-amber-300">"markdown"</span>]
-  },
-  <span class="text-emerald-400">"grants_supported"</span>: [<span class="text-amber-300">"access"</span>, <span class="text-amber-300">"limit"</span>, <span class="text-amber-300">"signal"</span>]
+        <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed" tabindex="0" aria-label="Example resource metadata">{
+  <span class="text-emerald-400">"resource"</span>: <span class="text-amber-300">"https://inkwell.example/features/pro-export"</span>,
+  <span class="text-emerald-400">"authorization_servers"</span>: [<span class="text-amber-300">"https://license.lantern.example"</span>],
+  <span class="text-emerald-400">"ope"</span>: {
+    <span class="text-emerald-400">"version"</span>: <span class="text-amber-300">"0.2"</span>,
+    <span class="text-emerald-400">"publisher"</span>: <span class="text-amber-300">"https://inkwell.example/"</span>,
+    <span class="text-emerald-400">"offers"</span>: [
+      {
+        <span class="text-emerald-400">"id"</span>: <span class="text-amber-300">"pro-monthly"</span>,
+        <span class="text-emerald-400">"name"</span>: <span class="text-amber-300">"Inkwell Pro"</span>,
+        <span class="text-emerald-400">"payment"</span>: { <span class="text-emerald-400">"type"</span>: <span class="text-amber-300">"subscription"</span>, <span class="text-emerald-400">"amount"</span>: <span class="text-amber-300">"8.00"</span>,
+                     <span class="text-emerald-400">"currency"</span>: <span class="text-amber-300">"USD"</span>, <span class="text-emerald-400">"period"</span>: <span class="text-amber-300">"P1M"</span> },
+        <span class="text-emerald-400">"purchase_url"</span>: <span class="text-amber-300">"https://inkwell.example/pro"</span>,
+        <span class="text-emerald-400">"terms"</span>: { <span class="text-emerald-400">"url"</span>: <span class="text-amber-300">"https://inkwell.example/terms/pro"</span> }
+      }
+    ]
+  }
 }</pre>
       </div>
     </div>
@@ -263,13 +280,17 @@ title: OPE
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">Built for the entire ecosystem</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {% for card in [{t:"Publishers",d:"Keep full control of your content and subscriptions while making them work everywhere.",items:["Add OPE metadata to your existing feeds","Works for articles, podcasts, video, courses, and more","Expose a single discovery endpoint","Use the reference gateway or build your own","Support any payment processor you want","WordPress, Ghost, Substack, podcast host migration paths"]},{t:"Apps & Browsers",d:"Give your users seamless access to gated content from any OPE-enabled publisher — in feed readers, podcast players, video apps, or on the web.",items:["Detect OPE extensions in any feed format","Manage per-publisher OAuth sessions","Show rich previews: word count, duration, artwork","Retrieve full articles, media files, or streaming URLs","Batch retrieval for fast offline sync","Browser unlock via cookies and HTTP 402"]},{t:"Brokers",d:"Create subscription bundles across multiple publishers. Like cable bundles, but for the open web.",items:["Aggregate entitlements across publishers","Issue broker grant tokens with Macaroons","Capability attenuation for scoped access","Single sign-on for multi-publisher access","Enable new business models"]}] %}
+      {% for card in [
+        {t:"Publishers", d:"Keep full control of what you sell while making it work everywhere.", items:["Add ope:offer to the feeds you already publish","Gate articles, episodes, courses, features, or APIs","Publish resource metadata for each gated URL","Run a License Server, or use a platform's","Keep any payment processor and any login system","Migration paths for podcast hosts, newsletters, and course platforms"]},
+        {t:"Apps & Browsers", d:"Feed readers, podcast players, editors, and browsers can unlock what people already hold, from any OPE publisher.", items:["Read ope:offer in RSS, Atom, and JSON Feed","Find metadata from a 401 or 402, or from a feed","Standard OAuth 2.0 with PKCE and DPoP","Reuse one token across a whole subscription","Show offers before anyone pays","A step-by-step Client algorithm in the spec"]},
+        {t:"Platforms & License Servers", d:"Creator platforms, collectives, and institutions can issue access for many publishers at once.", items:["Issue for any publisher that lists you in its metadata","Host creators who don't have their own domain","Sell bundles across publishers, one token per publisher","Group and institutional access from a roster","Revoke by subscriber, app, or publisher","Keep a record of who held what, and when"]}
+      ] %}
       <div class="rounded-2xl border border-zinc-900/5 p-6">
         <h3 class="text-sm font-semibold text-zinc-900 mb-2">{{ card.t }}</h3>
         <p class="text-sm text-zinc-600 mb-4">{{ card.d }}</p>
         <ul class="space-y-1.5 list-none p-0">
           {% for item in card.items %}
-          <li class="text-sm text-zinc-500 flex gap-2"><span class="text-emerald-500 mt-1.5 shrink-0">·</span> {{ item }}</li>
+          <li class="text-sm text-zinc-600 flex gap-2"><span class="text-emerald-700 mt-1.5 shrink-0" aria-hidden="true">·</span> {{ item }}</li>
           {% endfor %}
         </ul>
       </div>
@@ -278,50 +299,51 @@ title: OPE
   </div>
 </section>
 
-<!-- Grant Primitives -->
-<section class="py-20 border-t border-zinc-900/5" id="grants">
+<!-- Entitlement Types -->
+<section class="py-20 border-t border-zinc-900/5" id="entitlements">
+  <span id="grants" aria-hidden="true"></span>{# keeps v0.1-era links to #grants working #}
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="max-w-2xl mb-10">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">Flexible Access</h2>
-      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Three simple grants, powerful access</p>
-      <p class="text-sm text-zinc-600 mt-3">OPE doesn't prescribe how entitlements are earned — it standardizes how they're proven. Every grant in the protocol is one of three primitives, each with a small set of composable fields. Fourteen common patterns (subscription, gift, trial, etc.) are named aliases — but the protocol itself only validates three types.</p>
+      <p class="text-2xl font-semibold tracking-tight text-zinc-900">Three entitlement types, one token</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE doesn't prescribe how access is earned; it standardizes how it's proven. Every Entitlement is one of three types with a few fields. Fourteen common patterns (subscription, gift, trial, and so on) are named aliases, but the protocol only validates three types.</p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
       <div class="rounded-2xl p-6 bg-emerald-400/5 border border-emerald-400/20">
         <div class="flex items-center gap-2 mb-3">
-          <span class="rounded-full bg-emerald-500 w-2 h-2"></span>
+          <span class="rounded-full bg-emerald-500 w-2 h-2" aria-hidden="true"></span>
           <h3 class="text-sm font-semibold font-[family-name:var(--font-mono)] text-emerald-700">access</h3>
         </div>
-        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The reader may view this content. Access grants cover subscriptions, per-item purchases, gifts, trials, rentals, bundles, and broker access — anything where the core question is "can this person see this?"</p>
-        <p class="text-xs text-zinc-400 font-[family-name:var(--font-mono)]">scope · duration · transferable · source</p>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The person may have this item, or everything in a collection. Covers subscriptions, single purchases, gifts, trials, rentals, bundles, and institutional seats: anything where the question is "can this person have this?"</p>
+        <p class="text-xs text-zinc-500 font-[family-name:var(--font-mono)]">coverage · duration · rental_expires_at · transferable · source</p>
       </div>
       <div class="rounded-2xl p-6 bg-amber-400/5 border border-amber-400/20">
         <div class="flex items-center gap-2 mb-3">
-          <span class="rounded-full bg-amber-500 w-2 h-2"></span>
+          <span class="rounded-full bg-amber-500 w-2 h-2" aria-hidden="true"></span>
           <h3 class="text-sm font-semibold font-[family-name:var(--font-mono)] text-amber-700">limit</h3>
         </div>
-        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The reader may view up to a threshold. Limit grants handle metered paywalls and locale-gated access — situations where entitlement is conditional on a quota or region rather than a binary yes/no.</p>
-        <p class="text-xs text-zinc-400 font-[family-name:var(--font-mono)]">kind · quota · period · source</p>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The person may have items up to a quota that the publisher's server counts: metered paywalls, API allotments, a few free articles a month.</p>
+        <p class="text-xs text-zinc-500 font-[family-name:var(--font-mono)]">coverage · kind · quota · period · remaining · source</p>
       </div>
       <div class="rounded-2xl p-6 bg-rose-400/5 border border-rose-400/20">
         <div class="flex items-center gap-2 mb-3">
-          <span class="rounded-full bg-rose-500 w-2 h-2"></span>
-          <h3 class="text-sm font-semibold font-[family-name:var(--font-mono)] text-rose-700">signal</h3>
+          <span class="rounded-full bg-rose-500 w-2 h-2" aria-hidden="true"></span>
+          <h3 class="text-sm font-semibold font-[family-name:var(--font-mono)] text-rose-700">status</h3>
         </div>
-        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The reader has a status that unlocks treatment. Signal grants communicate things like ad-free eligibility, institutional affiliation, patron status, or family-plan membership — the content is accessible, but the experience changes.</p>
-        <p class="text-xs text-zinc-400 font-[family-name:var(--font-mono)]">kind · source</p>
+        <p class="text-sm text-zinc-600 leading-relaxed mb-3">The person has a standing that changes treatment: ad-free, patron, family-plan member, institutional affiliation. Status alone unlocks nothing; the publisher decides what it means.</p>
+        <p class="text-xs text-zinc-500 font-[family-name:var(--font-mono)]">coverage · kind · source · group_id</p>
       </div>
     </div>
 
     <div class="max-w-2xl mb-10">
-      <h3 class="text-xs font-semibold text-zinc-900 mb-3">Grant Builder</h3>
-      <p class="text-sm text-zinc-600">Pick a preset to see how named grant types decompose into primitives, or build a custom grant and copy the JSON.</p>
+      <h3 class="text-xs font-semibold text-zinc-900 mb-3">Entitlement Builder</h3>
+      <p class="text-sm text-zinc-600">Pick a preset to see how a named entitlement breaks down into a type and fields, or build your own and copy the JSON.</p>
     </div>
-    <div id="grant-builder" aria-label="Grant builder widget" role="region"></div>
+    <div id="entitlement-builder" aria-label="Entitlement builder widget" role="region"></div>
   </div>
 </section>
-<script src="{{ '/js/grant-builder.js' | url }}"></script>
+<script src="{{ '/js/entitlement-builder.js' | url }}"></script>
 
 <!-- Compatibility -->
 <section class="py-20 border-t border-zinc-900/5">
@@ -329,10 +351,10 @@ title: OPE
     <div class="max-w-2xl mb-10">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">Compatibility</h2>
       <p class="text-2xl font-semibold tracking-tight text-zinc-900">Works with what you already use</p>
-      <p class="text-sm text-zinc-600 mt-3">OPE is a purely additive extension. Readers without OPE support simply see previews as usual.</p>
+      <p class="text-sm text-zinc-600 mt-3">OPE is additive. Apps without OPE support see previews as usual.</p>
     </div>
     <div class="flex flex-wrap gap-2">
-      {% for tag in ["RSS 2.0", "Atom", "JSON Feed", "AT Protocol", "OAuth 2.0", "PKCE", "JWT", "PASETO", "Macaroons", "DPoP", "PAR / RAR", "HTTP 402", "RFC 7591", "x402", "Stripe", "WordPress", "Ghost"] %}
+      {% for tag in ["RSS 2.0", "Atom", "JSON Feed", "Podcasting 2.0", "OAuth 2.0", "PKCE", "DPoP", "JWT", "RFC 9728", "RFC 8414", "RFC 7591", "RFC 7662", "HTTP 402", "RSL", "x402", "Stripe", "WordPress", "Ghost"] %}
       <span class="rounded-full px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-900/10">{{ tag }}</span>
       {% endfor %}
     </div>
@@ -343,10 +365,11 @@ title: OPE
 <section class="bg-zinc-900 py-20">
   <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
     <h2 class="text-2xl font-semibold tracking-tight text-white mb-3">Start building with OPE</h2>
-    <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">The spec is open. The demo runs locally in one command. Read it, build on it, and help shape portable entitlements for the open web.</p>
+    <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">v0.2 is open for comment. Read it, try it against your own product, and tell us what breaks. The demo still runs v0.1 while it's updated.</p>
     <div class="flex flex-wrap justify-center gap-3">
-      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Specification</a>
-      <a href="https://github.com/shellen/ope-eleventy-demo" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Try the Demo</a>
+      <a href="{{ '/ope/spec/0.2/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Read the v0.2 Draft</a>
+      <a href="{{ spec.commentsUrl }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Comment on GitHub</a>
+      <a href="https://github.com/shellen/ope-eleventy-demo" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Try the v0.1 Demo</a>
       <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Contribute on GitHub</a>
     </div>
   </div>

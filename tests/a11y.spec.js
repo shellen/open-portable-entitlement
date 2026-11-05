@@ -29,6 +29,36 @@ test.describe("Accessibility", () => {
     expect(results.violations).toEqual([]);
   });
 
+  for (const [name, url] of [
+    ["v0.1 spec at its permanent URL", "/ope/spec/0.1/"],
+    ["proposed v0.2 spec", "/ope/spec/0.2/"],
+    ["v0.2 namespace page", "/ope/ns/0.2/"],
+    ["withdrawn v0.1 namespace page", "/ope/ns/1.0/"],
+  ]) {
+    test(`${name} has no a11y violations`, async ({ page }) => {
+      await page.goto(url);
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+
+  test("entitlement builder has no a11y violations in either view", async ({ page }) => {
+    await page.goto("/ope/");
+    const builder = page.locator("#entitlement-builder");
+    for (const preset of ["Metered", "Ad-free"]) {
+      await builder.getByRole("button", { name: preset, exact: true }).click();
+      const results = await new AxeBuilder({ page }).include("#entitlement-builder")
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+      expect(results.violations).toEqual([]);
+    }
+    await builder.getByRole("tab", { name: "All 14 Presets" }).click();
+    const results = await new AxeBuilder({ page }).include("#entitlement-builder")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
   test("skip link is present and functional", async ({ page }) => {
     await page.goto("/");
     const skipLink = page.locator(".skip-link");
