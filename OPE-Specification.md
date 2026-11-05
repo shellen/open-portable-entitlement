@@ -324,7 +324,7 @@ A Resource Server serving gated Assets MUST make OAuth 2.0 Protected Resource Me
 
 Location is as RFC 9728 §3.1 specifies: `/.well-known/oauth-protected-resource` inserted between the host and the path of the identifier, which is the URL for per-URL metadata and the scope for scope metadata. For the scope `https://lamplighter.example/issues/`, that is `https://lamplighter.example/.well-known/oauth-protected-resource/issues/`. The document's `resource` MUST be identical to that identifier (RFC 9728 §3.3).
 
-Resource Servers SHOULD serve metadata as `application/json`. Clients MUST parse a metadata document as JSON whatever its `Content-Type`, because common static hosts cannot set a JSON type for a path that ends in `/` or has no file extension; RSL 1.0 §2.2 takes the same position for its own documents.
+Resource Servers SHOULD serve metadata as `application/json`. Clients MUST parse a metadata document as JSON whatever its `Content-Type`, because common static hosts cannot set a JSON type for a path that ends in `/` or has no file extension; RSL 1.0 §2.2 takes the same position for its own documents. Clients SHOULD follow a redirect to the same origin when fetching metadata, since static hosts redirect a path without a trailing slash to the folder it names; the `resource` check applies to the document finally received. GitHub Pages, for example, serves a folder index as `text/html`, an extensionless file as `application/octet-stream`, and every response with `Access-Control-Allow-Origin: *`.
 
 ```json
 {
