@@ -44,8 +44,9 @@ test.describe("OPE Landing Page", () => {
   test("renders hero with title", async ({ page }) => {
     await page.goto("/ope/");
     await expect(
-      page.locator("h1", { hasText: "Portable subscriptions for the open web" })
+      page.locator("h1", { hasText: "Your access, in every app" })
     ).toBeVisible();
+    await expect(page.locator("text=Draft Specification v0.2")).toBeVisible();
   });
 
   test("has link to spec", async ({ page }) => {
@@ -55,12 +56,55 @@ test.describe("OPE Landing Page", () => {
     await expect(specLink).toHaveAttribute("href", /\/ope\/spec\//);
   });
 
-  test("shows all four principles", async ({ page }) => {
+  test("shows all five principles", async ({ page }) => {
     await page.goto("/ope/");
     await expect(page.locator("text=Entitlement, not payments")).toBeVisible();
     await expect(page.locator("text=Truly portable")).toBeVisible();
     await expect(page.locator("text=Works with any feed")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Built on OAuth" })).toBeVisible();
     await expect(page.locator("text=Publisher-controlled")).toBeVisible();
+  });
+
+  test("tells four stories, each a working carousel", async ({ page }) => {
+    await page.goto("/ope/");
+    const tabs = page.locator("#story-tabs").getByRole("tab");
+    await expect(tabs).toHaveCount(4);
+    for (const id of ["alice", "priya", "bob", "school"]) {
+      await page.locator(`#tab-${id}`).click();
+      const deck = page.locator(`#story-${id}`);
+      await expect(deck).toBeVisible();
+      const cards = deck.locator(".deck-card");
+      const dots = deck.locator(".deck-dot");
+      expect(await dots.count()).toBe(await cards.count());
+    }
+  });
+
+  test("uses v0.2 vocabulary, not v0.1", async ({ page }) => {
+    await page.goto("/ope/");
+    const body = page.locator("body");
+    await expect(body).toContainText("oauth-protected-resource");
+    for (const stale of ["/.well-known/ope", "grant token", "PASETO", "Macaroon", "Brokers"]) {
+      await expect(body).not.toContainText(stale);
+    }
+  });
+});
+
+test.describe("Namespaces", () => {
+  test("ns/0.2 documents the v0.2 elements", async ({ page }) => {
+    await page.goto("/ope/ns/0.2/");
+    await expect(page.locator("h1")).toHaveText("OPE Namespace 0.2");
+    const body = page.locator("body");
+    await expect(body).toContainText('xmlns:ope="https://feedspec.org/ope/ns/0.2"');
+    for (const el of ["ope:offer", "ope:asset", "ope:payment", "ope:terms"]) {
+      await expect(body).toContainText(el);
+    }
+  });
+
+  test("ns/1.0 is marked withdrawn and points to 0.2", async ({ page }) => {
+    await page.goto("/ope/ns/1.0/");
+    const notice = page.getByRole("note");
+    await expect(notice).toContainText("Withdrawn");
+    await expect(notice.getByRole("link")).toHaveAttribute("href", /\/ope\/ns\/0\.2\//);
   });
 });
 

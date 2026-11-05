@@ -3,12 +3,20 @@ layout: landing.njk
 title: OPE Namespace — feedspec.org
 ---
 
+{# ABOUTME: Withdrawn v0.1 feed namespace, kept so feeds that declare it can still be understood. #}
+{# ABOUTME: Points readers to the current namespace at /ope/ns/0.2/. #}
+
 <!-- Namespace Header -->
 <section class="py-20 sm:py-28">
   <div class="max-w-3xl mx-auto px-6 lg:px-8">
-    <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-600 ring-1 ring-inset ring-emerald-400/20">XML Namespace</span>
+    <div class="mb-8 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900 ring-1 ring-inset ring-amber-900/10" role="note">
+      <strong class="font-semibold">Withdrawn.</strong> This namespace belongs to the superseded v0.1 draft and is kept for reference only.
+      OPE v0.2 uses a new namespace, <a href="{{ '/ope/ns/0.2/' | url }}" class="font-semibold text-amber-900 underline">https://feedspec.org/ope/ns/0.2</a>, with a different element set.
+      A feed that declares this one is a v0.1 feed.
+    </div>
+    <span class="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-900/10">XML Namespace · v0.1, withdrawn</span>
     <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">OPE Namespace 1.0</h1>
-    <p class="mt-4 text-sm text-zinc-600 leading-relaxed max-w-lg">This is the namespace URI for the Open Portable Entitlement (OPE) feed extensions. It is used in Atom and RSS feeds to identify OPE elements.</p>
+    <p class="mt-4 text-sm text-zinc-600 leading-relaxed max-w-lg">This was the namespace URI for the Open Portable Entitlement (OPE) v0.1 feed extensions, used in Atom and RSS feeds to identify OPE elements.</p>
 
     <div class="mt-8 bg-zinc-900 rounded-2xl overflow-hidden font-[family-name:var(--font-mono)] text-xs">
       <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
@@ -21,7 +29,7 @@ title: OPE Namespace — feedspec.org
     </div>
 
     <div class="mt-8 flex flex-wrap gap-3">
-      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
+      <a href="{{ '/ope/spec/0.1/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the v0.1 Spec</a>
       <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">View on GitHub</a>
     </div>
   </div>
@@ -137,7 +145,10 @@ title: OPE Namespace — feedspec.org
 <!-- Link to spec -->
 <section class="bg-zinc-900 py-16">
   <div class="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-    <p class="text-sm text-zinc-400 mb-6">For the full specification including JSON Feed extensions, grant token formats, discovery endpoints, and more:</p>
-    <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Full Specification</a>
+    <p class="text-sm text-zinc-400 mb-6">These elements are defined in the superseded v0.1 draft. The current specification uses the v0.2 namespace.</p>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a href="{{ '/ope/ns/0.2/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Current namespace (0.2)</a>
+      <a href="{{ '/ope/spec/0.1/' | url }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white no-underline transition-colors">v0.1 specification</a>
+    </div>
   </div>
 </section>
