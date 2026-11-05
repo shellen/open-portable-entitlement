@@ -234,15 +234,20 @@ An Asset identifier appears in three places:
 
 | Place | Field | Value |
 |---|---|---|
-| Protected Resource metadata | `ope.asset` (§7.1) | The Asset the URL serves or exercises. Defaults to the metadata's `resource`. |
-| Authorization and token requests | `resource` (RFC 8707) | The `ope.asset` value, exactly |
+| Protected Resource metadata | `resource`, `ope.asset` (§7.1) | Per-URL metadata: the URL, with `ope.asset` naming the Asset where the two differ. Scope metadata: the scope. |
+| Authorization and token requests | `resource` (RFC 8707) | The Asset identifier: `ope.asset` (default `resource`) from per-URL metadata, or the normalized URL the Client requested (§5.3) when it found scope metadata |
 | License Token | `resource` claim (§9.2) | The requested Asset identifier, or a scope (§5.5) that contains it |
 
-Protected Resource metadata is published per URL, as RFC 9728 requires: its `resource` member MUST be identical to the URL a Client requested (RFC 9728 §3.3). For a document or media file, that URL is the Asset identifier and `ope.asset` is omitted. Wherever a URL differs from the Asset identifier, `ope.asset` names the Asset: an endpoint that exercises a paid feature (Profile C), the target of a redirect from a moved Asset (§5.2), or a signed media URL (Feeds profile).
+Protected Resource metadata comes in two shapes. Both conform to RFC 9728, because in each the document's `resource` is identical to the identifier the Client used to find it (RFC 9728 §3.3):
+
+- **Per-URL metadata.** `resource` is the URL the Client requested. For a document or media file, that URL is the Asset identifier and `ope.asset` is omitted. Wherever a URL differs from the Asset identifier, `ope.asset` names the Asset: an endpoint that exercises a paid feature (Profile C), the target of a redirect from a moved Asset (§5.2), or a signed media URL (Feeds profile). This is the natural shape for APIs, which have few endpoints.
+- **Scope metadata.** `resource` is a scope (§5.5), and the one document covers every Asset under it: a newsletter with 500 paid issues publishes one file, not 500. A Client finds the scope from a feed's channel-level `ope:offer` (Feeds profile) or from the `ope_scope` challenge parameter (§7.1), never by guessing at prefixes. `ope.asset` is not used in scope metadata; the Asset is the URL the Client requested.
+
+A Publisher MAY use either shape, or both on one origin. Where an Asset has per-URL metadata, that document governs it.
 
 A Client requests one Asset. The License Server decides how much the token covers: the Asset alone when the Subject holds that Asset only, or the scope the Subject's Entitlement record names (§17.1), so one token serves every Asset in it. A scope `resource` MUST begin with the token's `publisher` when the Publisher identifier is itself a scope.
 
-Because a scope token is issued after reading one Asset's metadata and then used on others, a Publisher that sells Entitlements over a scope MUST publish the same `authorization_servers`, `ope.publisher`, `ope.audience`, and `client_policy` for every URL in that scope. A Publisher that needs different values for some Assets gives them a scope of their own. A License Server MUST NOT issue a token whose `resource` neither equals nor contains the requested Asset identifier. The token response states the issued `resource` (§8.5) so the Client can reuse the token across the scope.
+Because a scope token is issued after reading one Asset's metadata and then used on others, a Publisher that sells Entitlements over a scope MUST publish the same `authorization_servers`, `ope.publisher`, `ope.audience`, and `client_policy` for every URL in that scope. Scope metadata meets this by construction; per-URL documents under a scope must agree with each other. A Publisher that needs different values for some Assets gives them a scope of their own. A License Server MUST NOT issue a token whose `resource` neither equals nor contains the requested Asset identifier. The token response states the issued `resource` (§8.5) so the Client can reuse the token across the scope.
 
 ### 5.7 Non-Goals
 
@@ -315,9 +320,11 @@ OPE uses two published OAuth discovery documents and adds one extension member t
 
 ### 7.1 Protected Resource Metadata (Asset side)
 
-A Resource Server serving gated Assets MUST publish OAuth 2.0 Protected Resource Metadata (RFC 9728) for each gated URL. The document says which License Servers may issue for the resource, which Asset and Publisher it belongs to, and what is for sale.
+A Resource Server serving gated Assets MUST make OAuth 2.0 Protected Resource Metadata (RFC 9728) available for each gated URL, either as a per-URL document or through a scope document that covers it (§5.6). The document says which License Servers may issue for the resource, which Publisher it belongs to, and what is for sale.
 
-Location is as RFC 9728 §3.1 specifies: `/.well-known/oauth-protected-resource` inserted between the host and the path of the resource URL. The document's `resource` MUST be identical to that URL (RFC 9728 §3.3), so metadata is per URL, not per scope; a server with many Assets generates the documents rather than storing them. What the Assets share (Publisher, Offers, License Servers) is repeated in each.
+Location is as RFC 9728 §3.1 specifies: `/.well-known/oauth-protected-resource` inserted between the host and the path of the identifier, which is the URL for per-URL metadata and the scope for scope metadata. For the scope `https://lamplighter.example/issues/`, that is `https://lamplighter.example/.well-known/oauth-protected-resource/issues/`. The document's `resource` MUST be identical to that identifier (RFC 9728 §3.3).
+
+Resource Servers SHOULD serve metadata as `application/json`. Clients MUST parse a metadata document as JSON whatever its `Content-Type`, because common static hosts cannot set a JSON type for a path that ends in `/` or has no file extension; RSL 1.0 §2.2 takes the same position for its own documents.
 
 ```json
 {
@@ -368,11 +375,14 @@ A License Server MUST NOT issue for a Client matched by `deny`, or for a Client 
 
 `authorization_servers` is the Publisher's half of the trust relationship between Publisher and License Server; the License Server's `protected_resources` (§7.2) is the other half (§13.1). A License Server MUST NOT issue for a resource whose Protected Resource metadata does not list its `issuer`, and a Resource Server MUST NOT accept tokens from an issuer its own metadata does not list.
 
-On `401` and `402`, the Resource Server MUST include a `WWW-Authenticate` challenge with `resource_metadata` set to the metadata URL for the requested URL (RFC 9728 §5), so a Client that arrived with no other context can find everything above. A Client:
+On `401` and `402`, the Resource Server MUST include a `WWW-Authenticate` challenge that leads a Client with no other context to the metadata: either `resource_metadata` set to the per-URL metadata URL (RFC 9728 §5), or `ope_scope` set to the scope whose metadata covers the requested URL, as in `WWW-Authenticate: DPoP ope_scope="https://lamplighter.example/issues/"`. A Client:
 
-- MUST use a `resource_metadata` URL from a challenge when one is given, and MUST discard the document unless its `resource` is identical to the URL it requested (RFC 9728 §3.3);
-- MAY use a `metadata` URL from a feed (Feeds profile) only if it has the same origin as the feed's Asset identifier, and MUST discard the document unless its `resource` is identical to that identifier;
-- otherwise constructs the well-known URL from the Asset identifier (RFC 9728 §3.1).
+- given `resource_metadata`, MUST use it, and MUST discard the document unless its `resource` is identical to the URL it requested (RFC 9728 §3.3);
+- given `ope_scope`, or a scope from a feed's channel-level `ope:offer`, MUST check that the scope has the same origin as the requested URL and that the normalized URL (§5.3) begins with it, MUST construct the metadata URL from the scope (RFC 9728 §3.1) rather than accept a document URL from elsewhere, and MUST discard the document unless its `resource` is identical to the scope;
+- MAY use a per-URL `metadata` URL from a feed (Feeds profile) only if it has the same origin as the feed's Asset identifier, and MUST discard the document unless its `resource` is identical to that identifier;
+- otherwise constructs the per-URL well-known URL from the Asset identifier (RFC 9728 §3.1).
+
+Requiring the scope to be on the Asset's own origin and to contain it means a challenge or feed can only point a Client at metadata the Asset's own server publishes.
 
 ### 7.2 Authorization Server Metadata (License Server side)
 
@@ -426,7 +436,7 @@ Clients SHOULD cache both metadata documents for no less than one hour and no mo
 
 A License Server MUST support the OAuth 2.0 Authorization Code flow with PKCE (`S256`) for issuing License Tokens to Subjects. This is the only authorization path OPE defines.
 
-The authorization request MUST include exactly one `resource` parameter (RFC 8707): the `ope.asset` of the Asset's Protected Resource metadata (§5.6), or a bundle identifier (§13.6). A License Server MUST reject a request carrying more than one `resource` with `invalid_target` (RFC 8707 §2). A request with no `resource` is likewise rejected with `invalid_target`. The token request, including a refresh, repeats that `resource`, except after a bundle authorization, where the Client names one Asset in the bundle on each token request (§13.6).
+The authorization request MUST include exactly one `resource` parameter (RFC 8707): the Asset identifier as §5.6 determines it (`ope.asset` from per-URL metadata, or the requested URL when the Client used scope metadata), or a bundle identifier (§13.6). A License Server MUST reject a request carrying more than one `resource` with `invalid_target` (RFC 8707 §2). A request with no `resource` is likewise rejected with `invalid_target`. The token request, including a refresh, repeats that `resource`, except after a bundle authorization, where the Client names one Asset in the bundle on each token request (§13.6).
 
 ```
 GET /authorize
@@ -630,7 +640,7 @@ A Resource Server MUST, for each request for a gated Asset:
 
 1. Verify the signature against the JWKS of an issuer listed in its own Protected Resource metadata (§9.3).
 2. Verify `typ`, `iss`, `aud`, `exp`, and `iat`.
-3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's Protected Resource metadata, or the URL itself (§5.6). The URL is first normalized (§5.3). Verify that `resource` covers that Asset as `entitlement.coverage` says (§10.4), and that `publisher` equals the Asset's `ope.publisher`.
+3. Determine the Asset the request serves or exercises: the `ope.asset` of the requested URL's per-URL metadata, or else the URL itself (§5.6). The URL is first normalized (§5.3). Verify that `resource` covers that Asset as `entitlement.coverage` says (§10.4), and that `publisher` equals the `ope.publisher` of the metadata covering the Asset.
 4. Verify that the Entitlement permits serving (§10.4): its `type` is `access` or `limit`, a `limit` is within quota, and, when `duration` is `rental`, the current time is before `rental_expires_at`.
 5. Verify `cnf` when present, per RFC 9449 or RFC 8705.
 6. Check revocation: either the token is within a lifetime the Resource Server accepts without introspection (§12.3), or the Resource Server calls `/introspect`.
@@ -703,7 +713,7 @@ A License Server MUST NOT issue a token for a resource whose metadata it has not
 
 A License Server MUST obtain each resource's Protected Resource metadata and Terms from the Publisher's published locations, not from a copy supplied out of band. It:
 
-- MUST fetch the metadata for each Asset it issues for, and refetch at least every 24 hours (§7.3);
+- MUST fetch the metadata for each Asset it issues for: the Asset's per-URL document or, where it has none, the scope document of the longest entry in its own `protected_resources` that contains the Asset (§5.6). It refetches at least every 24 hours (§7.3);
 - MUST stop issuing for a resource whose metadata no longer lists it, or cannot be fetched;
 - MUST fetch the Terms of each Offer, compute `sha256`, and place the reference in every token (§6.1, §9.2);
 - MUST apply the `client_policy` from its most recent fetch at every issuance (§7.1);
@@ -801,7 +811,7 @@ A conforming v0.2 implementation MUST validate against the following, published 
 
 - JSON Schema for the `ope` member of Protected Resource metadata (§7.1), including the Offer and Terms reference.
 - JSON Schema for the `ope` member of Authorization Server metadata (§7.2) and for the `entitlement` object (§10).
-- A set of signed test vectors: valid tokens, expired tokens, wrong `aud`, wrong `typ`, `alg: none`, issuer not listed in resource metadata, `resource` not covering the Asset, `publisher` not matching the Asset, a `status`-only token for a gated Asset, a rental past `rental_expires_at`, revoked `jti`, a dot-segment request crossing into another Publisher's scope, an encoded `/` in a gated path, and a token signed by a withdrawn key, with expected Resource Server outcomes.
+- A set of signed test vectors: valid tokens, expired tokens, wrong `aud`, wrong `typ`, `alg: none`, issuer not listed in resource metadata, `resource` not covering the Asset, `publisher` not matching the Asset, a `status`-only token for a gated Asset, a rental past `rental_expires_at`, revoked `jti`, a dot-segment request crossing into another Publisher's scope, an `ope_scope` on another origin or not containing the requested URL (Client MUST discard), an encoded `/` in a gated path, and a token signed by a withdrawn key, with expected Resource Server outcomes.
 - For the Multi-Publisher License Server target: resource metadata not listing the issuer (MUST refuse to issue), requested `resource` outside its own `protected_resources` (MUST refuse without fetching), stale metadata older than 24 hours (MUST refetch or refuse), nested scopes of one Publisher (longer prefix wins), introspection of another Publisher's token (MUST refuse), an access token naming two Publishers or a bundle identifier (MUST NOT issue), `client_policy` deny (MUST refuse), group removal followed by a token request (MUST refuse), a replayed refresh token (MUST revoke the grant), revocation by `client_id` and `publisher` (MUST leave other Publishers' tokens active), and the operator actions in §17.3 (each MUST be observable through `/introspect`).
 
 Location: `conformance/` in the specification repository. *Status: the schemas and vectors are a v0.2 deliverable and are not yet published. This specification will not advance past Working Draft until they are.* An implementer who cannot run them should treat every MUST above as untested.
@@ -867,6 +877,8 @@ OPE extends registries that OAuth and HTTP already maintain. None of these regis
 | HTTP Field Names (RFC 9110 §16.3) | `Entitlement-Remaining` | Profile C |
 | OAuth Authorization Details Types (RFC 9396) | `ope_entitlement` | Profile C |
 
+The `ope_scope` challenge parameter (§7.1) is defined here for use with the `DPoP` and `License` schemes; where authentication-scheme parameters are registered will be settled with the registrations above.
+
 The `License` HTTP authentication scheme is RSL's: RSL 1.0 §10.2 requests its registration in the HTTP Authentication Scheme Registry. OPE uses that registration rather than requesting its own (D12). RSL 1.0 does not request an access token type, so `License` as a `token_type` is OPE's request, to be coordinated with RSL. The `resource` introspection parameter and `permitted` member are RSL's too and will be registered jointly or by whichever specification files first.
 
 ---
@@ -883,7 +895,7 @@ Applies to RSS 2.0, Atom (RFC 4287), and JSON Feed 1.1.
 
 **Where Offers go.** A feed can declare Offers once for everything it gates, per item, or both:
 
-- **Channel level.** One or more `ope:offer` elements on the RSS `<channel>` or Atom `<feed>`, all naming the same scope (§5.5) as `resource`. They apply to every gated item whose Asset is in that scope. This is the newsletter case: one subscription, hundreds of issues, declared once.
+- **Channel level.** One or more `ope:offer` elements on the RSS `<channel>` or Atom `<feed>`, all naming the same scope (§5.5) as `resource`. They apply to every gated item whose Asset is in that scope. This is the newsletter case: one subscription, hundreds of issues, declared once. A Client finds the scope's metadata by constructing its well-known URL from the scope, with the checks in §7.1, so the Publisher can serve one scope document instead of one per item (§5.6).
 - **Item level.** One or more `ope:offer` elements on an `<item>` or `<entry>`, all naming that item's Asset as `resource`. They replace the channel-level Offers for that item: a one-off paid episode in a free feed, or a special issue with its own price.
 - **Gated item without its own Offers.** An item covered by channel-level Offers carries an empty `ope:asset` element naming its Asset. An item with neither `ope:asset` nor `ope:offer` is not gated by OPE.
 
@@ -1110,8 +1122,8 @@ A member buys the pro tier of *Inkwell*, a writing tool, and wants "pro export" 
 **Client (minimum).** A Client that follows these steps meets the Client requirements of Part I:
 
 1. **Reuse a token if one fits.** Tokens are cached by License Server `issuer` and by the `resource` and `coverage` from the token response. If a cached token covers the Asset (§10.4), present it (step 8) without fetching metadata; fetch metadata only if it is refused.
-2. **Find the metadata.** Request the Asset, or read the item's `ope:offer` or `ope:asset` and any channel-level Offers (Feeds profile). On `401` or `402`, take `resource_metadata` from the challenge; from a feed, take `metadata` only if it is on the Asset's origin; otherwise construct the well-known URL (§7.1).
-3. **Check it.** Discard the document unless its `resource` is identical to the URL requested or the feed's `resource`. Read `ope.asset` (default: `resource`), `ope.publisher`, `ope.offers`, and `authorization_servers`.
+2. **Find the metadata.** Request the Asset, or read the item's `ope:offer` or `ope:asset` and any channel-level Offers (Feeds profile). On `401` or `402`, take `resource_metadata` or `ope_scope` from the challenge; from a feed, take the channel-level scope, or an item's `metadata` only if it is on the Asset's origin; otherwise construct the per-URL well-known URL (§7.1). For a scope, check it is on the Asset's origin and contains the Asset, and construct its metadata URL yourself.
+3. **Check it.** Parse it as JSON whatever its `Content-Type`. Discard it unless its `resource` is identical to the identifier you used to find it: the URL requested, the feed's `resource`, or the scope. Read `ope.asset` (per-URL metadata only), `ope.publisher`, `ope.offers`, and `authorization_servers`. The Asset to request is `ope.asset`, or the URL itself.
 4. **Use a bundle if one applies.** If the Client holds a refresh token from a bundle authorization (§13.6) at a listed License Server, and that bundle's `publishers` include `ope.publisher`, refresh with `resource` set to the Asset and go to step 8. A Client learns of bundles from `ope.bundles` (§7.2); using them is optional.
 5. **Choose a License Server.** Prefer one listed in `authorization_servers` that the Client is already registered with; otherwise the first one listed. If the Subject has a known account at one of several, the Client MAY let them choose.
 6. **Register if needed.** Fetch its RFC 8414 metadata (§7.2). If the Client has no `client_id` there, register through `registration_endpoint`; if there is none, the Client needs a `client_id` issued out of band, and without one it returns to step 5 for the next listed License Server.
@@ -1128,7 +1140,7 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 
 **Revision 5 (2026-10-27) within v0.2.** Review pass: fixes from two adversarial reviews and a cross-check against the RSL 1.0 text.
 
-- *Discovery follows RFC 9728 exactly.* Protected Resource metadata is per URL, with `resource` identical to the requested URL (RFC 9728 §3.3), which revision 4's per-scope metadata could not satisfy. The new `ope.asset` names the Asset a URL serves or exercises, which also gives API endpoints a defined Asset (Profile C, worked example). Feed-supplied metadata URLs must be on the Asset's origin (§7.1).
+- *Discovery follows RFC 9728 exactly.* Each metadata document's `resource` is identical to the identifier the Client used to find it (RFC 9728 §3.3), which revision 4's scope metadata reached from an Asset's challenge could not satisfy. Metadata is per URL, with the new `ope.asset` naming the Asset a URL serves or exercises (which also gives API endpoints a defined Asset: Profile C, worked example), or per scope, found from a feed or an `ope_scope` challenge on the Asset's own origin. Feed-supplied metadata URLs must be on the Asset's origin (§5.6, §7.1).
 - *Token coverage is decided by the License Server.* The Client requests one Asset; the token's `resource` is that Asset or a scope containing it, and the token response says which (§5.6, §8.5). One `resource` per request (§8.1). `coverage` is now `item` or `collection`, required for every type, and tells a Resource Server whether `resource` is a scope, since Asset identifiers may also end in `/`. `all` became a `collection` over the Publisher's root scope, and `pre-release` became a `kind` (§5.5, §10). A Publisher selling over a scope keeps its metadata uniform across it, so a scope token cannot bypass a per-Asset policy (§5.6). The token response must carry `resource` and `entitlement` (§8.5).
 - *Publishers are identified.* New `ope.publisher` metadata member and `publisher` claim (§5.8). Scope separation, one Publisher per token, introspection isolation, and pairwise `sub` are stated against it. Bundles need nothing new in the common case. They may also be authorized with a bundle identifier and narrowed per Publisher at the token endpoint, an OPE extension of RFC 8707 §2.2. Bundles carry their own Terms and are exempt from the per-Asset trust checks only at the authorization endpoint (§13.1, §13.6).
 - *Offers.* `ope.offers` is an array, Offers may carry an `id` echoed as `entitlement.offer`, and `entitlement_types` is informational (§6.2, §7.1).
@@ -1158,6 +1170,8 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
     - Introspection may give the token's own Publisher a `revocation_reason` (§12.4).
     - Agent delegation is one hop (Profile D).
     - Feeds: a new namespace, `ns/0.2` (D9 closed); channel-level Offers; `ope:asset`; `ope:terms` as an element with attributes, aligned with the JSON Offer; a normative XML-to-JSON mapping; Atom and JSON Feed examples (Profile A).
+
+- *Scope metadata (editor decision of 2026-11-05).* Besides per-URL metadata, a Publisher may publish one RFC 9728 document for a whole scope, found from a feed's channel-level Offer or the new `ope_scope` challenge parameter, on the Asset's own origin. Clients parse metadata as JSON whatever its `Content-Type`, so static hosts work (§5.6, §7.1, §13.2, Profile A).
 
 Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
 

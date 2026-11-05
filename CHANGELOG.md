@@ -16,8 +16,9 @@ v0.1 should start with Appendix C, which maps every v0.1 construct to its replac
 Review pass: fixes from two adversarial reviews and a cross-check against the RSL 1.0
 text. Several changes are breaking for revision 4 implementers.
 
-- **Breaking:** Protected Resource metadata is per URL, as RFC 9728 §3.3 requires; the
-  new `ope.asset` member names the Asset a URL serves or exercises (§5.6, §7.1).
+- **Breaking:** Protected Resource metadata follows RFC 9728 §3.3 exactly: per URL, with
+  the new `ope.asset` naming the Asset a URL serves or exercises, or per scope, found
+  through the feed or the `ope_scope` challenge parameter (§5.6, §7.1).
 - **Breaking:** the License Server chooses the token's `resource` (the requested Asset or
   a scope containing it) and returns it in the token response. One `resource` per
   authorization request (§5.6, §8.1, §8.5).
@@ -51,6 +52,9 @@ text. Several changes are breaking for revision 4 implementers.
 - Refresh-token replay revokes the whole grant (§12.1).
 - Per-Publisher Client revocation and an optional `revocation_reason` (§12.4, §17.3).
 - Agent delegation is one hop (Profile D).
+- Scope metadata: one RFC 9728 document can cover a whole scope, found from a feed's
+  channel-level Offer or the new `ope_scope` challenge parameter; Clients parse metadata
+  as JSON whatever its `Content-Type` (§5.6, §7.1).
 - Text license settled as Apache 2.0 (D1); D14 closed.
 
 ### Revision 4 — 2026-10-05
