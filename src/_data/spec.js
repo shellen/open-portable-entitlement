@@ -80,9 +80,10 @@ function renderSpec(mdPath) {
 // comment; when it is adopted, set CURRENT to "0.2" and PROPOSED to null.
 const CURRENT = "0.1";
 const PROPOSED = "0.2";
-// Where comments on the proposed draft go. Point this at the call-for-comment
-// issue once it is posted.
-const COMMENTS_URL = "https://github.com/shellen/open-portable-entitlement/issues";
+// Where comments on the proposed draft go: the call-for-comment issue, open
+// until 2026-11-19.
+const COMMENTS_URL = "https://github.com/shellen/open-portable-entitlement/issues/23";
+const COMMENTS_UNTIL = "November 19, 2026";
 
 const SOURCES = {
   "0.1": "archive/OPE-Specification-0.1.md",
@@ -99,6 +100,7 @@ export default function () {
     current: CURRENT,
     proposed: PROPOSED,
     commentsUrl: COMMENTS_URL,
+    commentsUntil: COMMENTS_UNTIL,
     versions,
   };
 }

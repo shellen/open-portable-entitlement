@@ -25,7 +25,7 @@ This is a Working Draft published by the editor for review by feed and podcast c
 
 v0.2 is a restructuring release. It adds no wire primitives of its own beyond the OAuth extension points it names (§18), shrinks the normative core to OAuth plus a small set of OPE-defined claims and objects, aligns its vocabulary with Really Simple Licensing (RSL) so that implementers of both use one set of words, and moves surface-specific material into profiles. Implementers of v0.1 should read Appendix C before anything else.
 
-v0.2 is published as a proposed revision for public comment. Until the comment period closes and the editor adopts it, v0.1 remains the published version of OPE at <https://feedspec.org/ope/spec/>. Comments may change this draft substantially.
+v0.2 is published as a proposed revision for public comment, from 2026-11-05 to 2026-11-19, at <https://github.com/shellen/open-portable-entitlement/issues/23>. Until the comment period closes and the editor adopts it, v0.1 remains the published version of OPE at <https://feedspec.org/ope/spec/>. Comments may change this draft substantially.
 
 Comments go to the issue tracker. Substantive proposals should be filed as issues with a scenario, the text being changed, and replacement text.
 
