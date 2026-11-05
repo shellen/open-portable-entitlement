@@ -1,5 +1,5 @@
-// ABOUTME: Serves the archived OPE v0.1 specification markdown at /ope/spec/0.1.md.
-// ABOUTME: Mirrors /ope/spec.md so tools that fetched v0.1 as markdown can still find it.
+// ABOUTME: Serves the OPE v0.1 specification markdown at /ope/spec/0.1.md.
+// ABOUTME: Permanent Markdown URL for v0.1, whichever version /ope/spec.md serves.
 
 export const data = {
   permalink: "/ope/spec/0.1.md",

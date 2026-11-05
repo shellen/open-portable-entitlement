@@ -46,14 +46,14 @@ test.describe("OPE Landing Page", () => {
     await expect(
       page.locator("h1", { hasText: "Your access, in every app" })
     ).toBeVisible();
-    await expect(page.locator("text=Draft Specification v0.2")).toBeVisible();
+    await expect(page.locator("text=Draft v0.2 · Proposed, open for comment")).toBeVisible();
   });
 
   test("has link to spec", async ({ page }) => {
     await page.goto("/ope/");
-    const specLink = page.getByRole("link", { name: "Read the Spec", exact: true });
+    const specLink = page.getByRole("link", { name: "Read the v0.2 Draft" }).first();
     await expect(specLink).toBeVisible();
-    await expect(specLink).toHaveAttribute("href", /\/ope\/spec\//);
+    await expect(specLink).toHaveAttribute("href", /\/ope\/spec\/0\.2\/$/);
   });
 
   test("shows all five principles", async ({ page }) => {
@@ -144,7 +144,7 @@ test.describe("Namespaces", () => {
   test("ns/1.0 is marked withdrawn and points to 0.2", async ({ page }) => {
     await page.goto("/ope/ns/1.0/");
     const notice = page.getByRole("note");
-    await expect(notice).toContainText("Withdrawn");
+    await expect(notice).toContainText("Replaced in the v0.2 proposal");
     await expect(notice.getByRole("link")).toHaveAttribute("href", /\/ope\/ns\/0\.2\//);
   });
 });
@@ -184,45 +184,57 @@ test.describe("Spec Page", () => {
 });
 
 test.describe("Spec Versions", () => {
-  test("current spec is v0.2 and links to v0.1", async ({ page }) => {
+  test("/ope/spec/ is the published v0.1 and points to the v0.2 proposal", async ({ page }) => {
     await page.goto("/ope/spec/");
-    await expect(page.locator("article")).toContainText("Draft Specification v0.2");
-    await page.getByRole("link", { name: "Previous version: v0.1" }).click();
-    await expect(page).toHaveURL(/\/ope\/spec\/0\.1\/$/);
+    await expect(page.locator("article")).toContainText("Draft Specification v0.1");
+    const notice = page.getByRole("note");
+    await expect(notice).toContainText("A revision is proposed");
+    await notice.getByRole("link", { name: "Read the v0.2 draft" }).click();
+    await expect(page).toHaveURL(/\/ope\/spec\/0\.2\/$/);
   });
 
-  test("Part headings appear as sidebar group labels", async ({ page }) => {
-    await page.goto("/ope/spec/");
+  test("/ope/spec/0.2/ is the proposed draft and points back to v0.1", async ({ page }) => {
+    await page.goto("/ope/spec/0.2/");
+    await expect(page.locator("article")).toContainText("Draft Specification v0.2");
+    const notice = page.getByRole("note");
+    await expect(notice).toContainText("Proposed draft, open for comment");
+    await expect(notice.getByRole("link", { name: "Comment on GitHub" })).toHaveAttribute("href", /github\.com\/shellen\/open-portable-entitlement/);
+    await notice.getByRole("link", { name: "v0.1" }).click();
+    await expect(page).toHaveURL(/\/ope\/spec\/$/);
+  });
+
+  test("v0.2 Part headings appear as sidebar group labels", async ({ page }) => {
+    await page.goto("/ope/spec/0.2/");
     const parts = page.locator("#sidebar .nav-part");
     await expect(parts).toHaveCount(3);
     await expect(parts.first()).toHaveText("Part I: Core");
   });
 
   test("key/value tables have no empty header row", async ({ page }) => {
-    await page.goto("/ope/spec/");
-    const emptyHeaders = page.locator("article thead th:empty");
-    await expect(emptyHeaders).toHaveCount(0);
+    await page.goto("/ope/spec/0.2/");
+    await expect(page.locator("article thead th:empty")).toHaveCount(0);
   });
 
-  test("v0.1 is archived with a superseded notice", async ({ page }) => {
+  test("v0.1 keeps its permanent URL, sidebar, and anchors", async ({ page }) => {
     await page.goto("/ope/spec/0.1/");
     await expect(page.locator("article")).toContainText("Draft Specification v0.1");
-    const notice = page.getByRole("note");
-    await expect(notice).toContainText("Superseded");
-    await notice.getByRole("link", { name: "v0.2" }).click();
-    await expect(page).toHaveURL(/\/ope\/spec\/$/);
-  });
-
-  test("v0.1 keeps its sidebar and anchors", async ({ page }) => {
-    await page.goto("/ope/spec/0.1/");
     await expect(page.locator("#sidebar .nav-link").first()).toBeAttached();
     await expect(page.locator('article h2[id="8-grant-tokens"]')).toBeAttached();
   });
 
-  test("markdown is served for both versions", async ({ request }) => {
-    const current = await request.get("/ope/spec.md");
-    expect(await current.text()).toContain("Draft Specification v0.2");
-    const archived = await request.get("/ope/spec/0.1.md");
-    expect(await archived.text()).toContain("Draft Specification v0.1");
+  test("toolbars link to the other version", async ({ page }) => {
+    await page.goto("/ope/spec/");
+    await expect(page.getByRole("link", { name: "v0.2 (proposed draft)" })).toHaveAttribute("href", /\/ope\/spec\/0\.2\/$/);
+    await page.goto("/ope/spec/0.2/");
+    await expect(page.getByRole("link", { name: "v0.1 (published)" })).toHaveAttribute("href", /\/ope\/spec\/0\.1\/$/);
+  });
+
+  test("markdown is served for every version", async ({ request }) => {
+    const published = await request.get("/ope/spec.md");
+    expect(await published.text()).toContain("Draft Specification v0.1");
+    const v01 = await request.get("/ope/spec/0.1.md");
+    expect(await v01.text()).toContain("Draft Specification v0.1");
+    const v02 = await request.get("/ope/spec/0.2.md");
+    expect(await v02.text()).toContain("Draft Specification v0.2");
   });
 });

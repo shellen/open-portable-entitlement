@@ -12,14 +12,16 @@ OPE doesn't handle payments — it proves you're allowed in. How you earned acce
 
 ## Read the Spec
 
-The current version is **v0.2** (Working Draft, revision 5).
+The published version is **v0.1**. **v0.2** (revision 5), a proposed revision that rebuilds OPE on standard OAuth 2.0, is open for public comment.
 
-- **[Rendered specification](https://feedspec.org/ope/spec/)**: navigable docs with sidebar and section anchors
-- **[Plain text (Markdown)](./OPE-Specification.md)**: the spec source file, readable on GitHub
+- **[Proposed v0.2 draft](https://feedspec.org/ope/spec/0.2/)**: navigable docs with sidebar and section anchors; source in [`OPE-Specification.md`](./OPE-Specification.md)
+- **[Published v0.1](https://feedspec.org/ope/spec/)**: also at [/ope/spec/0.1/](https://feedspec.org/ope/spec/0.1/); source in [`archive/`](./archive/OPE-Specification-0.1.md)
 - **[Changelog](./CHANGELOG.md)**: what changed in each revision; Appendix C of the spec has the full record
-- **[Feed namespace](https://feedspec.org/ope/ns/0.2/)**: the `ope:` elements for RSS and Atom
+- **[Feed namespace for v0.2](https://feedspec.org/ope/ns/0.2/)**: the proposed `ope:` elements for RSS and Atom
 
-The superseded v0.1 draft is kept at [feedspec.org/ope/spec/0.1/](https://feedspec.org/ope/spec/0.1/) and in [`archive/`](./archive/OPE-Specification-0.1.md). Implementers of v0.1 should start with Appendix C of v0.2.
+**Comment on v0.2** by opening an issue: what breaks for your product, what's unclear, what's missing. Appendix D of the draft lists the questions still open.
+
+Implementers of v0.1 should start with Appendix C of v0.2, which maps every v0.1 construct to its replacement. Which version `/ope/spec/` serves is set in `src/_data/spec.js`.
 
 ## Try the Demo
 
@@ -68,7 +70,7 @@ OPE is a working draft. Feedback, questions, and contributions are welcome:
 2. **Submit a pull request** for spec changes or site improvements
 3. **Start a discussion** in GitHub Discussions for broader topics
 
-The specification source is `OPE-Specification.md`; the archived v0.1 text is in `archive/`, and supporting profile material is in `profiles/`. The site is built with [Eleventy](https://www.11ty.dev/) and [Tailwind CSS](https://tailwindcss.com/).
+The specification source is `OPE-Specification.md` (v0.2); the v0.1 text is in `archive/`, and supporting profile material is in `profiles/`. The site is built with [Eleventy](https://www.11ty.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
 ## Author
 

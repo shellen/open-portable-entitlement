@@ -1,0 +1,17 @@
+{# ABOUTME: Version notice shown above a rendered specification. #}
+{# ABOUTME: Expects `v` (a spec version object); says whether it is current, proposed, or older. #}
+{% if v.version == spec.proposed %}
+<div class="not-prose mb-8 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900 ring-1 ring-inset ring-amber-900/10" role="note">
+  <strong class="font-semibold">Proposed draft, open for comment.</strong>
+  v{{ v.version }} is a proposed revision of OPE and is not yet the published version. It may change in response to comments.
+  The published version is <a href="{{ '/ope/spec/' | url }}" class="font-semibold text-amber-900 underline">v{{ spec.current }}</a>.
+  <a href="{{ spec.commentsUrl }}" class="font-semibold text-amber-900 underline">Comment on GitHub</a>.
+</div>
+{% elif spec.proposed %}
+<div class="not-prose mb-8 rounded-xl bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-900 ring-1 ring-inset ring-emerald-900/10" role="note">
+  <strong class="font-semibold">A revision is proposed.</strong>
+  This is v{{ v.version }}, the published version. A proposed v{{ spec.proposed }}, which rebuilds OPE on standard OAuth, is open for comment.
+  <a href="{{ ('/ope/spec/' + spec.proposed + '/') | url }}" class="font-semibold text-emerald-900 underline">Read the v{{ spec.proposed }} draft</a> ·
+  <a href="{{ spec.commentsUrl }}" class="font-semibold text-emerald-900 underline">Comment on GitHub</a>
+</div>
+{% endif %}

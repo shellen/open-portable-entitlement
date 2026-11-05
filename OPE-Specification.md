@@ -4,11 +4,11 @@
 
 | | |
 |---|---|
-| **Status** | Working Draft |
+| **Status** | Working Draft: proposed revision, open for public comment |
 | **Version** | 0.2, revision 5 (supersedes 0.1, 2026-03-27) |
 | **Date** | 2026-10-27 (revision 1: 2026-09-24; revisions 2 to 4: 2026-10-05) |
 | **Editor** | Jason Shellen <https://shellen.com> (@shellen.com on ATProto / Bluesky) |
-| **Canonical URL** | <https://feedspec.org/ope/spec/> |
+| **URL** | <https://feedspec.org/ope/spec/0.2/> while proposed; <https://feedspec.org/ope/spec/> once adopted |
 | **Source** | <https://github.com/shellen/open-portable-entitlement> |
 | **Issues** | <https://github.com/shellen/open-portable-entitlement/issues> |
 | **Changelog** | Appendix C, and `CHANGELOG.md` in the repository |
@@ -24,6 +24,8 @@
 This is a Working Draft published by the editor for review by feed and podcast client developers, publishing platforms, independent creators, and decentralized protocol communities. It may change substantially before wider review.
 
 v0.2 is a restructuring release. It adds no wire primitives of its own beyond the OAuth extension points it names (§18), shrinks the normative core to OAuth plus a small set of OPE-defined claims and objects, aligns its vocabulary with Really Simple Licensing (RSL) so that implementers of both use one set of words, and moves surface-specific material into profiles. Implementers of v0.1 should read Appendix C before anything else.
+
+v0.2 is published as a proposed revision for public comment. Until the comment period closes and the editor adopts it, v0.1 remains the published version of OPE at <https://feedspec.org/ope/spec/>. Comments may change this draft substantially.
 
 Comments go to the issue tracker. Substantive proposals should be filed as issues with a scenario, the text being changed, and replacement text.
 

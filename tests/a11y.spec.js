@@ -30,7 +30,8 @@ test.describe("Accessibility", () => {
   });
 
   for (const [name, url] of [
-    ["archived v0.1 spec", "/ope/spec/0.1/"],
+    ["v0.1 spec at its permanent URL", "/ope/spec/0.1/"],
+    ["proposed v0.2 spec", "/ope/spec/0.2/"],
     ["v0.2 namespace page", "/ope/ns/0.2/"],
     ["withdrawn v0.1 namespace page", "/ope/ns/1.0/"],
   ]) {

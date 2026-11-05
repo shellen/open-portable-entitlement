@@ -4,9 +4,11 @@ Changes to the Open Portable Entitlement specification (`OPE-Specification.md`).
 Appendix C of the specification is the authoritative record of what changed between
 versions; this file is the short index. Site-only changes are not listed.
 
-## 0.2 — Working Draft
+## 0.2 — Proposed draft, open for comment
 
-The current version, published at <https://feedspec.org/ope/spec/>. v0.2 is a
+Published for public comment at <https://feedspec.org/ope/spec/0.2/>; it moves to
+<https://feedspec.org/ope/spec/> if adopted. v0.1 remains the published version until then.
+v0.2 is a
 restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
@@ -109,8 +111,9 @@ Appendix C):
 
 ## 0.1 — 2026-03-27
 
-First public draft. Superseded; kept at <https://feedspec.org/ope/spec/0.1/> and in
-`archive/OPE-Specification-0.1.md`.
+First public draft, and the published version while v0.2 is under comment. Served at
+<https://feedspec.org/ope/spec/> and permanently at <https://feedspec.org/ope/spec/0.1/>;
+source in `archive/OPE-Specification-0.1.md`.
 
 Changes made to the v0.1 text after first publication:
 

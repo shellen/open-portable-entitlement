@@ -1,4 +1,4 @@
-// ABOUTME: Reads the current and archived OPE specifications and renders HTML plus a nav tree.
+// ABOUTME: Renders every OPE specification version to HTML plus a nav tree, and says which is current.
 // ABOUTME: The nav tree powers the expandable sidebar on the spec docs pages.
 
 import fs from "fs";
@@ -76,11 +76,29 @@ function renderSpec(mdPath) {
   return { html, nav, md };
 }
 
+// Which version /ope/spec/ shows. v0.2 is a proposed draft, open for public
+// comment; when it is adopted, set CURRENT to "0.2" and PROPOSED to null.
+const CURRENT = "0.1";
+const PROPOSED = "0.2";
+// Where comments on the proposed draft go. Point this at the call-for-comment
+// issue once it is posted.
+const COMMENTS_URL = "https://github.com/shellen/open-portable-entitlement/issues";
+
+const SOURCES = {
+  "0.1": "archive/OPE-Specification-0.1.md",
+  "0.2": "OPE-Specification.md",
+};
+
 export default function () {
+  const versions = {};
+  for (const [version, source] of Object.entries(SOURCES)) {
+    versions[version] = { ...renderSpec(path.join(root, source)), version, source };
+  }
   return {
-    ...renderSpec(path.join(root, "OPE-Specification.md")),
-    versions: {
-      "0.1": renderSpec(path.join(root, "archive/OPE-Specification-0.1.md")),
-    },
+    ...versions[CURRENT],
+    current: CURRENT,
+    proposed: PROPOSED,
+    commentsUrl: COMMENTS_URL,
+    versions,
   };
 }
