@@ -1,5 +1,5 @@
 # ABOUTME: GitHub Actions workflow to build and deploy the OPE site.
-# ABOUTME: Triggers on push to main, builds with Eleventy, deploys to GitHub Pages.
+# ABOUTME: Triggers on push to main; builds with Eleventy, runs the tests, deploys to GitHub Pages.
 
 name: Deploy to GitHub Pages
 
@@ -28,9 +28,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+          # Ship .well-known/ (OAuth metadata); v4+ drops dotfiles by default.
+          include-hidden-files: true
 
   deploy:
     environment:

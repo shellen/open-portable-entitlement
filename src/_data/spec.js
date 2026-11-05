@@ -61,7 +61,7 @@ function renderSpec(mdPath) {
     const cls = isPart ? "group spec-part" : "group";
     return `<h${depth} id="${id}" class="${cls}">
       ${text}
-      <a href="#${id}" class="anchor-link" aria-hidden="true">#</a>
+      <a href="#${id}" class="anchor-link" aria-hidden="true" tabindex="-1">#</a>
     </h${depth}>`;
   };
 
@@ -69,7 +69,9 @@ function renderSpec(mdPath) {
   // otherwise render a blank shaded header; drop it.
   const html = marked
     .parse(md, { renderer })
-    .replace(/<thead>\s*<tr>(\s*<th(\s[^>]*)?>\s*<\/th>)+\s*<\/tr>\s*<\/thead>/g, "");
+    .replace(/<thead>\s*<tr>(\s*<th(\s[^>]*)?>\s*<\/th>)+\s*<\/tr>\s*<\/thead>/g, "")
+    // Code blocks scroll sideways; tabindex lets keyboard users scroll them too.
+    .replace(/<pre>/g, '<pre tabindex="0">');
 
   return { html, nav, md };
 }

@@ -46,7 +46,7 @@
     // Remove all active states
     document.querySelectorAll(".nav-link").forEach(function (link) {
       link.classList.remove(
-        "text-emerald-500",
+        "text-emerald-700",
         "font-semibold"
       );
       link.setAttribute("aria-current", "false");
@@ -55,7 +55,7 @@
     var active = document.querySelector('.nav-link[data-section="' + id + '"]');
     if (!active) return;
     active.classList.add(
-      "text-emerald-500",
+      "text-emerald-700",
       "font-semibold"
     );
     active.setAttribute("aria-current", "location");

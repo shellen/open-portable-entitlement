@@ -23,13 +23,13 @@ title: OPE Namespace — feedspec.org
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
-        <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">Namespace Declaration</span>
+        <span class="ml-2 text-zinc-400 text-xs font-[family-name:var(--font-mono)]">Namespace Declaration</span>
       </div>
       <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed"><span class="text-sky-300">xmlns:ope</span>=<span class="text-amber-300">"https://feedspec.org/ope/ns/1.0"</span></pre>
     </div>
 
     <div class="mt-8 flex flex-wrap gap-3">
-      <a href="{{ '/ope/spec/0.1/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the v0.1 Spec</a>
+      <a href="{{ '/ope/spec/0.1/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Read the v0.1 Spec</a>
       <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">View on GitHub</a>
     </div>
   </div>
@@ -43,64 +43,64 @@ title: OPE Namespace — feedspec.org
 
     <div class="space-y-6">
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:access</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:access</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed mb-2">Container element indicating that a feed entry requires entitlement. Wraps all other OPE elements for an entry.</p>
         <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Attributes:</span> <code>level</code> — access level required (e.g., <code>"subscriber"</code>)</div>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-id</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-id</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Unique identifier for the gated content item. Used when requesting full content from the publisher's API.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:grant-types</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:grant-types</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Container for the list of grant types the publisher accepts for this content.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:type</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:type</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed mb-2">A single grant primitive type.</p>
         <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Allowed values:</span> <code>access</code>, <code>limit</code>, <code>signal</code></div>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:metadata</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:metadata</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Container for structured content metadata. Provides information readers can display as rich previews for gated content.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:word-count</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:word-count</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Word count of the full content. Helps readers display reading length estimates.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:estimated-read-time-minutes</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:estimated-read-time-minutes</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Estimated reading time in minutes.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-type</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:content-type</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Type of the content (e.g., <code>"essay"</code>, <code>"article"</code>, <code>"podcast"</code>).</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:preview-image</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:preview-image</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">URL of a hero or preview image for the content.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-cta</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-cta</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Publisher-specified call-to-action string displayed to readers who don't have access (e.g., "Subscribe to read the full essay").</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-url</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:unlock-url</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed">Browser-openable URL that triggers the web-based entitlement flow. Bridges feed discovery to browser access.</p>
       </div>
 
       <div class="p-5 rounded-2xl border border-zinc-900/5">
-        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-600 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:per-item-price</code></h3>
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1"><code class="text-emerald-700 bg-emerald-400/10 px-1.5 py-0.5 rounded text-xs">ope:per-item-price</code></h3>
         <p class="text-sm text-zinc-600 leading-relaxed mb-2">Price for per-item access. Uses the smallest currency unit (e.g., cents for USD).</p>
         <div class="text-xs text-zinc-500"><span class="font-semibold text-zinc-700">Attributes:</span> <code>currency</code>, <code>amount</code></div>
       </div>
@@ -119,7 +119,7 @@ title: OPE Namespace — feedspec.org
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
         <span class="w-2 h-2 rounded-full bg-white/10"></span>
-        <span class="ml-2 text-zinc-500 text-xs font-[family-name:var(--font-mono)]">Atom entry</span>
+        <span class="ml-2 text-zinc-400 text-xs font-[family-name:var(--font-mono)]">Atom entry</span>
       </div>
       <pre class="p-5 overflow-x-auto m-0 text-zinc-300 leading-relaxed">&lt;<span class="text-sky-300">entry</span>&gt;
   &lt;<span class="text-sky-300">id</span>&gt;https://example.com/post-123&lt;/<span class="text-sky-300">id</span>&gt;
@@ -147,7 +147,7 @@ title: OPE Namespace — feedspec.org
   <div class="max-w-3xl mx-auto px-6 lg:px-8 text-center">
     <p class="text-sm text-zinc-400 mb-6">These elements are defined in the superseded v0.1 draft. The current specification uses the v0.2 namespace.</p>
     <div class="flex flex-wrap justify-center gap-3">
-      <a href="{{ '/ope/ns/0.2/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Current namespace (0.2)</a>
+      <a href="{{ '/ope/ns/0.2/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Current namespace (0.2)</a>
       <a href="{{ '/ope/spec/0.1/' | url }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white no-underline transition-colors">v0.1 specification</a>
     </div>
   </div>

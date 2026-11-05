@@ -13,7 +13,7 @@ title: OPE
       <div class="deck-card flex-none w-full px-1" role="group" aria-roledescription="slide">
         <div class="rounded-2xl border border-zinc-900/5 p-6 sm:p-8 h-full">
           <div class="flex items-center gap-3 mb-4">
-            <span class="text-xs font-medium text-emerald-600">{{ loop.index }} of {{ cards | length }}</span>
+            <span class="text-xs font-medium text-emerald-700">{{ loop.index }} of {{ cards | length }}</span>
           </div>
           <h3 class="text-lg font-semibold text-zinc-900 mb-3">{{ card.title }}</h3>
           <p class="text-sm text-zinc-600 leading-relaxed">{{ card.body | safe }}</p>
@@ -51,7 +51,7 @@ title: OPE
       <p class="mt-4 text-base text-zinc-300 leading-relaxed max-w-lg">Buy from a publisher once. Use it in any app you choose.</p>
       <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-lg">OPE is an open protocol, built on OAuth 2.0, for proving that a person holds access to something (an article, a podcast episode, a course, a pro feature) and carrying that proof across the apps they use. Feed readers, podcast players, editors, and browsers all check it the same way. No lock-in. No walled gardens.</p>
       <div class="mt-8 flex flex-wrap gap-3">
-        <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
+        <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Read the Spec</a>
         <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">View on GitHub</a>
       </div>
     </div>
@@ -63,35 +63,35 @@ title: OPE
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-600 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 18.3s6.7-3.3 6.7-8.3V4.2L10 1.7 3.3 4.2V10c0 5 6.7 8.3 6.7 8.3z"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Entitlement, not payments</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">OPE proves you're allowed in. Payment processors handle money. Clean separation.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-600 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M13 18V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Truly portable</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">What you hold works in any OPE-compatible app: feed reader, podcast player, browser, or the tool you already use. No platform lock-in.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-600 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.3 9.2a7.5 7.5 0 0 1 7.5 7.5"/><path d="M3.3 3.3a13.3 13.3 0 0 1 13.3 13.3"/><circle cx="4.2" cy="15.8" r=".8"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Works with any feed</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">RSS, Atom, and JSON Feed today, with AT Protocol planned. OPE extends what you already use, and works without a feed too.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-600 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6.5" cy="13.5" r="3.5"/><path d="M9 11l8-8"/><path d="M14 6l2 2"/><path d="M12 8l2 2"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Built on OAuth</h3>
         <p class="text-sm text-zinc-600 leading-relaxed">OAuth 2.0 and its published RFCs, plus a few claims that say what a person holds. Nothing exotic to implement.</p>
       </div>
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-600 mb-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-400/10 text-emerald-700 mb-4">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.2 17.5v-1.7a3.3 3.3 0 0 0-3.3-3.3H4.2a3.3 3.3 0 0 0-3.3 3.3v1.7"/><circle cx="7.5" cy="5.8" r="3.3"/><path d="M19.2 17.5v-1.7a3.3 3.3 0 0 0-2.5-3.2"/><path d="M13.3 2.6a3.3 3.3 0 0 1 0 6.5"/></svg>
         </div>
         <h3 class="text-sm font-semibold text-zinc-900 mb-1">Publisher-controlled</h3>
@@ -151,7 +151,7 @@ title: OPE
         {t:"Access", d:"The app presents the token. The publisher's server checks it and serves the article, episode, or feature."}
       ] %}
       <div>
-        <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-600 mb-4">{{ loop.index }}</div>
+        <div class="flex items-center justify-center w-10 h-10 rounded-full ring-1 ring-zinc-900/10 text-sm font-semibold text-emerald-700 mb-4">{{ loop.index }}</div>
         <h4 class="text-sm font-semibold text-zinc-900 mb-1">{{ step.t }}</h4>
         <p class="text-xs text-zinc-600 leading-relaxed">{{ step.d }}</p>
       </div>
@@ -176,7 +176,7 @@ title: OPE
         {id:"bob", label:"Bob listens to a podcast"},
         {id:"school", label:"A school buys a course"}
       ] %}
-      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors {% if loop.first %}bg-emerald-500 text-white{% else %}text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900{% endif %}" data-story="{{ tab.id }}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="story-{{ tab.id }}" id="tab-{{ tab.id }}"{% if not loop.first %} tabindex="-1"{% endif %}>{{ tab.label }}</button>
+      <button class="story-tab rounded-full px-4 py-1.5 text-sm font-semibold transition-colors {% if loop.first %}bg-emerald-500 text-zinc-900{% else %}text-zinc-500 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900{% endif %}" data-story="{{ tab.id }}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="story-{{ tab.id }}" id="tab-{{ tab.id }}"{% if not loop.first %} tabindex="-1"{% endif %}>{{ tab.label }}</button>
       {% endfor %}
     </div>
 
@@ -289,7 +289,7 @@ title: OPE
         <p class="text-sm text-zinc-600 mb-4">{{ card.d }}</p>
         <ul class="space-y-1.5 list-none p-0">
           {% for item in card.items %}
-          <li class="text-sm text-zinc-600 flex gap-2"><span class="text-emerald-600 mt-1.5 shrink-0" aria-hidden="true">·</span> {{ item }}</li>
+          <li class="text-sm text-zinc-600 flex gap-2"><span class="text-emerald-700 mt-1.5 shrink-0" aria-hidden="true">·</span> {{ item }}</li>
           {% endfor %}
         </ul>
       </div>
@@ -366,7 +366,7 @@ title: OPE
     <h2 class="text-2xl font-semibold tracking-tight text-white mb-3">Start building with OPE</h2>
     <p class="text-sm text-zinc-400 mb-8 max-w-md mx-auto">The spec is open. Read it, build on it, and help shape portable access for the open web. The demo still runs the v0.1 draft while it's updated.</p>
     <div class="flex flex-wrap justify-center gap-3">
-      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 no-underline transition-colors">Read the Specification</a>
+      <a href="{{ '/ope/spec/' | url }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Read the Specification</a>
       <a href="https://github.com/shellen/ope-eleventy-demo" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Try the v0.1 Demo</a>
       <a href="https://github.com/shellen/open-portable-entitlement" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 ring-1 ring-inset ring-zinc-400/20 hover:text-white hover:ring-zinc-400/40 no-underline transition-colors">Contribute on GitHub</a>
     </div>

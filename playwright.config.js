@@ -12,5 +12,10 @@ export default defineConfig({
   },
   use: {
     baseURL: "http://localhost:8090",
+    // Set PLAYWRIGHT_CHROMIUM_PATH to use a preinstalled browser whose build
+    // differs from the one this Playwright version downloads.
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
+      : {},
   },
 });

@@ -206,7 +206,7 @@
     var typeBtns = ["access", "limit", "status"].map(function (t) {
       var on = e.type === t;
       if (on) {
-        return '<button onclick="_eb.setType(\'' + t + '\')" aria-pressed="true" class="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors" style="background:' + COLORS[t].fg + ';color:#fff">' + t + "</button>";
+        return '<button onclick="_eb.setType(\'' + t + '\')" aria-pressed="true" class="rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors" style="background:' + COLORS[t].bg + ";color:" + COLORS[t].text + ";box-shadow:inset 0 0 0 1.5px " + COLORS[t].fg + '">' + t + "</button>";
       }
       return '<button onclick="_eb.setType(\'' + t + '\')" aria-pressed="false" class="rounded-full px-3.5 py-1.5 text-xs font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 transition-colors">' + t + "</button>";
     }).join("");
@@ -233,8 +233,8 @@
     fields += fieldGroup("Source", SOURCES, e.source, "_eb.setField('source','{v}')", NEUTRAL);
 
     var badge = '<div class="rounded-2xl p-5 transition-all" style="background:' + (match ? col.bg : "#fff") + ";border:1px solid " + (match ? col.ring : "rgba(24,24,27,0.08)") + '">'
-      + '<div class="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-1">Recognized as</div>'
-      + '<div class="text-lg font-semibold tracking-tight" style="color:' + (match ? col.fg : "#52525b") + '">' + (match ? esc(match.name) : "Custom entitlement") + "</div>"
+      + '<div class="text-xs font-medium text-zinc-600 uppercase tracking-wider mb-1">Recognized as</div>'
+      + '<div class="text-lg font-semibold tracking-tight" style="color:' + (match ? col.text : "#52525b") + '">' + (match ? esc(match.name) : "Custom entitlement") + "</div>"
       + '<div class="text-xs mt-1" style="color:' + (match ? col.text : "#52525b") + '">' + (match ? esc(match.desc) : "A valid combination, just not one of the named aliases") + "</div>"
       + "</div>";
 
@@ -252,9 +252,9 @@
       + "</div>";
 
     var explTexts = {
-      access: '<span class="font-semibold" style="color:' + col.fg + '">access</span> lets a person have the item, or everything in a collection. Coverage says which: the token\'s <code>resource</code> is one item or a scope. A rental ends at <code>rental_expires_at</code>, which the publisher\'s server enforces.',
-      limit: '<span class="font-semibold" style="color:' + col.fg + '">limit</span> allows items up to a quota per period. The publisher\'s server keeps the count; the token only says what the quota is.',
-      status: '<span class="font-semibold" style="color:' + col.fg + '">status</span> is a standing, like ad-free or patron. It unlocks nothing by itself: the publisher decides what it changes, such as dropping ads.',
+      access: '<span class="font-semibold" style="color:' + col.text + '">access</span> lets a person have the item, or everything in a collection. Coverage says which: the token\'s <code>resource</code> is one item or a scope. A rental ends at <code>rental_expires_at</code>, which the publisher\'s server enforces.',
+      limit: '<span class="font-semibold" style="color:' + col.text + '">limit</span> allows items up to a quota per period. The publisher\'s server keeps the count; the token only says what the quota is.',
+      status: '<span class="font-semibold" style="color:' + col.text + '">status</span> is a standing, like ad-free or patron. It unlocks nothing by itself: the publisher decides what it changes, such as dropping ads.',
     };
     var explainer = '<div class="rounded-2xl border border-zinc-900/5 p-4 text-xs text-zinc-600 leading-relaxed">' + explTexts[e.type]
       + (e.source === "institution" || e.source === "group" ? ' <code>group_id</code> names the paying group; its value here is a placeholder.' : "")
@@ -287,7 +287,7 @@
       html += '<div class="hidden sm:grid grid-cols-[170px_1fr_72px_96px_110px_100px_90px] gap-2 px-5 py-3 items-center">';
       html += '<div class="flex items-center gap-2">';
       html += '<span class="w-1.5 h-1.5 rounded-full shrink-0" aria-hidden="true" style="background:' + (isActive ? c.fg : "#a1a1aa") + '"></span>';
-      html += '<span class="text-sm font-medium" style="color:' + (isActive ? c.fg : "#3f3f46") + '">' + esc(p.name) + "</span></div>";
+      html += '<span class="text-sm font-medium" style="color:' + (isActive ? c.text : "#3f3f46") + '">' + esc(p.name) + "</span></div>";
       html += '<span class="text-xs text-zinc-600 truncate">' + esc(p.desc) + "</span>";
       html += '<span class="text-xs font-medium rounded-full px-2 py-0.5 justify-self-start" style="background:' + c.bg + ";color:" + c.text + '">' + esc(p.e.type) + "</span>";
       html += '<span class="text-xs text-zinc-600 font-[family-name:var(--font-mono)]">' + esc(p.e.coverage) + "</span>";
@@ -299,7 +299,7 @@
       html += '<div class="sm:hidden px-5 py-3">';
       html += '<div class="flex items-center gap-2 mb-1">';
       html += '<span class="w-1.5 h-1.5 rounded-full shrink-0" aria-hidden="true" style="background:' + (isActive ? c.fg : "#a1a1aa") + '"></span>';
-      html += '<span class="text-sm font-medium" style="color:' + (isActive ? c.fg : "#3f3f46") + '">' + esc(p.name) + "</span>";
+      html += '<span class="text-sm font-medium" style="color:' + (isActive ? c.text : "#3f3f46") + '">' + esc(p.name) + "</span>";
       html += '<span class="text-xs font-medium rounded-full px-2 py-0.5 ml-auto" style="background:' + c.bg + ";color:" + c.text + '">' + esc(p.e.type) + "</span>";
       html += "</div>";
       html += '<div class="text-xs text-zinc-600 ml-3.5">' + esc(p.desc) + "</div>";
