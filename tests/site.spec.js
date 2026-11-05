@@ -89,6 +89,47 @@ test.describe("OPE Landing Page", () => {
   });
 });
 
+test.describe("Entitlement Builder", () => {
+  const output = (page) => page.getByRole("region", { name: "Entitlement claim JSON" }).locator("pre");
+
+  test("offers the 14 named aliases and v0.2 types", async ({ page }) => {
+    await page.goto("/ope/");
+    const builder = page.locator("#entitlement-builder");
+    await builder.getByRole("tab", { name: "All 14 Presets" }).click();
+    await expect(builder.getByRole("button", { name: /^Load .* preset$/ })).toHaveCount(14);
+    await builder.getByRole("tab", { name: "Builder" }).click();
+    for (const t of ["access", "limit", "status"]) {
+      await expect(builder.getByRole("button", { name: t, exact: true })).toBeVisible();
+    }
+    await expect(builder).not.toContainText("signal");
+  });
+
+  test("emits an entitlement claim with coverage", async ({ page }) => {
+    await page.goto("/ope/");
+    const json = JSON.parse(await output(page).innerText());
+    expect(json).toEqual({
+      entitlement: { type: "access", coverage: "collection", duration: "recurring", source: "direct" },
+    });
+  });
+
+  test("rentals carry a rental_expires_at timestamp", async ({ page }) => {
+    await page.goto("/ope/");
+    await page.locator("#entitlement-builder").getByRole("button", { name: "Rental", exact: true }).click();
+    const { entitlement } = JSON.parse(await output(page).innerText());
+    expect(entitlement.duration).toBe("rental");
+    const now = Math.floor(Date.now() / 1000);
+    expect(entitlement.rental_expires_at).toBeGreaterThan(now + 71 * 3600);
+    expect(entitlement.rental_expires_at).toBeLessThan(now + 73 * 3600);
+  });
+
+  test("metered limits use an ISO 8601 period", async ({ page }) => {
+    await page.goto("/ope/");
+    await page.locator("#entitlement-builder").getByRole("button", { name: "Metered", exact: true }).click();
+    const { entitlement } = JSON.parse(await output(page).innerText());
+    expect(entitlement).toMatchObject({ type: "limit", kind: "metered", quota: 5, period: "P1M" });
+  });
+});
+
 test.describe("Namespaces", () => {
   test("ns/0.2 documents the v0.2 elements", async ({ page }) => {
     await page.goto("/ope/ns/0.2/");

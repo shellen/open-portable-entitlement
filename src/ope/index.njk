@@ -299,7 +299,8 @@ title: OPE
 </section>
 
 <!-- Entitlement Types -->
-<section class="py-20 border-t border-zinc-900/5" id="grants">
+<section class="py-20 border-t border-zinc-900/5" id="entitlements">
+  <span id="grants" aria-hidden="true"></span>{# keeps v0.1-era links to #grants working #}
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <div class="max-w-2xl mb-10">
       <h2 class="text-xs font-semibold text-zinc-900 mb-3">Flexible Access</h2>
@@ -338,10 +339,10 @@ title: OPE
       <h3 class="text-xs font-semibold text-zinc-900 mb-3">Entitlement Builder</h3>
       <p class="text-sm text-zinc-600">Pick a preset to see how a named entitlement breaks down into a type and fields, or build your own and copy the JSON.</p>
     </div>
-    <div id="grant-builder" aria-label="Entitlement builder widget" role="region"></div>
+    <div id="entitlement-builder" aria-label="Entitlement builder widget" role="region"></div>
   </div>
 </section>
-<script src="{{ '/js/grant-builder.js' | url }}"></script>
+<script src="{{ '/js/entitlement-builder.js' | url }}"></script>
 
 <!-- Compatibility -->
 <section class="py-20 border-t border-zinc-900/5">
