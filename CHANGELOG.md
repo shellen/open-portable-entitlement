@@ -13,6 +13,14 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Correction during the comment period — 2026-11-06
+
+- §11.4, §5.4, and Appendix B now match §7.1: a `401` or `402` challenge carries
+  `resource_metadata` for a URL with per-URL metadata and `ope_scope` otherwise. They had
+  required `resource_metadata` everywhere, which RFC 9728 §3.3 makes incompatible with
+  scope metadata. A URL with per-URL metadata must be challenged with `resource_metadata`
+  (§7.1).
+
 ### Revision 5 — 2026-10-27
 
 Review pass: fixes from two adversarial reviews and a cross-check against the RSL 1.0

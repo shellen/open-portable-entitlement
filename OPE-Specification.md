@@ -221,7 +221,7 @@ A request URL is not an identifier until it is normalized. Before matching a req
 When an Asset identifier is an `https` URL, a request to it SHOULD return one of:
 
 - the Asset, if the request carries a valid License Token or the Asset is free;
-- `401` or `402` with a `WWW-Authenticate` challenge carrying `resource_metadata` (RFC 9728 §5), pointing at the Asset's Protected Resource metadata;
+- `401` or `402` with a `WWW-Authenticate` challenge that leads to the Asset's Protected Resource metadata: `resource_metadata` (RFC 9728 §5.1) for per-URL metadata, or `ope_scope` for scope metadata (§7.1);
 - for Assets that are not documents, a `401` or `402` whose body is a short description of the Asset, with the same header.
 
 Resolving the identifier is how a Client discovers that an Asset is gated and where to obtain a token. No feed is required.
@@ -377,7 +377,7 @@ A License Server MUST NOT issue for a Client matched by `deny`, or for a Client 
 
 `authorization_servers` is the Publisher's half of the trust relationship between Publisher and License Server; the License Server's `protected_resources` (§7.2) is the other half (§13.1). A License Server MUST NOT issue for a resource whose Protected Resource metadata does not list its `issuer`, and a Resource Server MUST NOT accept tokens from an issuer its own metadata does not list.
 
-On `401` and `402`, the Resource Server MUST include a `WWW-Authenticate` challenge that leads a Client with no other context to the metadata: either `resource_metadata` set to the per-URL metadata URL (RFC 9728 §5), or `ope_scope` set to the scope whose metadata covers the requested URL, as in `WWW-Authenticate: DPoP ope_scope="https://lamplighter.example/issues/"`. A Client:
+On `401` and `402`, the Resource Server MUST include a `WWW-Authenticate` challenge that leads a Client with no other context to the metadata: either `resource_metadata` set to the per-URL metadata URL (RFC 9728 §5.1), or `ope_scope` set to the scope whose metadata covers the requested URL, as in `WWW-Authenticate: DPoP ope_scope="https://lamplighter.example/issues/"`. Where the requested URL has per-URL metadata, the challenge MUST use `resource_metadata`, because that document governs the URL (§5.6). `ope_scope` is for URLs covered only by scope metadata. `resource_metadata` cannot name scope metadata: RFC 9728 §3.3 requires a document found through `resource_metadata` to have the requested URL as its `resource`. Requiring `resource_metadata` everywhere would therefore require a per-URL document for every gated URL. A Client:
 
 - given `resource_metadata`, MUST use it, and MUST discard the document unless its `resource` is identical to the URL it requested (RFC 9728 §3.3);
 - given `ope_scope`, or a scope from a feed's channel-level `ope:offer`, MUST check that the scope has the same origin as the requested URL and that the normalized URL (§5.3) begins with it, MUST construct the metadata URL from the scope (RFC 9728 §3.1) rather than accept a document URL from elsewhere, and MUST discard the document unless its `resource` is identical to the scope;
@@ -665,7 +665,7 @@ A Client MAY inspect the token response it received to decide what to show the S
 | `403 Forbidden` | The token is valid but does not cover the Asset, its Entitlement does not permit serving, a `limit` is spent, or the Resource Server's own policy refuses | Do not retry with the same token. On `insufficient_scope`, authorize for this Asset. On `no_entitlement`, show the Offers. |
 | `503 Service Unavailable` | Introspection failed and local validation is not possible | Retry per `Retry-After` |
 
-`401` and `402` responses MUST include a `WWW-Authenticate` challenge for each scheme the Resource Server accepts (§11.1), each with `resource_metadata` (§7.1). A challenge carries `error` only when the request carried a token: a request with no credentials gets a challenge with no error code (RFC 6750 §3.1). A License Token presented under a scheme the Resource Server does not accept for it, such as `Bearer` (§14, downgrade), counts as no credentials. `403` responses SHOULD carry the same challenge with `error`. v0.1's `OPE-*` response headers are withdrawn.
+`401` and `402` responses MUST include a `WWW-Authenticate` challenge for each scheme the Resource Server accepts (§11.1), each leading to the metadata as §7.1 requires: `resource_metadata` for a URL with per-URL metadata, `ope_scope` otherwise. A challenge carries `error` only when the request carried a token: a request with no credentials gets a challenge with no error code (RFC 6750 §3.1). A License Token presented under a scheme the Resource Server does not accept for it, such as `Bearer` (§14, downgrade), counts as no credentials. `403` responses SHOULD carry the same challenge with `error`. v0.1's `OPE-*` response headers are withdrawn.
 
 Error codes:
 
@@ -1119,7 +1119,7 @@ A member buys the pro tier of *Inkwell*, a writing tool, and wants "pro export" 
 
 **License Server (minimum):** RFC 8414 metadata with `protected_resources` and the `ope` member; Authorization Code + PKCE; `/token` returning `license+jwt` and the `resource` response member; `/revoke`; `/introspect`; JWKS; Protected Resource metadata ingestion (§13.2); an Entitlement record (§17). Reuse an existing OAuth server and add the token claims and the OPE-specific behaviors: choosing the token's `resource` (§5.6), and the `publisher`, `terms`, and `entitlement` claims. *Effort estimates from v0.1 are withdrawn until the conformance kit exists to measure against.*
 
-**Resource Server (minimum):** Protected Resource metadata per gated URL with `ope.publisher` and `ope.offers` (and `ope.asset` for endpoints); §11.2 in a middleware; JWKS caching; a tolerance for local validation; `/introspect` fallback; `WWW-Authenticate` challenges with `resource_metadata` on 401/402.
+**Resource Server (minimum):** Protected Resource metadata covering each gated URL, per URL or per scope (§5.6), with `ope.publisher` and `ope.offers` (and `ope.asset` for endpoints); §11.2 in a middleware; JWKS caching; a tolerance for local validation; `/introspect` fallback; `WWW-Authenticate` challenges on 401/402 with `resource_metadata` or `ope_scope` (§7.1).
 
 **Client (minimum).** A Client that follows these steps meets the Client requirements of Part I:
 
@@ -1177,6 +1177,8 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 
 Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
 
+**Correction during the comment period (2026-11-06).** §11.4, §5.4, and Appendix B required `resource_metadata` in every `401` and `402` challenge, which contradicted §7.1's `ope_scope` and, under RFC 9728 §3.3, would have required per-URL metadata for every gated URL. They now follow §7.1. §7.1 adds one requirement: a URL with per-URL metadata is challenged with `resource_metadata`, not `ope_scope`. Appendix B's Resource Server minimum now allows scope metadata. No other behavior changes.
+
 **Revision 4 (2026-10-05) within v0.2.** Correctness pass. DPoP-bound tokens now use RFC 9449's `DPoP` scheme and `token_type`; revision 3's use of `License` for them conflicted with RFC 9449 (§8.5, §11.1, §14). Clients follow a `resource_metadata` URL when given and request the metadata's `resource` when metadata is published per scope (§5.6, §7.1); feeds may carry the metadata URL. Scopes may nest within a Publisher, longest prefix wins (§5.5; revision 3 forbade overlap and then gave an overlap rule). Durations in Offers and limit Entitlements are ISO 8601 (`P1M`, `PT72H`), removing the last numbers encoded in strings. Token response MAY carry `entitlement` for advisory display (§8.5, §9.5). `X-Entitlement-Remaining` renamed `Entitlement-Remaining` (RFC 6648). D13, D14 added.
 
 **Revision 3 (2026-10-05) within v0.2.** OPE no longer depends on any specification outside OAuth and its RFCs. Replaced RSL-based discovery and trust with RFC 9728 Protected Resource Metadata (§7.1, §13.1); replaced the borrowed terms vocabulary with a Terms reference by URL and digest (§6.1) and an Offer object (§6.2); renamed the `license` claim to `terms`; moved `client_policy` into Protected Resource metadata (closes D10); renamed `ope.publishers` to `resources_served`; reframed §1.1 and the Roadmap as alignment with RSL rather than convergence into it; §2.2 keeps RSL's role names and says so. Token format otherwise unchanged; Clients from revision 2 need only follow `resource_metadata` instead of `Link rel="license"`.
@@ -1201,7 +1203,7 @@ Known issue carried to revision 6: several gated Assets per feed item (an mp3 an
 | JSON Feed `extensions.ope` | `_ope` | JSON Feed conformance |
 | Atom/RSS `<ope:access>` with metadata children | `<ope:offer>` | Economy |
 | `Authorization: Bearer <grant_token>` | `Authorization: DPoP <token>` for bound tokens (RFC 9449); `Authorization: License <token>` otherwise | RFC 9449 conformance; `typ` marks the credential; `License` scheme shared with RSL |
-| `OPE-Content-Id`, `OPE-Access-Level`, `OPE-Unlock-URL`, `rel="ope-discovery"` | `WWW-Authenticate` challenges with `resource_metadata` (RFC 9728) | Reuse; unregistered headers withdrawn |
+| `OPE-Content-Id`, `OPE-Access-Level`, `OPE-Unlock-URL`, `rel="ope-discovery"` | `WWW-Authenticate` challenges with `resource_metadata` (RFC 9728) or `ope_scope` (§7.1) | Reuse; unregistered headers withdrawn |
 | Cookie name `ope_grant` as default | Site-defined | Product-adjacent constant removed |
 | §13 Multi-Publisher Session Management | Client conformance notes in §4 and Appendix B | Implementation guidance, not protocol |
 | §14 Entitlement Brokers: `broker_support`, allowlists, broker JWKS, broker authorization endpoint | §13: a broker is a License Server listed in the Publisher's Protected Resource metadata | `authorization_servers` already expresses this |
