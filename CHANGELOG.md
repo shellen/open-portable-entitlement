@@ -13,6 +13,13 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Clarification during the comment period — 2026-11-10
+
+- Informative only. §1.1 now says RSL governs what may be done with content and OPE
+  governs who may receive it, and that they meet in the Terms reference every License
+  Token carries (restoring a point from v0.1 §3.2). §3 lists Cloudflare Content Signals;
+  Appendix E adds IPTC RightsML, the IETF AI Preferences vocabulary, and Content Signals.
+
 ### Correction during the comment period — 2026-11-06
 
 - §11.4, §5.4, and Appendix B now match §7.1: a `401` or `402` challenge carries
