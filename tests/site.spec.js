@@ -238,3 +238,28 @@ test.describe("Spec Versions", () => {
     expect(await v02.text()).toContain("Draft Specification v0.2");
   });
 });
+
+test.describe("Demo walkthrough", () => {
+  test("shows both reading paths with their screenshots", async ({ page }) => {
+    const broken = [];
+    page.on("response", (r) => { if (r.url().includes("/ope/demo/img/") && r.status() !== 200) broken.push(r.url()); });
+    await page.goto("/ope/demo/");
+    await expect(page.locator("h1")).toContainText("Subscribe once");
+    await expect(page.locator("#on-blog")).toBeVisible();
+    await expect(page.locator("#in-app")).toBeVisible();
+    const images = page.locator("main img, img[src*='/ope/demo/img/']");
+    expect(await images.count()).toBe(9);
+    for (const img of await images.all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);
+    }
+    expect(broken).toEqual([]);
+  });
+
+  test("is linked from the OPE page and the v0.2 draft", async ({ page }) => {
+    await page.goto("/ope/");
+    await expect(page.locator("a[href$='/ope/demo/']").first()).toBeVisible();
+    await page.goto("/ope/spec/0.2/");
+    await expect(page.locator("a[href$='/ope/demo/']").first()).toBeVisible();
+  });
+});

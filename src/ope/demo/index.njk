@@ -1,0 +1,172 @@
+---
+layout: landing.njk
+title: OPE Demo — feedspec.org
+demo:
+  blog: https://ope-demo.jason-e0e.workers.dev
+  post: https://ope-demo.jason-e0e.workers.dev/posts/002-protocol-economics/
+  reader: https://ope-demo.jason-e0e.workers.dev/reader/
+  ls: https://ope-license-server.jason-e0e.workers.dev
+  atproto: https://ope-demo.jason-e0e.workers.dev/atproto/
+  repo: https://github.com/shellen/ope-eleventy-demo
+  captured: November 11, 2026
+blogSteps:
+  - img: a1-blog-preview
+    alt: "A subscriber-only post on the demo blog: the opening paragraph, a word count, and a 'Subscribe and read here' button."
+    title: A subscriber-only post
+    see: The post's opening, a word count, and a Subscribe and read here button. The full text isn't on the page.
+    why: The blog answers 402 Payment Required, with a pointer to the offers for this group of posts.
+  - img: a2-signin
+    alt: "The License Server's sign-in page, a separate site from the blog."
+    title: Sign in at the License Server
+    see: A sign-in page on the License Server, a separate site from the blog. In the demo, any name works.
+    why: The blog started a standard OAuth sign-in from its own server. The blog never sees a password.
+    narrow: true
+  - img: a3-consent-site
+    alt: "The consent screen: it says this is the publisher's own site, links the terms, and offers monthly and annual subscriptions."
+    title: Choose an offer
+    see: It names the publisher's own site, links the terms, and shows the blog's two offers. Choosing one is the demo's stand-in for checkout.
+    why: The License Server records the subscription and sends the blog a token covering every post in the subscription, valid for an hour.
+    narrow: true
+  - img: a4-blog-unlocked
+    alt: "Back on the blog, the same post in full, tagged 'Unlocked with OPE'."
+    title: Back on the blog, unlocked
+    see: The same post in full, tagged Unlocked with OPE. The other subscriber-only posts are unlocked too.
+    why: The blog checked the token and keeps it in a cookie on this browser, so every covered post opens. Stop reading on this browser forgets it.
+appSteps:
+  - img: b1-reader-locked
+    alt: "The reader app: a library of the blog's posts on the left, with locks on subscriber-only posts, and the selected post's preview and offers on the right."
+    title: Open the post in a reader app
+    see: A reader app with the blog's posts in a library, subscriber-only ones locked. The selected post shows its preview and the blog's offers.
+    why: The app reads the blog's ordinary feed, and learns where to get access the same way the blog's own page does.
+  - img: b2-consent-app
+    alt: "The License Server's consent screen for the reader app, saying 'You have: OPE Demo Blog, monthly', with Allow and Deny buttons."
+    title: Allow the app, no second subscription
+    see: The License Server already knows the subscription from the blog. It only asks whether to let this app use it, and warns that the app isn't reviewed.
+    why: One subscription, many apps. Each app gets its own token, tied to a key that never leaves the app.
+    narrow: true
+  - img: b3-reader-unlocked
+    alt: "The reader app after allowing: every subscriber-only post in the library now shows an open lock, and the full post is on the right."
+    title: Every covered post unlocks
+    see: All three subscriber-only posts flip to unlocked in the library, and the post opens in full.
+    why: The token covers the whole subscription, so the app reads any post in it without asking again.
+  - img: b4-reader-hood
+    alt: "The reader app's 'Under the hood' panel, listing each request, including two copied-token attempts refused with 401."
+    title: A copied token is useless
+    see: The Under the hood panel lists every request in plain language. Its copied-token test is refused twice.
+    why: Each request carries a fresh proof signed by the app's key (DPoP). A token copied from logs or a screenshot fails that check.
+---
+{# ABOUTME: The OPE demo walkthrough: screenshots of the live v0.2 demo, subscribing on the blog and in a reader app. #}
+{# ABOUTME: Links to the live demo sites and the demo's source; the specification remains authoritative. #}
+
+{% macro step(s, n) %}
+<li class="grid gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start rounded-2xl bg-white p-6 ring-1 ring-zinc-900/5">
+  <div class="min-w-0">
+    <div class="flex items-center gap-3">
+      <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-zinc-900 text-xs font-semibold text-white font-[family-name:var(--font-mono)]">{{ n }}</span>
+      <h3 class="text-base font-semibold text-zinc-900">{{ s.title }}</h3>
+    </div>
+    <p class="mt-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see</p>
+    <p class="mt-1 text-sm leading-6 text-zinc-700">{{ s.see }}</p>
+    <p class="mt-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">What just happened</p>
+    <p class="mt-1 text-sm leading-6 text-zinc-700">{{ s.why }}</p>
+  </div>
+  <figure class="m-0 min-w-0">
+    <img src="{{ ('/ope/demo/img/' + s.img + '.webp') | url }}" alt="{{ s.alt }}" loading="lazy" decoding="async"
+      class="block w-full rounded-xl ring-1 ring-zinc-900/10 bg-white {% if s.narrow %}max-w-sm mx-auto{% endif %}">
+  </figure>
+</li>
+{% endmacro %}
+
+<section class="py-20 sm:py-28">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-400/20">Live demo · OPE v0.2, proposed</span>
+    <h1 class="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 text-balance">Subscribe once, read on the site or in any app</h1>
+    <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-600">A reader subscribes to a blog at its <strong class="font-semibold text-zinc-900">License Server</strong>, then reads subscriber-only posts on the blog itself and in a separate reader app, with no second subscription. The blog never handles a password or a payment. Every screenshot below is from the live demo, which implements the <a href="{{ '/ope/spec/0.2/' | url }}" class="text-emerald-700 underline">v0.2 draft</a>.</p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="{{ demo.post }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Try it on the blog</a>
+      <a href="{{ demo.reader }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">Open the reader app</a>
+      <a href="{{ demo.repo }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">Source on GitHub</a>
+    </div>
+
+    <div class="mt-14 grid gap-4 sm:grid-cols-3">
+      <div class="rounded-2xl bg-white p-5 ring-1 ring-zinc-900/5">
+        <p class="text-sm font-semibold text-zinc-900">The blog</p>
+        <p class="mt-1 text-sm leading-6 text-zinc-600">The publisher. It serves posts, and checks a token before showing a subscriber-only one. A static Eleventy site with a small function in front.</p>
+      </div>
+      <div class="rounded-2xl bg-white p-5 ring-1 ring-zinc-900/5">
+        <p class="text-sm font-semibold text-zinc-900">The License Server</p>
+        <p class="mt-1 text-sm leading-6 text-zinc-600">Signs readers in, keeps their subscriptions, and issues short-lived tokens. Usually run by someone else, the way a payment provider is.</p>
+      </div>
+      <div class="rounded-2xl bg-white p-5 ring-1 ring-zinc-900/5">
+        <p class="text-sm font-semibold text-zinc-900">A reader app</p>
+        <p class="mt-1 text-sm leading-6 text-zinc-600">Any app the reader chooses. It gets its own token from the License Server and presents it to the blog.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pb-20" aria-labelledby="on-blog">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <h2 id="on-blog" class="text-2xl font-semibold tracking-tight text-zinc-900">On the blog itself</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">The site unlocks its own posts in the browser (the draft's Web profile).</p>
+    <ol class="mt-8 grid gap-6 list-none p-0">
+      {% for s in blogSteps %}{{ step(s, loop.index) }}{% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="pb-20" aria-labelledby="in-app">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <h2 id="in-app" class="text-2xl font-semibold tracking-tight text-zinc-900">The same subscription, in a reader app</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">Continuing in the same browser, after subscribing on the blog.</p>
+    <ol class="mt-8 grid gap-6 list-none p-0">
+      {% for s in appSteps %}{{ step(s, loop.index + blogSteps.length) }}{% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="pb-20" aria-labelledby="account">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8 grid gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start">
+    <div class="min-w-0">
+      <h2 id="account" class="text-2xl font-semibold tracking-tight text-zinc-900">One account, every app</h2>
+      <p class="mt-3 text-sm leading-6 text-zinc-600">At the License Server, the reader sees one subscription and every app connected to it: here, the blog itself and the reader app. Cancelling the subscription locks the posts everywhere on the next request. Disconnecting an app ends only that app's access.</p>
+    </div>
+    <figure class="m-0 min-w-0">
+      <img src="{{ '/ope/demo/img/c1-account.webp' | url }}" alt="The reader's account at the License Server: one active monthly subscription, and two connected apps, the publisher's site and OPE Reader, each with a Disconnect button." loading="lazy" decoding="async" class="block w-full max-w-sm mx-auto rounded-xl ring-1 ring-zinc-900/10 bg-white">
+    </figure>
+  </div>
+</section>
+
+<section class="pb-20" aria-labelledby="atproto">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <div class="rounded-2xl bg-white p-6 sm:p-8 ring-1 ring-zinc-900/5">
+      <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-900/10">Prototype</span>
+      <h2 id="atproto" class="mt-4 text-xl font-semibold tracking-tight text-zinc-900">Subscriber-only posts on atproto</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">atproto spaces, now in alpha, let a space hand each "may this account read?" decision to an outside service. The demo's License Server can be that service, answering from the same subscription. See the <a href="{{ '/ope/spec/0.2/' | url }}#e-atproto-profile-deferred" class="text-emerald-700 underline">Profile E notes</a> and <a href="{{ demo.atproto }}" class="text-emerald-700 underline">the demo's atproto page</a>.</p>
+      <div class="mt-6 grid gap-6 sm:grid-cols-2">
+        <div>
+          <p class="text-sm font-semibold text-zinc-900">Works</p>
+          <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
+            <li>Passes against Bluesky's own spaces-alpha server, run locally. A space credential is issued only while the reader is subscribed.</li>
+            <li>Checks that each request is signed by the space's owner.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-zinc-900">Not yet</p>
+          <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
+            <li>A hosted space (the alpha is invite-only).</li>
+            <li>Verified account linking, and an app reading the space's posts.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pb-24" aria-labelledby="run">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <h2 id="run" class="text-2xl font-semibold tracking-tight text-zinc-900">Run it yourself</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">The <a href="{{ demo.repo }}" class="text-emerald-700 underline">demo's source</a> runs locally with one command (<code>./run-demo.sh</code>), and puts both servers on a Cloudflare account with another (<code>./deploy-cloudflare.sh</code>). Adding OPE to your own Eleventy site takes four steps with <code>eleventy-plugin-ope</code>. You don't run a License Server yourself.</p>
+    <p class="mt-6 text-xs text-zinc-500">Screenshots captured {{ demo.captured }} from the live demo. The demo implements a proposed draft, which may change in response to <a href="{{ spec.commentsUrl }}" class="underline">comments</a>.</p>
+  </div>
+</section>

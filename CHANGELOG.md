@@ -13,6 +13,13 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Clarification during the comment period — 2026-11-11 (demo)
+
+- Informative only. Appendix B's reference-implementation note now says the Eleventy demo
+  implements this draft and runs live, with a walkthrough at
+  <https://feedspec.org/ope/demo/>. Site-only: the walkthrough page itself, and links to it
+  from the OPE landing page and the v0.2 notice.
+
 ### Clarification during the comment period — 2026-11-11
 
 - Informative only. Profile E's notes follow the current atproto spaces proposal: the
