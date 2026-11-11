@@ -13,6 +13,14 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Clarification during the comment period — 2026-11-11
+
+- Informative only. Profile E's notes follow the current atproto spaces proposal: the
+  Publisher is the space authority, and the License Server is the space's `managedspace`
+  managing app, answering `checkUserAccess` from the Entitlement record. Corrects
+  revision 5's guessed mapping, confirms HTTP Message Signatures for space credentials,
+  and lists open questions (account linking, DID privacy, client policy).
+
 ### Clarification during the comment period — 2026-11-10
 
 - Informative only. §1.1 now says RSL governs what may be done with content and OPE

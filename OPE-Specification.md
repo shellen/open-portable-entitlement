@@ -1061,16 +1061,21 @@ Applies when a Client acts for a Subject under delegated, narrowed rights (S3). 
 
 ## E. ATProto Profile (Deferred)
 
-v0.1 §15 described integration with what ATProto then called permission spaces, and defined three lexicons under `org.feedspec.ope.*`. That work is now called **atproto spaces**. It entered public alpha on 2026-08-20 with a reference PDS, community PDS implementations, and alpha SDKs. Bluesky has said the alpha will see breaking changes, should not be used in production, and is targeted for launch later in 2026. As of this revision, credential format, repo serialization, commit signatures, DID document semantics, and the space URI syntax are all still changing.
+v0.1 §15 described integration with what ATProto then called permission spaces, and defined three lexicons under `org.feedspec.ope.*`. That work is now called **atproto spaces** (permissioned data, proposal 0016). It entered public alpha on 2026-08-20 with a reference PDS, community PDS implementations, and alpha SDKs. As of November 2026 Bluesky still ships breaking changes weekly and expects the launch "over the next several weeks" (atproto blog, 2026-11-06). The alpha should not be used in production.
 
 v0.2 defers the profile until atproto spaces reaches a stable release. The v0.1 text is preserved in `profiles/atproto/v0.1-draft.md` for reference and is not normative; it predates the current design and should not be implemented.
 
 Notes for the future profile (informative):
 
-- Atproto spaces names subscription-only publishing as an intended use, so the overlap with OPE is direct.
-- The likely mapping is: space authority to License Server, space membership to Entitlement, space credential to License Token. Whether OPE should wrap space credentials, issue alongside them, or simply describe how an OPE Resource Server admits space members is the main design question.
-- The atproto spaces proposal moved space credentials from DPoP to HTTP Message Signatures in a revision of 2026-10-01; whether a released alpha has shipped the change is not confirmed here. OPE uses DPoP (§8.2, §11.1). The profile will need to bridge the two or explain why it does not need to.
-- The `org.feedspec.ope.*` namespace was self-assigned and will be reconsidered when the profile is written.
+- **The fit is direct.** Proposal 0016 lists "Gated content: paid newsletters, subscriber-only posts" among its uses. Its `managedspace` policy "defers each user access decision to an external managing app", naming paid subscriptions as an example, so no materialized member list is needed.
+- **Likely design: the License Server is the space's managing app.** The Publisher is the space authority: its DID, with a space type of its choosing, and its members' records held in their own repos. The License Server serves `checkUserAccess` for that space and answers each read or write check for a user DID from the Subject's Entitlement record (§17). Space credentials stay atproto's own: issued by the space host, valid 10 minutes by default and 60 at most, key-bound with HTTP Message Signatures (RFC 9421), and revocable early by `jti`. No License Token appears on this path. OPE contributes the entitlement decision and its lifecycle: when an Entitlement ends, the License Server answers no from then on, and outstanding credentials lapse within their lifetime, inside the hour §12 allows.
+- **Earlier note corrected.** Revision 5 guessed "space authority to License Server". The space authority is the Publisher; the License Server decides access for it. The question of wrapping space credentials or issuing alongside them falls away. The move from DPoP to HTTP Message Signatures, noted as unconfirmed in revision 5, is in the current proposal text.
+- **Open questions:**
+  - *Linking accounts.* The License Server must know a Subject's DID: for example, the Subject signs in with their atproto account (atproto OAuth) and the License Server records the link.
+  - *Privacy.* Atproto DIDs are public and global, so on this path the Publisher learns which DID reads its space. Pairwise `sub` (§8.3) doesn't hold here, and the profile must say so to the Subject at consent.
+  - *Client policy.* For reads, `checkUserAccess` receives the app's attested `client_id`, if presented; the profile should map `ope.client_policy` (§7.1) onto it.
+  - *Confidentiality.* Space records are access-controlled, not encrypted at rest.
+  - *Namespace.* The `org.feedspec.ope.*` namespace was self-assigned and will be reconsidered when the profile is written.
 
 Two v0.2 core decisions were made with ATProto in mind: Asset identifiers are defined as URIs, so a future profile can admit non-`https` ones once metadata exists for them (§5.2 requires `https` today), and `sub` is issuer-scoped rather than a DID, so a future profile can map either way.
 
@@ -1179,6 +1184,8 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 - *Scope metadata (editor decision of 2026-11-05).* Besides per-URL metadata, a Publisher may publish one RFC 9728 document for a whole scope, found from a feed's channel-level Offer or the new `ope_scope` challenge parameter, on the Asset's own origin. Clients parse metadata as JSON whatever its `Content-Type`, so static hosts work (§5.6, §7.1, §13.2, Profile A).
 
 Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
+
+**Clarification during the comment period (2026-11-11).** Informative only. Profile E's notes now reflect the atproto spaces proposal as of November 2026: the License Server as a `managedspace` managing app answering `checkUserAccess`, with the Publisher as space authority. This corrects revision 5's guessed mapping, confirms the move to HTTP Message Signatures, and lists open questions (account linking, DID privacy, client policy). No requirement changes.
 
 **Clarification during the comment period (2026-11-10).** Informative only. §1.1 says how RSL and OPE divide the work (terms of use versus access) and where they meet (the Terms reference in every token), restoring a point from v0.1 §3.2 in v0.2's terms. §3 lists Cloudflare Content Signals, and Appendix E adds the references §3 names. No requirement changes.
 
