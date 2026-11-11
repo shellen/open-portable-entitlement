@@ -34,6 +34,7 @@ test.describe("Accessibility", () => {
     ["proposed v0.2 spec", "/ope/spec/0.2/"],
     ["v0.2 namespace page", "/ope/ns/0.2/"],
     ["withdrawn v0.1 namespace page", "/ope/ns/1.0/"],
+    ["demo walkthrough", "/ope/demo/"],
   ]) {
     test(`${name} has no a11y violations`, async ({ page }) => {
       await page.goto(url);

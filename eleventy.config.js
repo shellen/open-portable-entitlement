@@ -24,6 +24,7 @@ export default function (eleventyConfig) {
   // Pass through static files
   eleventyConfig.addPassthroughCopy("src/js");
   eleventyConfig.addPassthroughCopy("src/CNAME");
+  eleventyConfig.addPassthroughCopy("src/ope/demo/img");
 
   return {
     pathPrefix: "/",

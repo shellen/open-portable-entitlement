@@ -1142,7 +1142,7 @@ A member buys the pro tier of *Inkwell*, a writing tool, and wants "pro export" 
 9. **Handle refusals.** On `401` with `invalid_token`, refresh once, then re-authorize. On `403` with `insufficient_scope`, authorize for this Asset. On `403` with `no_entitlement`, show the Offers; do not re-authorize. On `403` with `quota_exceeded`, tell the Subject; do not retry. On `503`, retry per `Retry-After`.
 10. **Refresh** before `exp`, sending the same `resource` the token was requested with (or, for a bundle, the Asset needed), and keep tokens in platform-private storage (§14).
 
-**Reference implementations.** Eleventy demo (<https://github.com/shellen/ope-eleventy-demo>) targets v0.1 and will be updated. The reference gateway remains planned. Neither is a substitute for the conformance kit in §16.
+**Reference implementations.** The Eleventy demo (<https://github.com/shellen/ope-eleventy-demo>) implements this draft: a Publisher with the Feeds and Web profiles, a License Server, and a reader app. It runs live, with a walkthrough at <https://feedspec.org/ope/demo/>. A production-grade License Server remains planned. Neither is a substitute for the conformance kit in §16.
 
 ## Appendix C: Changes from v0.1
 
@@ -1184,6 +1184,8 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 - *Scope metadata (editor decision of 2026-11-05).* Besides per-URL metadata, a Publisher may publish one RFC 9728 document for a whole scope, found from a feed's channel-level Offer or the new `ope_scope` challenge parameter, on the Asset's own origin. Clients parse metadata as JSON whatever its `Content-Type`, so static hosts work (§5.6, §7.1, §13.2, Profile A).
 
 Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
+
+**Clarification during the comment period (2026-11-11, demo).** Informative only. Appendix B's reference-implementation note said the Eleventy demo targeted v0.1. It now implements this draft and runs live, with a walkthrough at feedspec.org/ope/demo/. No requirement changes.
 
 **Clarification during the comment period (2026-11-11).** Informative only. Profile E's notes now reflect the atproto spaces proposal as of November 2026: the License Server as a `managedspace` managing app answering `checkUserAccess`, with the Publisher as space authority. This corrects revision 5's guessed mapping, confirms the move to HTTP Message Signatures, and lists open questions (account linking, DID privacy, client policy). No requirement changes.
 
