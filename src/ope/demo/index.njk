@@ -147,15 +147,16 @@ appSteps:
         <div>
           <p class="text-sm font-semibold text-zinc-900">Works</p>
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
-            <li>Passes against Bluesky's own spaces-alpha server, run locally. A space credential is issued only while the reader is subscribed.</li>
-            <li>Checks that each request is signed by the space's owner.</li>
+            <li>The whole path, against Bluesky's own spaces-alpha server run locally. A reader signs in with their atproto account to link it. The space asks the License Server before issuing a credential. An app reads the posts with that credential.</li>
+            <li>Credentials go only to linked readers with an active subscription. Each request must be signed by the space's owner.</li>
           </ul>
         </div>
         <div>
           <p class="text-sm font-semibold text-zinc-900">Not yet</p>
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
             <li>A hosted space (the alpha is invite-only).</li>
-            <li>Verified account linking, and an app reading the space's posts.</li>
+            <li>Spaces in the demo's reader app.</li>
+            <li>Cutting off a credential already issued: after a cancellation, it lasts until it expires (10 minutes).</li>
           </ul>
         </div>
       </div>

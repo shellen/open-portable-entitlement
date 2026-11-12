@@ -13,6 +13,23 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Update during the comment period — 2026-11-12
+
+- Informative only. Updates known out-of-date information in Profile E's notes, first noted
+  in the comment issue (<https://github.com/shellen/open-portable-entitlement/issues/23#issuecomment-6814252569>):
+  - The access check is now `checkAccess` (`space`, an optional `repo`, an optional
+    `clientId` → `{read, write}`). The published alpha's `checkUserAccess` is noted.
+  - The service auth audience is the full `did#serviceId`. A space host denies access
+    when the managing app is unreachable.
+  - Only the space authority can revoke a credential early. When an Entitlement ends,
+    no new credentials are issued, and issued ones lapse within their lifetime.
+  - The policy can be published in the space.
+  - Account linking is described as the reference implementation does it: atproto
+    OAuth, identity only, with a check of the authorization server.
+  - The notes record what the reference implementation has tested.
+
+  No requirement changes. Profile E stays deferred.
+
 ### Clarification during the comment period — 2026-11-11 (demo)
 
 - Informative only. Appendix B's reference-implementation note now says the Eleventy demo
