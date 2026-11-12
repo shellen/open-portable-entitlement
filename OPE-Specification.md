@@ -1094,7 +1094,7 @@ Notes for the future profile (informative):
   3. The space host consults the License Server before issuing a credential.
   4. An app reads the posts with that credential.
 
-  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. It has not run against a hosted space, because the alpha's hosted server is invite-only.
+  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. Account linking also works on the hosted demo with a real Bluesky account (2026-11-12). It has not run against a hosted space, because the alpha's hosted server is invite-only.
 
 Two v0.2 core decisions were made with ATProto in mind: Asset identifiers are defined as URIs, so a future profile can admit non-`https` ones once metadata exists for them (§5.2 requires `https` today), and `sub` is issuer-scoped rather than a DID, so a future profile can map either way.
 
