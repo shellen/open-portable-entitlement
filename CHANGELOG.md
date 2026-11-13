@@ -25,6 +25,8 @@ v0.1 should start with Appendix C, which maps every v0.1 construct to its replac
     for the space's Asset, per user.
   - The privacy and client policy notes are revised to match. The client attestation is
     the source of `clientId`.
+  - The implementation status notes that the reference implementation now includes a
+    multi-user app doing that per-user check.
 
   No requirement changes. Profile E stays deferred.
 

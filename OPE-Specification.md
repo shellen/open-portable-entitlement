@@ -1096,7 +1096,7 @@ Notes for the future profile (informative):
   3. The space host consults the License Server before issuing a credential.
   4. An app reads the posts with that credential.
 
-  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. These tests run against the 2026-11-12 alpha. Account linking also works on the hosted demo with a real Bluesky account (2026-11-12). The demo doesn't yet show a multi-user app checking each user's entitlement. It has not run against a hosted space, because the alpha's hosted server is invite-only.
+  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. These tests run against the 2026-11-12 alpha. Account linking also works on the hosted demo with a real Bluesky account (2026-11-12). The demo also includes a multi-user app that follows the recommendation above. It syncs a managed space once, using one Subject's session, and then shows its posts only to users it holds a License Token for, re-checking by refresh. Against the same alpha PDS, a user of that app with no Entitlement stays locked out even though the app holds the posts. A Subject who subscribes from the app sees them without linking an atproto account. An ended Entitlement locks that Subject's view at the next refresh. It has not run against a hosted space, because the alpha's hosted server is invite-only.
 
 Two v0.2 core decisions were made with ATProto in mind: Asset identifiers are defined as URIs, so a future profile can admit non-`https` ones once metadata exists for them (§5.2 requires `https` today), and `sub` is issuer-scoped rather than a DID, so a future profile can map either way.
 
@@ -1210,7 +1210,8 @@ Known issue carried to revision 6: several gated Assets per feed item (an mp3 an
 - the alpha now uses `checkAccess`, as the notes already described;
 - getting a credential is `authorizeSpaceSync`;
 - a new note says a space credential admits an app, not each reader, so a multi-user app must check each user's entitlement itself. It recommends an OPE License Token for the space's Asset for that check;
-- the privacy and client policy notes are revised to match, with the client attestation as the source of `clientId`.
+- the privacy and client policy notes are revised to match, with the client attestation as the source of `clientId`;
+- the implementation status notes that the reference implementation now includes a multi-user app doing that per-user check.
 
 No requirement changes; Profile E stays deferred.
 
