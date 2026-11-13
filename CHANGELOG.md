@@ -13,6 +13,21 @@ restructuring release: a §0–§18 core built on OAuth 2.0 and its RFCs, five
 profiles (Feeds, Web, API and Feature, Agents, ATProto), and appendices. Implementers of
 v0.1 should start with Appendix C, which maps every v0.1 construct to its replacement.
 
+### Update during the comment period — 2026-11-13
+
+- Informative only. Profile E follows the atproto spaces proposal and the alpha both revised
+  on 2026-11-12, first noted in the comment issue
+  (<https://github.com/shellen/open-portable-entitlement/issues/23#issuecomment-6839596851>):
+  - The alpha now uses `checkAccess`, as the notes already described. Getting a
+    credential is `authorizeSpaceSync`.
+  - New note: a space credential admits an app, not each reader. A multi-user app must
+    check each user's entitlement itself, and OPE can supply that check: a License Token
+    for the space's Asset, per user.
+  - The privacy and client policy notes are revised to match. The client attestation is
+    the source of `clientId`.
+
+  No requirement changes. Profile E stays deferred.
+
 ### Update during the comment period — 2026-11-12
 
 - Informative only. Updates known out-of-date information in Profile E's notes, first noted

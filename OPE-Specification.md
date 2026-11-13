@@ -1061,40 +1061,42 @@ Applies when a Client acts for a Subject under delegated, narrowed rights (S3). 
 
 ## E. ATProto Profile (Deferred)
 
-v0.1 §15 described integration with what ATProto then called permission spaces, and defined three lexicons under `org.feedspec.ope.*`. That work is now called **atproto spaces** (permissioned data, proposal 0016). It entered public alpha on 2026-08-20 with a reference PDS, community PDS implementations, and alpha SDKs. As of November 2026 Bluesky still ships breaking changes weekly and expects the launch "over the next several weeks" (atproto blog, 2026-11-06). The alpha should not be used in production. These notes follow Bluesky's integration branch as of 2026-11-11; the most recent published alpha (2026-11-05) differs where noted.
+v0.1 §15 described integration with what ATProto then called permission spaces, and defined three lexicons under `org.feedspec.ope.*`. That work is now called **atproto spaces** (permissioned data, proposal 0016). It entered public alpha on 2026-08-20 with a reference PDS, community PDS implementations, and alpha SDKs. As of November 2026 Bluesky still ships breaking changes weekly and expects the launch "over the next several weeks" (atproto blog, 2026-11-06). The alpha should not be used in production. These notes follow the proposal text and the alpha both revised on 2026-11-12.
 
 v0.2 defers the profile until atproto spaces reaches a stable release. The v0.1 text is preserved in `profiles/atproto/v0.1-draft.md` for reference and is not normative; it predates the current design and should not be implemented.
 
 Notes for the future profile (informative):
 
 - **The fit is direct.** Proposal 0016 lists "Gated content: paid newsletters, subscriber-only posts" among its uses. Its `managedspace` policy "defers each user access decision to an external managing app", naming paid subscriptions as an example, so no materialized member list is needed.
-- **Design: the License Server is the space's managing app.** The Publisher is the space authority: the space is anchored on its DID, with a space type of its choosing, and members' records stay in their own repos. The space's `com.atproto.managedspace.policy` names the License Server in `managingApp`, as a `did#serviceId` reference: for example the License Server's `did:web` with a service whose endpoint is its issuer. For each access decision, the space host calls the License Server's `com.atproto.managedspace.checkAccess`:
-  - **Request.** `space`; the reader's DID as `repo`; and the app's attested OAuth `clientId`, if any. `repo` is absent for an anonymous read, and `clientId` is absent for writes.
+- **Design: the License Server is the space's managing app.** The Publisher is the space authority: the space is anchored on its DID, with a space type of its choosing, and members' records stay in their own repos. The space's `com.atproto.managedspace.policy` names the License Server in `managingApp`, as a `did#serviceId` reference: for example the License Server's `did:web` with a service whose endpoint is its issuer. When an app asks the space host for a space credential (`com.atproto.space.authorizeSpaceSync`), the space host calls the License Server's `com.atproto.managedspace.checkAccess`:
+  - **Request.** `space`; as `repo`, the DID of the user the app acts for, taken from a delegation token minted by that user's PDS; and the app's `clientId`, if the app presented a client attestation. `repo` is absent for a request with no delegation token, and `clientId` is absent for checks prompted by writes.
   - **Authentication.** atproto service auth: a JWT signed by the space authority, with `aud` set to the full `did#serviceId` and `lxm` set to the method. The License Server should check that the issuer is the authority named in `space`.
   - **Response.** `{read, write}`. `read` is true when the DID is linked to a Subject whose Entitlement record (§17) covers the Asset the space stands for. `write` is false for subscribers; the space authority is always authorized by the host. An anonymous read gets no access.
   - **Failure.** If the License Server can't be reached, the space host denies access.
 - **Which Asset a space stands for.** The License Server must know which OPE `resource` (typically a scope, §5.5) each space it manages corresponds to. The reference implementation takes this from deployment configuration. Open: whether Protected Resource metadata should list the space, or whether the space's policy, which the host can now publish as a record in the space (`publishPolicy`), should point to OPE metadata. This ties to D4.
 - **Credentials and revocation.** Space credentials stay atproto's own: issued by the space host, valid 10 minutes by default and 60 at most, and bound to the app's key with HTTP Message Signatures (RFC 9421). No License Token appears on this path. OPE contributes the entitlement decision and its lifecycle. Only the space authority can revoke a credential before it expires (`com.atproto.space.notifyCredentialsRevoked`); the managing app can't. So when an Entitlement ends, the License Server answers no from then on, and credentials already issued lapse within their lifetime, inside the hour §12 allows. A future profile could ask atproto for a way for the managing app to request early revocation.
+- **The credential admits an app; each reader is the app's to check.** A space credential lets an *application* sync the space. In the proposal's words, it "does not tell it which of its users should see that space". An app serving several users may obtain its credential with any one user's session. Deciding which of its users see the content is the app's job, enforced in the views it serves. So `checkAccess` decides which apps may sync a paid space, on behalf of an entitled Subject. It does not keep content from the app's other users. A multi-user app needs a per-user entitlement check of its own, and OPE already supplies one: the app obtains a License Token for the space's Asset for each user, through the ordinary flow (§8), and shows a user the space's content only while that user holds one. The future profile should recommend this. A single-user app (a client that syncs only for its own user) needs no extra step, because its credential was authorized for that user.
 - **Linking accounts.** The License Server must know a Subject's DID, and should require proof of control rather than accept a typed handle. The reference implementation does this with atproto OAuth:
   1. The License Server acts as an atproto OAuth client with scope `atproto`, which is identity only.
   2. It resolves the handle to a DID and a PDS, and runs a pushed authorization request with PKCE and DPoP at the PDS's authorization server.
   3. It keeps the token response's `sub` and discards the tokens.
   4. It checks that the authorization server that signed the Subject in is the one the DID's own PDS names. Without that check, any authorization server could claim any DID.
 - **Open questions:**
-  - *Privacy.* Atproto DIDs are public and global, so on this path the Publisher learns which DID reads its space. Pairwise `sub` (§8.3) doesn't hold here, and the profile must say so to the Subject, at consent or when they link the account.
-  - *Client policy.* For reads, `checkAccess` receives the app's attested `clientId`, if presented; the profile should map `ope.client_policy` (§7.1) onto it.
+  - *Privacy.* Atproto DIDs are public and global, so on this path the Publisher learns the DID of each Subject on whose behalf an app authorizes a sync. That is not necessarily every reader, since one Subject's authorization can admit an app that serves many. Pairwise `sub` (§8.3) doesn't hold for those DIDs, and the profile must say so to the Subject, at consent or when they link the account.
+  - *Client policy.* For reads, `checkAccess` receives the app's `clientId` when the app presented a client attestation: a short-lived JWT the app signs, shaped like a `private_key_jwt` client assertion, addressed to the space host, and verified against the JWKS in the app's client metadata. The profile should map `ope.client_policy` (§7.1) onto it, and say whether a License Server may require an attestation.
   - *Confidentiality.* Space records are access-controlled, not encrypted at rest.
   - *Namespace.* The `org.feedspec.ope.*` namespace was self-assigned and will be reconsidered when the profile is written.
 - **Earlier notes corrected.**
   - *Revision 5* guessed "space authority to License Server". The space authority is the Publisher; the License Server decides access for it. The question of wrapping space credentials, or issuing alongside them, falls away. The move from DPoP to HTTP Message Signatures, noted as unconfirmed in revision 5, is in the current proposal text.
-  - *The 2026-11-11 notes* named the check `checkUserAccess` (`space`, `user`, `access` → `{authorized}`). The published alpha still uses that name; Bluesky's integration branch renamed and reshaped it as above. They also said credentials are revocable early without saying by whom, and listed account linking as open.
+  - *The 2026-11-11 notes* named the check `checkUserAccess` (`space`, `user`, `access` → `{authorized}`). The alpha published on 2026-11-05 used that name; the proposal and the 2026-11-12 alpha use `checkAccess` as above. Those notes also said credentials are revocable early without saying by whom, and listed account linking as open.
+  - *The 2026-11-12 notes* treated a credential as admitting a reader. The proposal now says it admits an app, which decides for itself which of its users see the content (see above).
 - **Implementation status.** The reference implementation's License Server (Appendix B) is a managing app, answering both method names during the alpha. It links accounts as described above. Against Bluesky's spaces-alpha PDS run locally, it has been tested end to end:
   1. A Subject links their account through the PDS's sign-in page.
   2. The Publisher writes posts into a managed space.
   3. The space host consults the License Server before issuing a credential.
   4. An app reads the posts with that credential.
 
-  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. Account linking also works on the hosted demo with a real Bluesky account (2026-11-12). It has not run against a hosted space, because the alpha's hosted server is invite-only.
+  It refuses Subjects without an Entitlement and unlinked accounts, and stops issuing once an Entitlement ends. These tests run against the 2026-11-12 alpha. Account linking also works on the hosted demo with a real Bluesky account (2026-11-12). The demo doesn't yet show a multi-user app checking each user's entitlement. It has not run against a hosted space, because the alpha's hosted server is invite-only.
 
 Two v0.2 core decisions were made with ATProto in mind: Asset identifiers are defined as URIs, so a future profile can admit non-`https` ones once metadata exists for them (§5.2 requires `https` today), and `sub` is issuer-scoped rather than a DID, so a future profile can map either way.
 
@@ -1203,6 +1205,14 @@ Structural. v0.1 was 24 sections in one document. v0.2 is a core of 19 sections 
 - *Scope metadata (editor decision of 2026-11-05).* Besides per-URL metadata, a Publisher may publish one RFC 9728 document for a whole scope, found from a feed's channel-level Offer or the new `ope_scope` challenge parameter, on the Asset's own origin. Clients parse metadata as JSON whatever its `Content-Type`, so static hosts work (§5.6, §7.1, §13.2, Profile A).
 
 Known issue carried to revision 6: several gated Assets per feed item (an mp3 and an opus encoding, or an episode and its transcript).
+
+**Update during the comment period (2026-11-13).** Informative only. Follows the atproto spaces proposal and alpha revised on 2026-11-12, as announced in the comment issue (<https://github.com/shellen/open-portable-entitlement/issues/23#issuecomment-6839596851>):
+- the alpha now uses `checkAccess`, as the notes already described;
+- getting a credential is `authorizeSpaceSync`;
+- a new note says a space credential admits an app, not each reader, so a multi-user app must check each user's entitlement itself. It recommends an OPE License Token for the space's Asset for that check;
+- the privacy and client policy notes are revised to match, with the client attestation as the source of `clientId`.
+
+No requirement changes; Profile E stays deferred.
 
 **Update during the comment period (2026-11-12).** Informative only. It updates known out-of-date information in Profile E's notes, as announced in the comment issue (<https://github.com/shellen/open-portable-entitlement/issues/23#issuecomment-6814252569>):
 - the access check is now `checkAccess` (`space`, an optional `repo`, an optional `clientId` → `{read, write}`), and the published alpha's `checkUserAccess` is noted;
