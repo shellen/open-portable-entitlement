@@ -19,7 +19,7 @@ The published version is **v0.1**. **v0.2** (revision 5), a proposed revision th
 - **[Changelog](./CHANGELOG.md)**: what changed in each revision; Appendix C of the spec has the full record
 - **[Feed namespace for v0.2](https://feedspec.org/ope/ns/0.2/)**: the proposed `ope:` elements for RSS and Atom
 
-**Comment on v0.2** by opening an issue: what breaks for your product, what's unclear, what's missing. Appendix D of the draft lists the questions still open.
+**Comment on v0.2** until November 19, 2026, in [the comment issue](https://github.com/shellen/open-portable-entitlement/issues/23), or open an issue of your own: what breaks for your product, what's unclear, what's missing. Corrections and updates made during the comment period are announced there and recorded in Appendix C and the changelog. Appendix D of the draft lists the questions still open.
 
 Implementers of v0.1 should start with Appendix C of v0.2, which maps every v0.1 construct to its replacement. Which version `/ope/spec/` serves is set in `src/_data/spec.js`.
 
@@ -37,7 +37,23 @@ cd ope-eleventy-demo
 ./run-demo.sh
 ```
 
+## Repository layout
+
+```
+OPE-Specification.md   The v0.2 draft (the source of /ope/spec/0.2/ and /ope/spec/0.2.md)
+CHANGELOG.md           What changed in each revision, and during the comment period
+archive/               The v0.1 text
+profiles/              Supporting profile material: the v0.1 atproto draft and feed batch retrieval (both informative)
+src/                   The feedspec.org site: the OPE landing page, the spec pages, the feed
+                       namespace pages, the demo walkthrough (/ope/demo/), and an entitlement builder
+src/_data/spec.js      Renders each spec version, and sets which one /ope/spec/ serves
+tests/                 Playwright site and accessibility tests
+docs/                  Design notes for the site
+```
+
 ## Local Development
+
+You need Node.js 20 or later.
 
 ```bash
 npm install
@@ -60,15 +76,14 @@ Outputs to `_site/`.
 npm test
 ```
 
-Runs the Playwright site and accessibility tests against a local server.
+Runs the Playwright site and accessibility tests against a local server. On every push to `main`, GitHub Actions builds the site, runs the tests, and deploys it to GitHub Pages at feedspec.org.
 
 ## Contributing
 
 OPE is a working draft. Feedback, questions, and contributions are welcome:
 
-1. **Open an issue** to discuss ideas or report problems
-2. **Submit a pull request** for spec changes or site improvements
-3. **Start a discussion** in GitHub Discussions for broader topics
+1. **Open an issue** to discuss ideas or report problems. For a substantive change to the spec, include a scenario, the text being changed, and replacement text.
+2. **Submit a pull request** for spec changes or site improvements.
 
 The specification source is `OPE-Specification.md` (v0.2); the v0.1 text is in `archive/`, and supporting profile material is in `profiles/`. The site is built with [Eleventy](https://www.11ty.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
