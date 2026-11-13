@@ -149,6 +149,7 @@ appSteps:
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
             <li>The whole path, against Bluesky's own spaces-alpha server run locally. A reader signs in with their atproto account to link it. The space asks the License Server before issuing a credential. An app reads the posts with that credential.</li>
             <li>Credentials go only to linked readers with an active subscription. Each request must be signed by the space's owner.</li>
+            <li>A multi-user app syncs the space once, then shows the posts only to users with their own subscription, checked with an OPE License Token.</li>
           </ul>
         </div>
         <div>
@@ -156,7 +157,6 @@ appSteps:
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
             <li>A hosted space (the alpha is invite-only).</li>
             <li>Spaces in the demo's reader app.</li>
-            <li>An app serving many users checking each one's subscription. A space credential admits the app, not each reader.</li>
             <li>Cutting off a credential already issued: after a cancellation, it lasts until it expires (10 minutes).</li>
           </ul>
         </div>
