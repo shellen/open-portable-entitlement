@@ -240,15 +240,17 @@ test.describe("Spec Versions", () => {
 });
 
 test.describe("Demo walkthrough", () => {
-  test("shows both reading paths with their screenshots", async ({ page }) => {
+  test("shows the reading paths and the space app with their screenshots", async ({ page }) => {
     const broken = [];
     page.on("response", (r) => { if (r.url().includes("/ope/demo/img/") && r.status() !== 200) broken.push(r.url()); });
     await page.goto("/ope/demo/");
     await expect(page.locator("h1")).toContainText("Subscribe once");
     await expect(page.locator("#on-blog")).toBeVisible();
     await expect(page.locator("#in-app")).toBeVisible();
+    await expect(page.locator("#many-users")).toBeVisible();
+    await expect(page.locator("a[href$='/space-app/']").first()).toBeVisible();
     const images = page.locator("main img, img[src*='/ope/demo/img/']");
-    expect(await images.count()).toBe(9);
+    expect(await images.count()).toBe(12);
     for (const img of await images.all()) {
       await img.scrollIntoViewIfNeeded();
       await expect.poll(() => img.evaluate((el) => el.complete && el.naturalWidth > 0)).toBe(true);

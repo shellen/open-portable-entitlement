@@ -7,8 +7,9 @@ demo:
   reader: https://ope-demo.jason-e0e.workers.dev/reader/
   ls: https://ope-license-server.jason-e0e.workers.dev
   atproto: https://ope-demo.jason-e0e.workers.dev/atproto/
+  spaceApp: https://ope-demo.jason-e0e.workers.dev/space-app/
   repo: https://github.com/shellen/ope-eleventy-demo
-  captured: November 11, 2026
+  captured: November 11 and 13, 2026
 blogSteps:
   - img: a1-blog-preview
     alt: "A subscriber-only post on the demo blog: the opening paragraph, a word count, and a 'Subscribe and read here' button."
@@ -54,8 +55,24 @@ appSteps:
     title: A copied token is useless
     see: The Under the hood panel lists every request in plain language. Its copied-token test is refused twice.
     why: Each request carries a fresh proof signed by the app's key (DPoP). A token copied from logs or a screenshot fails that check.
+spaceSteps:
+  - img: d1-space-app-ada
+    alt: "The space app viewing as Ada, who is subscribed: the three synced subscriber-only posts. The sidebar shows the app holds 3 posts, synced for Ada, and lists Ada, Bobby, and Carol."
+    title: The app syncs once, for one subscriber
+    see: Ada connects a subscription at the License Server, and the app syncs the posts for Ada, who sees all three.
+    why: The app syncs a space once for all its users, acting for one subscriber. The space admits the app on that subscriber's behalf.
+  - img: d2-space-app-bobby
+    alt: "The space app viewing as Bobby: a card saying Bobby can't read this space, and that the app holds 3 posts it won't show without a License Token for Bobby."
+    title: Another user of the same app stays locked out
+    see: Bobby uses the same app but didn't subscribe. The app already holds the posts, and still doesn't show them to Bobby.
+    why: Admitting the app doesn't admit every user. The app shows a user the posts only while it holds a License Token for that user.
+  - img: d3-space-app-carol
+    alt: "The space app viewing as Carol after cancelling: locked, with the License Server's refusal to renew Carol's token. Ada is still subscribed in the sidebar."
+    title: A cancellation locks only that user
+    see: Carol subscribed, then cancelled at the License Server. When the app checks again, Carol's view locks. Ada still reads.
+    why: The app re-checks a user by renewing their token. After the cancellation, the License Server refuses to renew Carol's token.
 ---
-{# ABOUTME: The OPE demo walkthrough: screenshots of the live v0.2 demo, subscribing on the blog and in a reader app. #}
+{# ABOUTME: The OPE demo walkthrough: screenshots of the live v0.2 demo, on the blog, in a reader app, and in the space app. #}
 {# ABOUTME: Links to the live demo sites and the demo's source; the specification remains authoritative. #}
 
 {% macro step(s, n) %}
@@ -85,6 +102,7 @@ appSteps:
     <div class="mt-8 flex flex-wrap gap-3">
       <a href="{{ demo.post }}" class="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-emerald-400 no-underline transition-colors">Try it on the blog</a>
       <a href="{{ demo.reader }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">Open the reader app</a>
+      <a href="{{ demo.spaceApp }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">Open the space app</a>
       <a href="{{ demo.repo }}" class="rounded-full px-4 py-2 text-sm font-semibold text-zinc-600 ring-1 ring-inset ring-zinc-900/10 hover:text-zinc-900 hover:ring-zinc-900/20 no-underline transition-colors">Source on GitHub</a>
     </div>
 
@@ -137,25 +155,36 @@ appSteps:
   </div>
 </section>
 
+<section class="pb-20" aria-labelledby="many-users">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <h2 id="many-users" class="text-2xl font-semibold tracking-tight text-zinc-900">One app, many users: subscriber-only posts on atproto</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">In atproto spaces, now in alpha, a space admits an <em>app</em>, not each reader. An app that serves many people syncs a space once, then has to decide which of its users see it. The <a href="{{ demo.spaceApp }}" class="text-emerald-700 underline">space app</a> decides with OPE. The page plays the app and its users at once.</p>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">On the hosted demo, the space is a stand-in: Bluesky's spaces alpha is invite-only, so the app syncs the blog's subscriber-only posts. Run locally, the same app syncs a real space on Bluesky's alpha server, where the License Server decides who the space admits.</p>
+    <ol class="mt-8 grid gap-6 list-none p-0">
+      {% for s in spaceSteps %}{{ step(s, loop.index + blogSteps.length + appSteps.length) }}{% endfor %}
+    </ol>
+  </div>
+</section>
+
 <section class="pb-20" aria-labelledby="atproto">
   <div class="max-w-5xl mx-auto px-6 lg:px-8">
     <div class="rounded-2xl bg-white p-6 sm:p-8 ring-1 ring-zinc-900/5">
       <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-900/10">Prototype</span>
       <h2 id="atproto" class="mt-4 text-xl font-semibold tracking-tight text-zinc-900">Subscriber-only posts on atproto</h2>
-      <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">atproto spaces, now in alpha, let a space hand each "may this account read?" decision to an outside service. The demo's License Server can be that service, answering from the same subscription. See the <a href="{{ '/ope/spec/0.2/' | url }}#e-atproto-profile-deferred" class="text-emerald-700 underline">Profile E notes</a> and <a href="{{ demo.atproto }}" class="text-emerald-700 underline">the demo's atproto page</a>.</p>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">atproto spaces, now in alpha, let a space hand each "may this account read?" decision to an outside service. The demo's License Server can be that service, answering from the same subscription. See the <a href="{{ '/ope/spec/0.2/' | url }}#e-atproto-profile-deferred" class="text-emerald-700 underline">Profile E notes</a> and <a href="{{ demo.atproto }}" class="text-emerald-700 underline">the demo's atproto page</a>. The space app above is the part you can try on the hosted demo.</p>
       <div class="mt-6 grid gap-6 sm:grid-cols-2">
         <div>
           <p class="text-sm font-semibold text-zinc-900">Works</p>
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
             <li>The whole path, against Bluesky's own spaces-alpha server run locally. A reader signs in with their atproto account to link it. The space asks the License Server before issuing a credential. An app reads the posts with that credential.</li>
             <li>Credentials go only to linked readers with an active subscription. Each request must be signed by the space's owner.</li>
-            <li>A multi-user app syncs the space once, then shows the posts only to users with their own subscription, checked with an OPE License Token.</li>
+            <li>A multi-user app syncs the space once, then shows the posts only to users with their own subscription, checked with an OPE License Token. You can <a href="{{ demo.spaceApp }}" class="text-emerald-700 underline">open it</a>; on the hosted demo the space is a stand-in.</li>
           </ul>
         </div>
         <div>
           <p class="text-sm font-semibold text-zinc-900">Not yet</p>
           <ul class="mt-2 space-y-1.5 text-sm leading-6 text-zinc-600 list-disc pl-5">
-            <li>A hosted space (the alpha is invite-only).</li>
+            <li>A hosted space (the alpha is invite-only), so the live space app uses a stand-in.</li>
             <li>Spaces in the demo's reader app.</li>
             <li>Cutting off a credential already issued: after a cancellation, it lasts until it expires (10 minutes).</li>
           </ul>
